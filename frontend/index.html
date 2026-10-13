@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>PromoMind AI — Intelligent Retail Demand Forecasting & Multi-Brand Optimization</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600;700&family=Roboto:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body class="light-theme">
+
+  <!-- =========================================================================
+       APP SHELL: TOP BAR
+       ========================================================================= -->
+  <header class="app-topbar">
+    <div class="topbar-brand">
+      <div class="brand-logo-mark">
+        <span class="g-blue">P</span><span class="g-red">r</span><span class="g-yellow">o</span><span class="g-blue">m</span><span class="g-green">o</span><span class="g-red">M</span><span class="g-yellow">i</span><span class="g-green">n</span><span class="g-blue">d</span>
+      </div>
+      <div class="brand-text">
+        <div class="brand-title">PromoMind AI <span class="app-badge">v2.5 Mobile/Cloud</span></div>
+        <div class="brand-subtitle" id="topbarSubtitle">Smart Demand Forecasting & Multi-Brand Retailer OS</div>
+      </div>
+    </div>
+
+    <!-- Center/Right Quick Pills -->
+    <div class="topbar-actions">
+      <!-- Store & Regional Profile Quick Chip -->
+      <div class="store-profile-chip" onclick="switchScreen('profile')" title="View or edit Store Profile & Regional Location">
+        <span class="chip-icon">🏪</span>
+        <div class="chip-details">
+          <div class="chip-title" id="topStoreName">Sharma Supermarket</div>
+          <div class="chip-sub" id="topStoreLocation">Bengaluru • Karnataka</div>
+        </div>
+        <span class="chip-arrow">›</span>
+      </div>
+
+      <!-- Problem Statement Whitepaper Link -->
+      <a href="/problem-statement" target="_blank" class="icon-btn" title="View Problem Statement, Retail Solution & Impact Whitepaper" style="text-decoration:none;font-size:13px;font-weight:600;width:auto;padding:0 12px;gap:6px;">
+        💡 Whitepaper
+      </a>
+
+      <!-- Theme Switcher -->
+      <button class="icon-btn theme-btn" onclick="toggleTheme()" id="themeToggleBtn" title="Toggle Light / Dark Mode">
+        🌙
+      </button>
+    </div>
+  </header>
+
+  <!-- =========================================================================
+       APP NAVIGATION (Desktop Top Tab Bar / Mobile Bottom Bar)
+       ========================================================================= -->
+  <nav class="app-navbar" id="appNavbar">
+    <button class="nav-item active" id="nav-inventory" onclick="switchScreen('inventory')">
+      <span class="nav-icon">📦</span>
+      <span class="nav-label">Stock & Brands</span>
+    </button>
+    <button class="nav-item" id="nav-promos" onclick="switchScreen('promos')">
+      <span class="nav-icon">⚡</span>
+      <span class="nav-label">Promo Generator</span>
+    </button>
+    <button class="nav-item" id="nav-calendar" onclick="switchScreen('calendar')">
+      <span class="nav-icon">📅</span>
+      <span class="nav-label">Regional Festivals</span>
+      <span class="badge-dot" id="calendarAlertDot"></span>
+    </button>
+    <button class="nav-item" id="nav-upload" onclick="switchScreen('upload')">
+      <span class="nav-icon">📁</span>
+      <span class="nav-label">CSV & AI Sync</span>
+    </button>
+    <button class="nav-item" id="nav-profile" onclick="switchScreen('profile')">
+      <span class="nav-icon">🏪</span>
+      <span class="nav-label">Store Profile</span>
+    </button>
+  </nav>
+
+  <!-- =========================================================================
+       ACTIVE FESTIVE ALERT STRIP (Sub-header)
+       ========================================================================= -->
+  <div class="festive-ticker-bar" id="festiveTickerBar">
+    <div class="ticker-content">
+      <span class="ticker-fire">🪔</span>
+      <span class="ticker-title">Active Regional Season:</span>
+      <span class="ticker-event-name" id="tickerEventName">Diwali / Deepavali (South India)</span>
+      <span class="ticker-divider">•</span>
+      <span class="ticker-surge">Clay Deepas/Diyas & Cow Ghee Demand: <strong>+85% to +140%</strong></span>
+      <span class="ticker-action" onclick="switchScreen('calendar')">View Calendar & Conflicts ›</span>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MAIN APP SCREENS CONTAINER
+       ========================================================================= -->
+  <main class="app-main-content">
+
+    <!-- =======================================================================
+         SCREEN 1: 📦 STOCK & INVENTORY PROFILE WITH MULTI-BRAND SALES GRAPH
+         ======================================================================= -->
+    <section class="app-screen active" id="screen-inventory">
+      <!-- Screen Header with Metrics -->
+      <div class="screen-header">
+        <div>
+          <h2>Retail Inventory & Multi-Brand Curves</h2>
+          <p class="section-desc">Track stock health, Holt-Winters demand velocity, and compare multi-brand sales on the exact same graph.</p>
+        </div>
+        <div class="screen-header-actions">
+          <button class="btn btn-secondary" onclick="openAddProductModal()">
+            <span>➕</span> Add SKU
+          </button>
+          <button class="btn btn-primary" onclick="switchScreen('upload')">
+            <span>📥</span> Import CSV
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Inventory KPI Stats -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-icon icon-blue">📦</div>
+          <div class="kpi-data">
+            <span class="kpi-value" id="kpiTotalSKUs">--</span>
+            <span class="kpi-label">Active SKUs</span>
+          </div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon icon-green">💰</div>
+          <div class="kpi-data">
+            <span class="kpi-value" id="kpiStockValuation">₹--</span>
+            <span class="kpi-label">Inventory Valuation</span>
+          </div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon icon-yellow">⚡</div>
+          <div class="kpi-data">
+            <span class="kpi-value" id="kpiFastMovers">--</span>
+            <span class="kpi-label">High Velocity Anchors</span>
+          </div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon icon-red">⚠️</div>
+          <div class="kpi-data">
+            <span class="kpi-value" id="kpiStockoutAlerts">--</span>
+            <span class="kpi-label">Festive Stockout Warnings</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Search, Category & Filter Bar -->
+      <div class="filter-toolbar">
+        <div class="search-input-wrapper">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="inventorySearch" placeholder="Search product name, category, or SKU..." oninput="filterInventory()">
+        </div>
+        <div class="category-pills" id="categoryPillList">
+          <button class="pill-btn active" onclick="setCategoryFilter('ALL', this)">All Items</button>
+          <button class="pill-btn" onclick="setCategoryFilter('Dairy', this)">Dairy & Ghee</button>
+          <button class="pill-btn" onclick="setCategoryFilter('Beverages', this)">Beverages</button>
+          <button class="pill-btn" onclick="setCategoryFilter('Snacks', this)">Biscuits & Snacks</button>
+          <button class="pill-btn" onclick="setCategoryFilter('Staples & Oils', this)">Staples & Oils</button>
+          <button class="pill-btn" onclick="setCategoryFilter('Dry Fruits', this)">Dry Fruits</button>
+          <button class="pill-btn" onclick="setCategoryFilter('Puja & Festive', this)">Puja & Deepas</button>
+        </div>
+      </div>
+
+      <!-- Inventory Items List / Table -->
+      <div class="inventory-table-container">
+        <table class="app-table">
+          <thead>
+            <tr>
+              <th>Product / SKU</th>
+              <th>Category</th>
+              <th>Stock Status</th>
+              <th>Cost / MRP</th>
+              <th>Margin</th>
+              <th>Weekly Velocity</th>
+              <th>AI Restock Verdict</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="inventoryTableBody">
+            <tr>
+              <td colspan="8" class="loading-td">
+                <div class="loader-spinner"></div> Loading retail inventory...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         SCREEN 2: ⚡ PROMO GENERATOR (CAMPAIGN & BUNDLE ENGINE)
+         ======================================================================= -->
+    <section class="app-screen" id="screen-promos">
+      <div class="screen-header">
+        <div>
+          <h2>Smart Promotional Bundle & Copy Generator</h2>
+          <p class="section-desc">Generate AI-optimized product bundles using Apriori co-purchase probability, Holt's demand surge, and conflict prevention.</p>
+        </div>
+        <div class="screen-header-actions">
+          <button class="btn btn-secondary" onclick="resetPromoForm()">
+            <span>🔄</span> Reset Form
+          </button>
+        </div>
+      </div>
+
+      <!-- Conflict Pre-Check Alert Banner (Dynamic) -->
+      <div class="conflict-alert-banner hidden" id="promoConflictAlertBanner">
+        <div class="conflict-alert-icon">⚠️</div>
+        <div class="conflict-alert-text">
+          <strong id="promoConflictTitle">Active Campaign Conflict Detected!</strong>
+          <p id="promoConflictMessage">This product is already part of an active promotion. Overlapping discounts may erode retailer margins.</p>
+        </div>
+        <button class="btn btn-sm btn-outline-danger" onclick="switchScreen('calendar')">View Active Offers</button>
+      </div>
+
+      <div class="promo-generator-layout">
+        <!-- Generator Controls Card -->
+        <div class="generator-controls-card">
+          <div class="card-header">
+            <h3>1. Campaign Parameters & Goal</h3>
+            <span class="step-badge">Step 1</span>
+          </div>
+
+          <!-- Goal Quick Presets -->
+          <div class="form-group">
+            <label class="form-label">Promotional Objective:</label>
+            <div class="goal-presets-grid">
+              <button class="goal-btn active" onclick="selectGoalPreset('diwali_festive', this)">
+                <span class="goal-icon">🪔</span>
+                <div>
+                  <div class="goal-title">Diwali Festive Saver</div>
+                  <div class="goal-sub">+75% lift on Ghee & Sweets</div>
+                </div>
+              </button>
+              <button class="goal-btn" onclick="selectGoalPreset('clear_slow', this)">
+                <span class="goal-icon">🏷️</span>
+                <div>
+                  <div class="goal-title">Clear Slow Movers</div>
+                  <div class="goal-sub">BOGO Overstock Rescue</div>
+                </div>
+              </button>
+              <button class="goal-btn" onclick="selectGoalPreset('high_margin', this)">
+                <span class="goal-icon">💰</span>
+                <div>
+                  <div class="goal-title">High Margin Basket</div>
+                  <div class="goal-sub">Smart Pair high profit items</div>
+                </div>
+              </button>
+              <button class="goal-btn" onclick="selectGoalPreset('weekend_rush', this)">
+                <span class="goal-icon">⚡</span>
+                <div>
+                  <div class="goal-title">Weekend Kirana Rush</div>
+                  <div class="goal-sub">Quick 48h stock turnover</div>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          <!-- Product Pair Selector -->
+          <div class="form-row-2">
+            <div class="form-group">
+              <label class="form-label" for="promoAnchorSelect">
+                Primary Anchor Product:
+                <span class="help-text">(High velocity or festive driver)</span>
+              </label>
+              <select id="promoAnchorSelect" class="form-select" onchange="onAnchorProductSelected(this.value)">
+                <option value="">Loading store inventory...</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="promoAttachedSelect">
+                Smart Co-Purchase Partner:
+                <span class="help-text" id="smartPairProbLabel">(Apriori Probability)</span>
+              </label>
+              <select id="promoAttachedSelect" class="form-select" onchange="checkConflictForSelectedProducts()">
+                <option value="">Select Anchor first...</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Format, Event & Margin Sliders -->
+          <div class="form-row-3">
+            <div class="form-group">
+              <label class="form-label" for="promoOfferType">Offer Structure:</label>
+              <select id="promoOfferType" class="form-select">
+                <option value="COMBO_DISCOUNT">Special Bundle Discount (15-20% Off)</option>
+                <option value="BOGO">Buy 1 Get 1 (BOGO Clearance)</option>
+                <option value="FLAT_DISCOUNT">Flat Festival Price Cut</option>
+                <option value="GIFT_HAMPER">Festive Gift Hamper Box</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="promoEventSelect">Festive / Seasonal Theme:</label>
+              <select id="promoEventSelect" class="form-select">
+                <option value="Diwali Maha Utsav (Big Billion Days Edition)">🪔 Diwali Maha Utsav (Peak)</option>
+                <option value="Ayudha Puja & Vijayadashami Special">🌾 Ayudha Puja Special</option>
+                <option value="Monsoon Warmth Refresh">🌧️ Monsoon Refresh Bonanza</option>
+                <option value="Super Weekend Kirana Rush">⚡ Super Weekend Kirana Rush</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">
+                Target Margin Floor:
+                <span class="margin-badge" id="marginDisplayBadge">18%</span>
+              </label>
+              <input type="range" id="promoMarginSlider" min="10" max="30" value="18" step="1" oninput="document.getElementById('marginDisplayBadge').innerText = this.value + '%'">
+            </div>
+          </div>
+
+          <!-- Prompt Customization -->
+          <div class="form-group">
+            <label class="form-label" for="promoPromptInput">Retail Strategy Prompt / Custom Instructions:</label>
+            <textarea id="promoPromptInput" class="form-textarea" rows="2" placeholder="e.g., Create a festival combo using my slow-moving biscuits and fast-selling tea for Diwali with WhatsApp broadcast copy..."></textarea>
+          </div>
+
+          <!-- Action Button -->
+          <button class="btn btn-primary btn-block btn-lg" id="generatePlanBtn" onclick="generatePromotionPlan()">
+            <span class="btn-spinner hidden" id="generateSpinner"></span>
+            <span>✨ Generate AI Promotional Plan & Omnichannel Copy</span>
+          </button>
+        </div>
+
+        <!-- Generated Plan & Omnichannel Preview Card -->
+        <div class="generator-preview-card" id="promoOutputCard">
+          <div class="empty-preview-placeholder" id="emptyPromoPlaceholder">
+            <div class="placeholder-icon">💡</div>
+            <h3>No Campaign Generated Yet</h3>
+            <p>Select your anchor product and goal above, then click <strong>Generate AI Promotional Plan</strong> to view margin calculations, Gemini copy, and print-ready creatives.</p>
+          </div>
+
+          <div class="plan-result-container hidden" id="planResultContainer">
+            <!-- Plan Header & Economics -->
+            <div class="plan-header-box">
+              <div class="plan-title-row">
+                <div>
+                  <span class="plan-theme-tag" id="planThemeTag">Diwali Maha Utsav</span>
+                  <h3 class="plan-title" id="planTitle">Festive Kirana Bundle</h3>
+                </div>
+                <div class="margin-health-badge" id="planMarginBadge">20.4% Net Margin</div>
+              </div>
+
+              <!-- Price Breakdown Cards -->
+              <div class="pricing-cards-grid">
+                <div class="price-pill">
+                  <span class="p-label">Combined MRP</span>
+                  <span class="p-value strike" id="planOriginalPrice">₹--</span>
+                </div>
+                <div class="price-pill highlight">
+                  <span class="p-label">Offer Bundle Price</span>
+                  <span class="p-value" id="planOfferPrice">₹--</span>
+                </div>
+                <div class="price-pill savings">
+                  <span class="p-label">Customer Saves</span>
+                  <span class="p-value" id="planSavings">₹-- (18%)</span>
+                </div>
+                <div class="price-pill">
+                  <span class="p-label">Combined Cost</span>
+                  <span class="p-value" id="planTotalCost">₹--</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- AI Retail Strategy Pitch -->
+            <div class="ai-rationale-box">
+              <div class="rationale-header">
+                <span>🤖</span>
+                <strong>Gemini Retail Strategy & ROI Projection:</strong>
+              </div>
+              <p id="planRationaleText">Calculating optimal retail pricing...</p>
+            </div>
+
+            <!-- Omnichannel Marketing Collateral Tabs -->
+            <div class="collateral-tabs-container">
+              <div class="collateral-tab-nav">
+                <button class="c-tab-btn active" onclick="switchCollateralTab('whatsapp', this)">
+                  <span>💬</span> WhatsApp Broadcast
+                </button>
+                <button class="c-tab-btn" onclick="switchCollateralTab('poster', this)">
+                  <span>🖼️</span> In-Store Poster
+                </button>
+              </div>
+
+              <!-- WhatsApp Chat Preview -->
+              <div class="c-tab-panel active" id="cTabWhatsapp">
+                <div class="whatsapp-mock-phone">
+                  <div class="whatsapp-chat-header">
+                    <div class="wa-avatar">🏪</div>
+                    <div class="wa-contact">
+                      <div class="wa-name" id="waStoreNamePreview">Sharma Supermarket</div>
+                      <div class="wa-sub">Broadcast to 1,420 Customers</div>
+                    </div>
+                  </div>
+                  <div class="whatsapp-bubble">
+                    <p class="wa-text" id="waMessageText">Generating customer broadcast message...</p>
+                    <span class="wa-time">Just now ✓✓</span>
+                  </div>
+                </div>
+                <div class="wa-actions-row">
+                  <button class="btn btn-secondary" onclick="copyWhatsAppMessage()">
+                    <span>📋</span> Copy WhatsApp Text
+                  </button>
+                  <a class="btn btn-success" id="openWhatsAppLink" href="#" target="_blank">
+                    <span>📲</span> Share on WhatsApp
+                  </a>
+                </div>
+              </div>
+
+              <!-- In-Store Visual Poster Preview -->
+              <div class="c-tab-panel" id="cTabPoster">
+                <div class="store-poster-card" id="storePosterCard">
+                  <div class="poster-badge" id="posterEventBadge">DIWALI MAHA UTSAV</div>
+                  <h2 class="poster-title" id="posterComboTitle">FESTIVE MEGA COMBO</h2>
+                  <div class="poster-bundle-items" id="posterBundleItems">Tea + Biscuits</div>
+                  <div class="poster-pricing">
+                    <span class="poster-mrp strike" id="posterMRP">MRP ₹470</span>
+                    <span class="poster-deal" id="posterDealPrice">₹389</span>
+                  </div>
+                  <div class="poster-savings" id="posterSavings">YOU SAVE ₹81 (17% OFF)</div>
+                  <div class="poster-footer">
+                    <span id="posterStoreLoc">Sharma Supermarket, Bengaluru</span>
+                    <span class="poster-barcode">|||||| ||| |||||||</span>
+                  </div>
+                </div>
+                <div class="poster-actions-row">
+                  <button class="btn btn-secondary" onclick="window.print()">
+                    <span>🖨️</span> Print Poster
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Activation Action Button -->
+            <div class="plan-dispatch-row">
+              <button class="btn btn-success btn-lg btn-block" onclick="activateCurrentOffer()">
+                <span>🚀</span> Schedule & Activate Offer in Calendar
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         SCREEN 3: 📅 REGIONAL FESTIVAL CALENDAR & CONFLICT TRACKER
+         ======================================================================= -->
+    <section class="app-screen" id="screen-calendar">
+      <div class="screen-header">
+        <div>
+          <h2>Regional Festival Calendar & Conflict Tracker</h2>
+          <p class="section-desc">Track local festive demand surges (e.g. Deepavali requiring Deepas/Diyas and Cow Ghee) and prevent promotional offer collisions.</p>
+        </div>
+        <div class="screen-header-actions">
+          <div class="region-select-wrapper">
+            <label for="calendarRegionSelect">Active Store Region:</label>
+            <select id="calendarRegionSelect" class="form-select" onchange="onRegionChanged(this.value)">
+              <option value="Karnataka & South India" selected>Karnataka & South India</option>
+              <option value="Maharashtra & West India">Maharashtra & West India</option>
+              <option value="Delhi-NCR & North India">Delhi-NCR & North India</option>
+              <option value="West Bengal & East India">West Bengal & East India</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Regional Demand Intelligence Banner -->
+      <div class="regional-intel-card">
+        <div class="intel-header">
+          <span class="intel-pin">📍</span>
+          <div>
+            <h3>Regional Demand Rules for <span id="intelRegionName">Karnataka & South India</span></h3>
+            <p>Festive demand in retail is heavily localized. Demand for specific SKUs fluctuates dramatically by calendar dates.</p>
+          </div>
+        </div>
+        <div class="intel-facts-grid">
+          <div class="intel-fact-item">
+            <span class="fact-icon">🪔</span>
+            <div>
+              <strong>Deepavali / Karthika Deepotsava:</strong>
+              <p>Demand for <strong>Clay Deepas / Diyas, Pure Cow Ghee, and Cotton Wicks</strong> spikes by <strong>+140%</strong>. For non-festival months, Clay Deepa demand is near zero (&lt;5 units/month).</p>
+            </div>
+          </div>
+          <div class="intel-fact-item">
+            <span class="fact-icon">🌾</span>
+            <div>
+              <strong>Ayudha Puja & Vijayadashami:</strong>
+              <p>Requires localized stock of <strong>Ash Gourd (Kumbalakai), Puffed Rice (Pori), Lemons, and Jaggery (Bella)</strong> (+60% surge for 3 days).</p>
+            </div>
+          </div>
+          <div class="intel-fact-item">
+            <span class="fact-icon">🛡️</span>
+            <div>
+              <strong>Offer Conflict Prevention:</strong>
+              <p>Running simultaneous discounts on the same SKU causes retailer margin dilution. PromoMind AI flags overlapping dates before promotions go live.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Two-Column Layout: Festivals on Left, Active Offers & Conflict Checker on Right -->
+      <div class="calendar-layout-grid">
+        <!-- Upcoming Regional Festivals Column -->
+        <div class="festivals-column">
+          <div class="column-header">
+            <h3>Upcoming Regional Festivals & Spikes</h3>
+            <span class="badge-count" id="festivalCountBadge">3 Events</span>
+          </div>
+
+          <div class="festival-cards-list" id="festivalCardsList">
+            <!-- Dynamic Festival Cards -->
+            <div class="loader-spinner"></div> Loading regional calendar...
+          </div>
+        </div>
+
+        <!-- Scheduled Offers & Conflict Management Column -->
+        <div class="offers-column">
+          <div class="column-header">
+            <h3>Active & Scheduled Store Offers</h3>
+            <span class="badge-count" id="activeOffersCountBadge">2 Active</span>
+          </div>
+
+          <!-- Active Offers List -->
+          <div class="scheduled-offers-list" id="scheduledOffersList">
+            <!-- Dynamic Scheduled Offers -->
+            <div class="loader-spinner"></div> Loading active offers...
+          </div>
+
+          <!-- Interactive Conflict Check Sandbox -->
+          <div class="conflict-checker-sandbox">
+            <div class="sandbox-header">
+              <span class="sandbox-icon">🔍</span>
+              <h4>Test New Proposed Offer for Conflicts</h4>
+            </div>
+            <p class="sandbox-desc">Simulate a prospective offer to check if it overlaps with an active promotion on the same SKU.</p>
+            
+            <div class="sandbox-form">
+              <div class="form-group">
+                <label class="form-label" for="conflictTestSKU">Check SKU:</label>
+                <select id="conflictTestSKU" class="form-select">
+                  <option value="">Select SKU...</option>
+                </select>
+              </div>
+
+              <div class="form-row-2">
+                <div class="form-group">
+                  <label class="form-label" for="conflictTestDiscount">Proposed Discount %:</label>
+                  <input type="number" id="conflictTestDiscount" class="form-input" value="20" min="5" max="50">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Simulation Window:</label>
+                  <input type="text" class="form-input" value="Oct 20 - Oct 30, 2026" readonly>
+                </div>
+              </div>
+
+              <button class="btn btn-secondary btn-block" onclick="runSandboxConflictCheck()">
+                <span>🛡️</span> Check for Overlap & Cannibalization
+              </button>
+
+              <div class="sandbox-result hidden" id="sandboxResultBox">
+                <!-- Sandbox Result -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         SCREEN 4: 📁 DATA IMPORT & AI MARKDOWN SYNC
+         ======================================================================= -->
+    <section class="app-screen" id="screen-upload">
+      <div class="screen-header">
+        <div>
+          <h2>Retail Data Intake & AI Knowledge Sync</h2>
+          <p class="section-desc">Upload distributor CSV or inventory files. PromoMind AI parses SKUs, executes Holt's demand forecasting, and compiles the AI Knowledge Base (<code>store_knowledge.md</code>).</p>
+        </div>
+        <div class="screen-header-actions">
+          <button class="btn btn-secondary" onclick="downloadSampleCSV()">
+            <span>📥</span> Download Sample CSV Template
+          </button>
+          <button class="btn btn-primary" onclick="syncKnowledgeMarkdown()">
+            <span>🔄</span> Sync Knowledge Base Now
+          </button>
+        </div>
+      </div>
+
+      <div class="upload-sync-layout">
+        <!-- CSV Upload Card -->
+        <div class="upload-box-card">
+          <div class="card-header">
+            <h3>1. Upload Inventory CSV Data</h3>
+            <span class="step-badge">Data Intake</span>
+          </div>
+
+          <!-- Drag and Drop Dropzone -->
+          <div class="drag-drop-zone" id="dropZone" onclick="document.getElementById('csvFileInput').click()">
+            <div class="drop-icon">📂</div>
+            <h4>Drag & Drop your Retail CSV here</h4>
+            <p>or click to browse from your computer</p>
+            <span class="file-spec">Supports .csv (Product ID, Name, Category, Brand, Stock, Cost, MRP, Sales)</span>
+            <input type="file" id="csvFileInput" accept=".csv" style="display: none;" onchange="handleFileSelected(this.files)">
+          </div>
+
+          <div class="upload-file-status hidden" id="selectedFileStatus">
+            <span class="file-name" id="selectedFileName">inventory.csv</span>
+            <button class="btn btn-sm btn-primary" onclick="submitUploadedCSV()">
+              <span>⚡</span> Process & Forecast
+            </button>
+          </div>
+
+          <!-- Or Paste Raw CSV -->
+          <div class="accordion-section">
+            <button class="accordion-toggle" onclick="toggleRawCSVAccordion()">
+              <span>📝</span> Or Paste Raw CSV Text
+              <span class="acc-arrow" id="accArrow">▾</span>
+            </button>
+            <div class="accordion-body hidden" id="accBody">
+              <textarea id="rawCsvText" class="form-textarea code-font" rows="6" placeholder="product_id,name,category,brand,stock_quantity,cost_price,selling_price,past_sales_weeks&#10;SKU_GHEE_99,Organic A2 Desi Cow Ghee,Dairy,Local Farm,50,480.0,620.0,15,18,22,25,28,34"></textarea>
+              <button class="btn btn-secondary btn-block mt-2" onclick="submitRawCSV()">
+                <span>⚡</span> Parse Raw Text & Update Knowledge
+              </button>
+            </div>
+          </div>
+
+          <!-- Import Log Result -->
+          <div class="import-log-box hidden" id="importLogBox">
+            <div class="log-title" id="importLogTitle">Import Succeeded</div>
+            <p id="importLogMsg">Successfully parsed 8 SKUs and updated time-series forecasts.</p>
+          </div>
+        </div>
+
+        <!-- AI Knowledge Base Markdown Viewer Card -->
+        <div class="knowledge-sync-card">
+          <div class="card-header">
+            <div>
+              <h3>2. AI Grounding Knowledge Base</h3>
+              <span class="file-badge">data/store_knowledge.md</span>
+            </div>
+            <button class="btn btn-sm btn-secondary" onclick="downloadMarkdownFile()">
+              <span>💾</span> Download .md
+            </button>
+          </div>
+          <p class="kb-desc">
+            This structured Markdown document is auto-generated by the system. Multi-agent models (Gemini Strategy, Inventory & Pricing) query this file to ground recommendations in real stock levels and historical demand.
+          </p>
+
+          <div class="markdown-preview-pane">
+            <pre class="md-code-block"><code id="knowledgeMdContent">Loading AI Knowledge Base markdown...</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         SCREEN 5: 🏪 STORE PROFILE & REGIONAL SETTINGS
+         ======================================================================= -->
+    <section class="app-screen" id="screen-profile">
+      <div class="screen-header">
+        <div>
+          <h2>Retailer Profile & Regional Settings</h2>
+          <p class="section-desc">Manage store identity, regional location, customer demographics, and appearance preferences.</p>
+        </div>
+        <div class="screen-header-actions">
+          <button class="btn btn-primary" onclick="saveStoreProfile()">
+            <span>💾</span> Save Changes
+          </button>
+        </div>
+      </div>
+
+      <div class="profile-layout-grid">
+        <!-- Store Information Card -->
+        <div class="profile-card">
+          <div class="card-header">
+            <h3>Store Identity & Contact</h3>
+            <span class="profile-badge">Active Business</span>
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label class="form-label" for="profStoreName">Store Name:</label>
+              <input type="text" id="profStoreName" class="form-input" value="Sharma Supermarket & Kirana">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="profOwnerName">Retailer Owner / Manager:</label>
+              <input type="text" id="profOwnerName" class="form-input" value="Ramesh Sharma">
+            </div>
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label class="form-label" for="profPhone">WhatsApp Business Number:</label>
+              <input type="text" id="profPhone" class="form-input" value="+91 98450 12345">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="profGSTIN">GSTIN / Trade License:</label>
+              <input type="text" id="profGSTIN" class="form-input" value="29AAAAA0000A1Z5">
+            </div>
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label class="form-label" for="profStoreType">Store Format:</label>
+              <select id="profStoreType" class="form-select">
+                <option value="Supermarket" selected>Supermarket / Self-Service Mart</option>
+                <option value="Kirana">Neighborhood Kirana Store</option>
+                <option value="Departmental">Departmental Grocery</option>
+                <option value="Organic">Organic & Gourmet Store</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="profAudienceSize">Active WhatsApp Customer List Size:</label>
+              <input type="number" id="profAudienceSize" class="form-input" value="1420">
+            </div>
+          </div>
+        </div>
+
+        <!-- Regional Location & Demographics -->
+        <div class="profile-card">
+          <div class="card-header">
+            <h3>Regional Demographics</h3>
+            <span class="profile-badge">Affects Demand Signals</span>
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label class="form-label" for="profStateRegion">State & Cultural Region:</label>
+              <select id="profStateRegion" class="form-select" onchange="onProfileRegionChanged(this.value)">
+                <option value="Karnataka & South India" selected>Karnataka & South India (Deepas, Ghee, Sweets)</option>
+                <option value="Maharashtra & West India">Maharashtra & West India (Ganesh, Modak, Diwali)</option>
+                <option value="Delhi-NCR & North India">Delhi-NCR & North India (Karwa Chauth, Diwali)</option>
+                <option value="West Bengal & East India">West Bengal & East India (Durga Puja, Sweets)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="profCity">City / District:</label>
+              <input type="text" id="profCity" class="form-input" value="Bengaluru">
+            </div>
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label class="form-label" for="profLocality">Locality / Area:</label>
+              <input type="text" id="profLocality" class="form-input" value="Koramangala 4th Block">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="profPin">Postal Pin Code:</label>
+              <input type="text" id="profPin" class="form-input" value="560034">
+            </div>
+          </div>
+        </div>
+
+        <!-- Appearance & Google Material Theme -->
+        <div class="profile-card">
+          <div class="card-header">
+            <h3>Theme & Display</h3>
+            <span class="profile-badge">Customization</span>
+          </div>
+
+          <div class="theme-selection-row">
+            <div class="theme-radio-box" onclick="setThemeMode('light')">
+              <input type="radio" name="themeSelector" id="themeRadioLight" checked>
+              <label for="themeRadioLight">
+                <strong>Google Material Light (Recommended)</strong>
+                <p>Clean white surface, Google blue accents, high-contrast typography.</p>
+              </label>
+            </div>
+            <div class="theme-radio-box" onclick="setThemeMode('dark')">
+              <input type="radio" name="themeSelector" id="themeRadioDark">
+              <label for="themeRadioDark">
+                <strong>Modern Dark Slate</strong>
+                <p>Reduced eye strain for night shifts and low ambient light counters.</p>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Store Health Summary Card -->
+        <div class="profile-card highlight-card">
+          <div class="card-header">
+            <h3>Store Health & Capital Allocation</h3>
+            <span class="profile-badge">Live System Metrics</span>
+          </div>
+
+          <div class="profile-metrics-list">
+            <div class="p-metric-row">
+              <span class="p-metric-label">Store Database Status:</span>
+              <span class="p-metric-val">🟢 Online & Persistent (JSON + Markdown)</span>
+            </div>
+            <div class="p-metric-row">
+              <span class="p-metric-label">Open-Source Forecasting Engine:</span>
+              <span class="p-metric-val">Holt-Winters Double Exponential Smoothing</span>
+            </div>
+            <div class="p-metric-row">
+              <span class="p-metric-label">Smart Pairing Algorithm:</span>
+              <span class="p-metric-val">Apriori Market Basket Probability (Support/Lift)</span>
+            </div>
+            <div class="p-metric-row">
+              <span class="p-metric-label">AI Agent Reasoning Grounding:</span>
+              <span class="p-metric-val">Grounding via <code>store_knowledge.md</code></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- =========================================================================
+       MULTI-BRAND COMPARATIVE SALES GRAPH MODAL
+       (Amul vs Nandini vs Mother Dairy on the exact same chart)
+       ========================================================================= -->
+  <div class="modal-backdrop hidden" id="brandModal" onclick="closeBrandModalOnBackdrop(event)">
+    <div class="modal-dialog brand-modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title-row">
+          <span class="modal-icon">📊</span>
+          <div>
+            <h3 id="brandModalTitle">Multi-Brand Sales Comparison</h3>
+            <p id="brandModalSubtitle">Compare competing brands in this category on the exact same graph</p>
+          </div>
+        </div>
+        <button class="modal-close-btn" onclick="closeBrandModal()">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- View Toggle Buttons: Single SKU vs All Category Brands -->
+        <div class="chart-view-toggle-bar">
+          <div class="view-toggle-pills">
+            <button class="toggle-pill active" id="btnViewAllBrands" onclick="setBrandChartView('ALL_BRANDS')">
+              📊 Compare All Category Brands (On Same Chart)
+            </button>
+            <button class="toggle-pill" id="btnViewSingleSKU" onclick="setBrandChartView('SINGLE_SKU')">
+              📈 Selected SKU Only
+            </button>
+          </div>
+          <div class="chart-legend-row" id="brandLegendRow">
+            <!-- Dynamic Brand Color Dots -->
+          </div>
+        </div>
+
+        <!-- Interactive SVG Chart Canvas -->
+        <div class="chart-canvas-box">
+          <svg id="brandSvgChart" class="brand-svg-chart" viewBox="0 0 760 300" preserveAspectRatio="none">
+            <!-- Rendered via JS -->
+          </svg>
+          <div class="chart-x-labels" id="brandChartXLabels">
+            <!-- W1, W2 ... W8 | Forecast F1, F2, F3, F4 -->
+          </div>
+        </div>
+
+        <!-- Multi-Brand Metrics Comparison Grid -->
+        <div class="brand-comparison-table-wrapper">
+          <h4>Category Brand Breakdown & Retail Profitability:</h4>
+          <table class="brand-metric-table">
+            <thead>
+              <tr>
+                <th>Brand Name</th>
+                <th>Selling MRP</th>
+                <th>Cost Price</th>
+                <th>Margin %</th>
+                <th>Weekly Turnover</th>
+                <th>Market Share</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="brandComparisonTableBody">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Strategic AI Recommendation Box -->
+        <div class="brand-strategy-box" id="brandStrategyBox">
+          <div class="strat-icon">💡</div>
+          <div>
+            <strong>AI Stocking & Brand Switch Recommendation:</strong>
+            <p id="brandStrategyText">Loading comparative recommendation...</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeBrandModal()">Close</button>
+        <button class="btn btn-primary" onclick="useProductInPromoFromModal()">
+          <span>⚡</span> Create Promo with this Product
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       ADD SKU MODAL
+       ========================================================================= -->
+  <div class="modal-backdrop hidden" id="addProductModal" onclick="closeAddProductModalOnBackdrop(event)">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title-row">
+          <span class="modal-icon">➕</span>
+          <div>
+            <h3>Add Retail SKU</h3>
+            <p>Runs open-source Holt's forecasting and updates AI knowledge base</p>
+          </div>
+        </div>
+        <button class="modal-close-btn" onclick="closeAddProductModal()">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <form id="addProductForm" onsubmit="submitNewProduct(event)">
+          <div class="form-group">
+            <label class="form-label" for="newProdName">Product Name & Variant:</label>
+            <input type="text" id="newProdName" class="form-input" placeholder="e.g., Aashirvaad Shudh Chakki Atta (5kg)" required>
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label class="form-label" for="newProdCategory">Category:</label>
+              <select id="newProdCategory" class="form-select">
+                <option value="Staples & Oils">Staples & Oils</option>
+                <option value="Dairy">Dairy</option>
+                <option value="Beverages">Beverages</option>
+                <option value="Snacks">Snacks & Biscuits</option>
+                <option value="Dry Fruits">Dry Fruits</option>
+                <option value="Puja & Festive">Puja & Festive</option>
+                <option value="Personal Care">Personal Care</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="newProdStock">Current Stock Quantity:</label>
+              <input type="number" id="newProdStock" class="form-input" min="1" value="50" required>
+            </div>
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label class="form-label" for="newProdCost">Retailer Cost Price (₹):</label>
+              <input type="number" id="newProdCost" class="form-input" step="0.5" value="180" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="newProdMRP">Selling MRP (₹):</label>
+              <input type="number" id="newProdMRP" class="form-input" step="0.5" value="230" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="newProdWeeklySales">Avg Weekly Sales (Units):</label>
+            <input type="number" id="newProdWeeklySales" class="form-input" value="25" min="1">
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="closeAddProductModal()">Cancel</button>
+            <button type="submit" class="btn btn-primary">Add SKU & Forecast</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

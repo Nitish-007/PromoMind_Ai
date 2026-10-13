@@ -1,0 +1,268 @@
+[
+  {
+    "id": "PROD_TEA_01",
+    "name": "Taj Mahal Premium Gold Tea (500g)",
+    "category": "Beverages",
+    "cost_price": 240.0,
+    "selling_price": 310.0,
+    "stock_quantity": 140,
+    "days_in_stock": 12,
+    "expiry_days": 360,
+    "velocity_status": "FAST_MOVING",
+    "weekly_sales_avg": 52,
+    "image_url": "tea.png",
+    "past_sales_weeks": [
+      42,
+      45,
+      48,
+      50,
+      52,
+      55
+    ],
+    "forecast_sales_weeks": [
+      58,
+      64,
+      72,
+      78
+    ],
+    "sell_through_verdict": "STRONG_INVEST_BUY",
+    "verdict_badge": "🟢 Strong Buy / Restock Now",
+    "days_inventory_remaining": 18,
+    "sell_through_rate_pct": 89.2,
+    "reorder_recommendation": "High Velocity Anchor (+35% monsoon/weekend surge): Current stock of 140 units will exhaust in ~18 days. Invest in a 50kg wholesale replenishment immediately to secure dealer discount.",
+    "brand_comparison_insight": "Taj Mahal dominates local chai consumption (74% brand retention in Indiranagar). While Brooke Bond Red Label offers ~2% higher retailer margins, Taj Mahal sells 35% faster. Do not switch away; retain as prime anchor.",
+    "alternative_brands": [
+      "Tata Tea Gold (500g) — 26% margin, +15% pull",
+      "Brooke Bond Red Label (500g) — 24% margin, steady volume",
+      "Wagh Bakri Premium (500g) — 28% margin, regional favorite"
+    ]
+  },
+  {
+    "id": "PROD_BISCUIT_01",
+    "name": "Britannia Good Day Butter Cookies (Pack of 6)",
+    "category": "Bakery & Snacks",
+    "cost_price": 110.0,
+    "selling_price": 160.0,
+    "stock_quantity": 195,
+    "days_in_stock": 48,
+    "expiry_days": 24,
+    "velocity_status": "SLOW_MOVING",
+    "weekly_sales_avg": 14,
+    "image_url": "biscuits.png",
+    "past_sales_weeks": [
+      24,
+      21,
+      18,
+      16,
+      14,
+      12
+    ],
+    "forecast_sales_weeks": [
+      11,
+      10,
+      8,
+      7
+    ],
+    "sell_through_verdict": "DO_NOT_REORDER",
+    "verdict_badge": "🛑 Do Not Reorder / Dead Stock Risk",
+    "days_inventory_remaining": 98,
+    "sell_through_rate_pct": 21.5,
+    "reorder_recommendation": "DO NOT COMMIT FRESH CAPITAL: 195 units sitting on shelves with only 24 days shelf life. Sales volume dropped 50% over the last 6 weeks. ₹21,450 in working capital is trapped. Clear via bundle promotion.",
+    "brand_comparison_insight": "Consumers are resisting the large ₹160 pack, opting for ₹10-₹30 single-serve pouches or Sunfeast Mom's Magic. Consider switching shelf space to Sunfeast Mom's Magic or Parle 20-20 which clear 2.8x faster.",
+    "alternative_brands": [
+      "Sunfeast Mom's Magic Butter (300g) — 34% margin, 2.5x turnover",
+      "Parle 20-20 Butter Cookies (Pack of 4) — 32% margin, lower ticket price",
+      "Unibic Butter Cookies (250g) — 38% margin, premium positioning"
+    ]
+  },
+  {
+    "id": "PROD_GHEE_01",
+    "name": "Amul Pure Cow Ghee Tin (1 Litre)",
+    "category": "Dairy & Oils",
+    "cost_price": 530.0,
+    "selling_price": 640.0,
+    "stock_quantity": 85,
+    "days_in_stock": 15,
+    "expiry_days": 270,
+    "velocity_status": "FAST_MOVING",
+    "weekly_sales_avg": 38,
+    "image_url": "ghee.png",
+    "past_sales_weeks": [
+      30,
+      32,
+      35,
+      36,
+      38,
+      42
+    ],
+    "forecast_sales_weeks": [
+      52,
+      65,
+      74,
+      82
+    ],
+    "sell_through_verdict": "STRONG_INVEST_BUY",
+    "verdict_badge": "🟢 Strong Buy / Festive Stockout Risk",
+    "days_inventory_remaining": 14,
+    "sell_through_rate_pct": 94.0,
+    "reorder_recommendation": "Critical Festive Surge (+75%): Stockout imminent in 14 days before peak Diwali sweet-making week. Allocate ₹45,000 to reorder 5 cartons immediately.",
+    "brand_comparison_insight": "Amul Cow Ghee has 82% consumer recall. Nandini Pure Ghee offers ₹18 cheaper distributor rate, but Amul guarantees zero unsold returns during festivals. Recommend holding 85% Amul and 15% Nandini.",
+    "alternative_brands": [
+      "Nandini Pure Cow Ghee (1L) — 19% margin, ₹20 cheaper",
+      "Mother Dairy Cow Ghee (1L) — 17.5% margin, stable demand",
+      "Aashirvaad Svasti Ghee (1L) — 21% margin, higher brand push"
+    ]
+  },
+  {
+    "id": "PROD_ALMOND_01",
+    "name": "Nutraj California Premium Almonds (500g)",
+    "category": "Dry Fruits",
+    "cost_price": 330.0,
+    "selling_price": 470.0,
+    "stock_quantity": 110,
+    "days_in_stock": 62,
+    "expiry_days": 180,
+    "velocity_status": "SLOW_MOVING",
+    "weekly_sales_avg": 11,
+    "image_url": "almonds.png",
+    "past_sales_weeks": [
+      14,
+      13,
+      12,
+      11,
+      11,
+      10
+    ],
+    "forecast_sales_weeks": [
+      12,
+      16,
+      22,
+      28
+    ],
+    "sell_through_verdict": "CAUTION_CHECK_BRANDS",
+    "verdict_badge": "🟡 Caution / Check Unbranded APMC",
+    "days_inventory_remaining": 70,
+    "sell_through_rate_pct": 30.0,
+    "reorder_recommendation": "Hold off on Nutraj branded reorders: 110 units will cover the next 70 days. Let the Diwali surge clear existing packs in bundles before restocking.",
+    "brand_comparison_insight": "Nutraj branded MRP of ₹470 meets consumer price resistance. Local APMC loose/pouch almonds sell for ₹390 with a 38% retailer margin vs Nutraj's 29.8%. Switching to local grade-A pouches yields higher net cash.",
+    "alternative_brands": [
+      "APMC Mandi Loose Grade-A Almonds (500g pouch) — 38% margin, ₹390 price",
+      "Happilo California Almonds (500g) — 31% margin, attractive tin pack",
+      "Tata Sampann California Almonds (500g) — 27% margin, high trust"
+    ]
+  },
+  {
+    "id": "PROD_OIL_01",
+    "name": "Fortune Sunlite Refined Sunflower Oil (1 Litre)",
+    "category": "Staples & Oils",
+    "cost_price": 125.0,
+    "selling_price": 148.0,
+    "stock_quantity": 220,
+    "days_in_stock": 8,
+    "expiry_days": 300,
+    "velocity_status": "FAST_MOVING",
+    "weekly_sales_avg": 95,
+    "image_url": "oil.png",
+    "past_sales_weeks": [
+      88,
+      90,
+      92,
+      94,
+      95,
+      98
+    ],
+    "forecast_sales_weeks": [
+      105,
+      115,
+      125,
+      130
+    ],
+    "sell_through_verdict": "STRONG_INVEST_BUY",
+    "verdict_badge": "🟢 Strong Buy / Core Fast Mover",
+    "days_inventory_remaining": 16,
+    "sell_through_rate_pct": 96.5,
+    "reorder_recommendation": "High Velocity Anchor: Sells 95+ pouches weekly. Capital turns over every 16 days. Restock 15 cartons to capture festive bulk frying demand.",
+    "brand_comparison_insight": "Fortune is the #1 household staple. However, Gemini and Sunpure are currently running a 'Buy 10 cartons get 1 free' trade scheme. Check with your local wholesaler to negotiate a matching rebate on Fortune.",
+    "alternative_brands": [
+      "Gemini Refined Sunflower Oil (1L) — 18% margin, trade scheme active",
+      "Sunpure Refined Sunflower Oil (1L) — 17.5% margin, popular in South India",
+      "Dhara Refined Sunflower Oil (1L) — 15% margin, standard"
+    ]
+  },
+  {
+    "id": "PROD_MASALA_01",
+    "name": "Everest Shahi Garam Masala (100g)",
+    "category": "Spices",
+    "cost_price": 58.0,
+    "selling_price": 88.0,
+    "stock_quantity": 90,
+    "days_in_stock": 55,
+    "expiry_days": 90,
+    "velocity_status": "SLOW_MOVING",
+    "weekly_sales_avg": 12,
+    "image_url": "masala.png",
+    "past_sales_weeks": [
+      15,
+      14,
+      13,
+      12,
+      12,
+      11
+    ],
+    "forecast_sales_weeks": [
+      12,
+      14,
+      15,
+      16
+    ],
+    "sell_through_verdict": "CAUTION_CHECK_BRANDS",
+    "verdict_badge": "🟡 Caution / Compare With MDH",
+    "days_inventory_remaining": 52,
+    "sell_through_rate_pct": 40.0,
+    "reorder_recommendation": "Maintain stock level: 90 packs in inventory are sufficient for 7+ weeks. Avoid tying up working capital until inventory drops below 30 units.",
+    "brand_comparison_insight": "In Indiranagar/Bengaluru kiranas, MDH Garam Masala records 1.6x higher repeat purchases than Everest. Everest offers 34% margin, but MDH generates higher cumulative rupee profits due to faster churn.",
+    "alternative_brands": [
+      "MDH Garam Masala (100g) — 31% margin, 1.6x faster churn",
+      "Catch Super Garam Masala (100g) — 33% margin, table-top sprinkler pack",
+      "Eastern Garam Masala (100g) — 36% margin, budget alternative"
+    ]
+  },
+  {
+    "id": "PROD_SWEET_01",
+    "name": "Haldiram's Gulab Jamun Traditional Tin (1kg)",
+    "category": "Sweets & Confectionery",
+    "cost_price": 190.0,
+    "selling_price": 260.0,
+    "stock_quantity": 120,
+    "days_in_stock": 10,
+    "expiry_days": 120,
+    "velocity_status": "FAST_MOVING",
+    "weekly_sales_avg": 45,
+    "image_url": "sweets.png",
+    "past_sales_weeks": [
+      35,
+      38,
+      40,
+      42,
+      45,
+      52
+    ],
+    "forecast_sales_weeks": [
+      65,
+      85,
+      98,
+      105
+    ],
+    "sell_through_verdict": "STRONG_INVEST_BUY",
+    "verdict_badge": "🟢 Strong Buy / Festive Peak (+110%)",
+    "days_inventory_remaining": 18,
+    "sell_through_rate_pct": 91.0,
+    "reorder_recommendation": "Massive Gifting Surge (+110%): 120 units will sell out before Diwali weekend. Reorder 10 cases today to avoid losing customers to modern retail.",
+    "brand_comparison_insight": "Haldiram's is the undisputed gifting gold standard. Bikaji offers 4% higher margins but lower gift appeal. Keep 80% Haldiram's on front display and 20% Bikaji for price-sensitive buyers.",
+    "alternative_brands": [
+      "Bikaji Traditional Gulab Jamun (1kg) — 31% margin, ₹30 lower MRP",
+      "Bikanervala Tin Sweets (1kg) — 28% margin, comparable brand",
+      "Gits Instant Gulab Jamun Mix (500g) — 35% margin, DIY segment"
+    ]
+  }
+]
