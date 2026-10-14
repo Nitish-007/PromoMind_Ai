@@ -1,9 +1,9 @@
 # 🏪 PromoMind AI — Retail Store Knowledge & Catalog Base
 > *Store Name*: **Test Bangalore Mart** | *Owner*: **Suresh Kumar**
-> *Cultural Region*: **Karnataka & South India** (Bengaluru, 560038)
-> *Store Format*: **Supermarket** | *WhatsApp Broadcast Reach*: **2500 Families**
+> *Cultural Region*: **Karnataka & South India** (Bengaluru, 560049)
+> *Store Format*: **Supermarket** | *WhatsApp Broadcast Reach*: **1420 Families**
 > *Working Capital Invested*: **₹371,520** | *Target Net Margin*: **16.5%**
-> *Storage Mode: **CLOUD** | Synchronized: 2026-10-14 16:50:24 UTC*
+> *Storage Mode: **CLOUD** | Synchronized: 2026-10-14 17:46:14 UTC*
 > *Auto-generated from retail inventory data & open-source demand forecasting engine.*
 
 ---
