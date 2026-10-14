@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { Plus, X, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { CustomSelect } from "@/components/ui/custom-select";
 
 const CATEGORIES = [
   "Staples & Oils",
@@ -87,17 +88,12 @@ export function AddProductModal({ isOpen, onClose, onAddProduct }) {
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <label className="text-xs font-medium text-foreground">Category:</label>
-              <select
+              <CustomSelect
                 value={formData.category}
-                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                className="w-full h-9 rounded-md border border-input bg-transparent px-3 py-1 text-xs shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-              >
-                {CATEGORIES.map((cat) => (
-                  <option key={cat} value={cat}>
-                    {cat}
-                  </option>
-                ))}
-              </select>
+                onChange={(val) => setFormData({ ...formData, category: val })}
+                options={CATEGORIES}
+                placeholder="Select category..."
+              />
             </div>
 
             <div className="space-y-1.5">

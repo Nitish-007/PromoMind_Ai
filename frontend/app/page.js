@@ -18,13 +18,18 @@ import {
   fetchStorageStatus
 } from "@/lib/api";
 
+import { CalendarScreen } from "@/components/calendar/CalendarScreen";
+import { UploadScreen } from "@/components/upload/UploadScreen";
+import { ProfileScreen } from "@/components/profile/ProfileScreen";
+
 export default function Home() {
   const [activeTab, setActiveTab] = useState("inventory");
   const [theme, setTheme] = useState("light");
+  const [copilotPrompt, setCopilotPrompt] = useState("");
   
   // Store Profile & Storage
   const [storeProfile, setStoreProfile] = useState({
-    store_name: "Sharma Supermarket & Kirana",
+    store_name: "Metro Supermarket & Retail Mart",
     owner_name: "Ramesh Sharma",
     city: "Bengaluru",
     region: "Karnataka & South India",
@@ -51,6 +56,19 @@ export default function Home() {
       document.documentElement.classList.add("dark");
     } else {
       document.documentElement.classList.remove("dark");
+    }
+
+    // Read cached store profile from localStorage after client hydration
+    const cachedStoreName = localStorage.getItem("promomind_store_name");
+    if (cachedStoreName) {
+      setStoreProfile((prev) => ({
+        ...prev,
+        store_name: cachedStoreName,
+        owner_name: localStorage.getItem("promomind_owner_name") || prev.owner_name,
+        city: localStorage.getItem("promomind_city") || prev.city,
+        region: localStorage.getItem("promomind_region") || prev.region,
+        phone: localStorage.getItem("promomind_phone") || prev.phone,
+      }));
     }
 
     loadInitialData();
@@ -141,7 +159,23 @@ export default function Home() {
   };
 
   const handleCreatePromoForProduct = (product) => {
+    setCopilotPrompt(`Create a high-margin promotional offer featuring ${product.name} (${product.id})`);
     setActiveTab("promos");
+  };
+
+  const handleLaunchPromoForFestival = (festivalName, comboTitle) => {
+    const prompt = comboTitle
+      ? `Create a festival promotional bundle for ${festivalName} (${comboTitle})`
+      : `Create an optimal festival promotional bundle for ${festivalName}`;
+    setCopilotPrompt(prompt);
+    setActiveTab("promos");
+  };
+
+  const handleProfileUpdated = (updatedProf) => {
+    setStoreProfile((prev) => ({
+      ...prev,
+      ...updatedProf,
+    }));
   };
 
   return (
@@ -184,28 +218,30 @@ export default function Home() {
           <CopilotScreen
             storeProfile={storeProfile}
             onOfferActivated={() => setActiveTab("calendar")}
+            initialPrompt={copilotPrompt}
+            onClearInitialPrompt={() => setCopilotPrompt("")}
           />
         )}
 
+        {/* Feature 3: Regional Festival Calendar & Conflict Tracker */}
         {activeTab === "calendar" && (
-          <div className="rounded-2xl border bg-card p-12 text-center shadow-xs">
-            <h3 className="text-lg font-bold">Regional Festival Calendar</h3>
-            <p className="text-xs text-muted-foreground mt-1">Ready for feature step #3.</p>
-          </div>
+          <CalendarScreen
+            onLaunchPromo={handleLaunchPromoForFestival}
+          />
         )}
 
+        {/* Feature 4: CSV Intake & AI Markdown Sync */}
         {activeTab === "upload" && (
-          <div className="rounded-2xl border bg-card p-12 text-center shadow-xs">
-            <h3 className="text-lg font-bold">CSV Intake & AI Markdown Sync</h3>
-            <p className="text-xs text-muted-foreground mt-1">Ready for feature step #4.</p>
-          </div>
+          <UploadScreen
+            onInventoryUpdated={loadInitialData}
+          />
         )}
 
+        {/* Feature 5: Store Profile & Settings */}
         {activeTab === "profile" && (
-          <div className="rounded-2xl border bg-card p-12 text-center shadow-xs">
-            <h3 className="text-lg font-bold">Store Profile & Settings</h3>
-            <p className="text-xs text-muted-foreground mt-1">Ready for feature step #5.</p>
-          </div>
+          <ProfileScreen
+            onProfileUpdated={handleProfileUpdated}
+          />
         )}
       </main>
 

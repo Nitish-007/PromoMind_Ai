@@ -51,12 +51,12 @@ export function Header({ storeProfile, theme, onToggleTheme, onOpenProfile }) {
                         title="Edit Store Profile & Regional Demographics"
                     >
                         <Store className="h-4 w-4 text-muted-foreground group-hover:text-foreground" />
-                        <div className="hidden xs:block sm:block">
-                            <span className="font-medium text-foreground text-sm">
+                        <div className="hidden xs:block sm:block" suppressHydrationWarning>
+                            <span className="font-medium text-foreground text-sm" suppressHydrationWarning>
                                 {storeProfile.store_name ||
-                                    "Sharma Supermarket"}
+                                    "Metro Supermarket"}
                             </span>
-                            <span className="text-xs text-muted-foreground ml-2 border-l pl-2">
+                            <span className="text-xs text-muted-foreground ml-2 border-l pl-2" suppressHydrationWarning>
                                 {storeProfile.city || "Bengaluru"}
                             </span>
                         </div>

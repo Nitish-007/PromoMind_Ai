@@ -5,6 +5,7 @@ import { Search, BarChart3, TrendingUp, AlertCircle, ArrowUpRight } from "lucide
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const CATEGORIES = [
   "ALL",
@@ -95,14 +96,40 @@ export function InventoryTable({
             </thead>
             <tbody className="divide-y divide-border/60">
               {isLoading ? (
-                <tr>
-                  <td colSpan={8} className="py-14 text-center text-muted-foreground text-sm">
-                    <div className="inline-flex items-center gap-2.5">
-                      <div className="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-                      <span>Loading retail inventory & curves...</span>
-                    </div>
-                  </td>
-                </tr>
+                [...Array(5)].map((_, i) => (
+                  <tr key={i} className="animate-pulse">
+                    <td className="px-4 py-3.5">
+                      <Skeleton className="h-4 w-40 rounded mb-1" />
+                      <Skeleton className="h-3 w-20 rounded" />
+                    </td>
+                    <td className="px-4 py-3.5">
+                      <Skeleton className="h-5 w-20 rounded-full" />
+                    </td>
+                    <td className="px-4 py-3.5">
+                      <Skeleton className="h-4 w-16 rounded mb-1" />
+                      <Skeleton className="h-3 w-24 rounded" />
+                    </td>
+                    <td className="px-4 py-3.5">
+                      <Skeleton className="h-4 w-20 rounded mb-1" />
+                      <Skeleton className="h-3 w-16 rounded" />
+                    </td>
+                    <td className="px-4 py-3.5">
+                      <Skeleton className="h-4 w-12 rounded" />
+                    </td>
+                    <td className="px-4 py-3.5">
+                      <Skeleton className="h-4 w-16 rounded" />
+                    </td>
+                    <td className="px-4 py-3.5">
+                      <Skeleton className="h-6 w-28 rounded-md" />
+                    </td>
+                    <td className="px-4 py-3.5 text-right">
+                      <div className="flex justify-end gap-1.5">
+                        <Skeleton className="h-8 w-16 rounded-md" />
+                        <Skeleton className="h-8 w-24 rounded-md" />
+                      </div>
+                    </td>
+                  </tr>
+                ))
               ) : filteredProducts.length === 0 ? (
                 <tr>
                   <td colSpan={8} className="py-14 text-center text-muted-foreground text-sm">

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Sparkles } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { CopilotQuickPrompts } from "./CopilotQuickPrompts";
@@ -8,7 +8,7 @@ import { CopilotChatThread } from "./CopilotChatThread";
 import { CollateralStudio } from "./CollateralStudio";
 import { sendChatMessage, publishOffer } from "@/lib/api";
 
-export function CopilotScreen({ storeProfile, onOfferActivated }) {
+export function CopilotScreen({ storeProfile, onOfferActivated, initialPrompt, onClearInitialPrompt }) {
   const [messages, setMessages] = useState([
     {
       sender: "bot",
@@ -18,6 +18,13 @@ export function CopilotScreen({ storeProfile, onOfferActivated }) {
   ]);
   const [isLoading, setIsLoading] = useState(false);
   const [activePlan, setActivePlan] = useState(null);
+
+  useEffect(() => {
+    if (initialPrompt && initialPrompt.trim()) {
+      handleSendMessage(initialPrompt.trim());
+      if (onClearInitialPrompt) onClearInitialPrompt();
+    }
+  }, [initialPrompt]);
 
   const formatTime = () => {
     const d = new Date();

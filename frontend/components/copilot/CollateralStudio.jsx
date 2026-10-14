@@ -209,15 +209,16 @@ export function CollateralStudio({ plan, onScheduleOffer }) {
                                 </span>
                             </Button>
                             <Button
+                                render={
+                                    <a
+                                        href={`https://api.whatsapp.com/send?text=${encodeURIComponent(currentVariety.whatsapp_copy)}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    />
+                                }
                                 size="sm"
                                 className="gap-1.5 text-xs h-9 flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-medium"
                             >
-                                <Link
-                                    href={`https://api.whatsapp.com/send?text=${encodeURIComponent(currentVariety.whatsapp_copy)}`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                />
-
                                 <Send className="h-4 w-4" />
                                 <span>Share via WhatsApp</span>
                             </Button>

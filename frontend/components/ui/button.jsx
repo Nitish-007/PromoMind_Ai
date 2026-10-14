@@ -43,11 +43,17 @@ function Button({
   className,
   variant = "default",
   size = "default",
+  nativeButton,
   ...props
 }) {
+  // If render is passed (e.g. <Link /> or <a>), default nativeButton to false so Base UI doesn't expect a native <button>
+  const isCustomRender = props.render != null;
+  const shouldBeNative = nativeButton ?? !isCustomRender;
+
   return (
     <ButtonPrimitive
       data-slot="button"
+      nativeButton={shouldBeNative}
       className={cn(buttonVariants({ variant, size, className }))}
       {...props}
     />
