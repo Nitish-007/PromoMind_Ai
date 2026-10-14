@@ -40,6 +40,11 @@
         💡 Whitepaper
       </a>
 
+      <!-- Presentation Slide Deck Link -->
+      <a href="/deck" target="_blank" class="icon-btn" title="View Interactive Hackathon & Investor Presentation Deck" style="text-decoration:none;font-size:13px;font-weight:600;width:auto;padding:0 12px;gap:6px;background:var(--g-blue-subtle);color:var(--g-blue);border-color:rgba(26,115,232,0.3);">
+        📊 Pitch Deck
+      </a>
+
       <!-- Theme Switcher -->
       <button class="icon-btn theme-btn" onclick="toggleTheme()" id="themeToggleBtn" title="Toggle Light / Dark Mode">
         🌙
@@ -57,7 +62,7 @@
     </button>
     <button class="nav-item" id="nav-promos" onclick="switchScreen('promos')">
       <span class="nav-icon">⚡</span>
-      <span class="nav-label">Promo Generator</span>
+      <span class="nav-label">AI Sales Copilot</span>
     </button>
     <button class="nav-item" id="nav-calendar" onclick="switchScreen('calendar')">
       <span class="nav-icon">📅</span>
@@ -110,6 +115,100 @@
           <button class="btn btn-primary" onclick="switchScreen('upload')">
             <span>📥</span> Import CSV
           </button>
+        </div>
+      </div>
+
+      <!-- Dukan Capital Investment & Returns / Profit Predictor Card -->
+      <div class="financial-roi-card" id="financialRoiCard">
+        <div class="roi-card-header">
+          <div class="roi-title-block">
+            <span class="roi-main-icon">💰</span>
+            <div>
+              <h3>Dukan Capital Investment & Returns / Profit Predictor</h3>
+              <p class="roi-subtext">Open-source financial intelligence: Predicts turnover, gross profit rupees, dead capital risk, and promo-unlocked cash.</p>
+            </div>
+          </div>
+          <button class="btn btn-sm btn-secondary" onclick="toggleRoiSimulator()">
+            <span id="simToggleIcon">⚡</span> <span id="simToggleText">Open "What-If" ROI Simulator</span>
+          </button>
+        </div>
+
+        <div class="roi-metrics-grid">
+          <div class="roi-stat-pill">
+            <span class="r-label">Total Capital Invested</span>
+            <span class="r-value" id="roiInvestedVal">₹--</span>
+            <span class="r-sub" id="roiInvestedSub">In Store Inventory</span>
+          </div>
+          <div class="roi-stat-pill highlight-blue">
+            <span class="r-label">Projected 30-Day Turnover</span>
+            <span class="r-value" id="roiRevenueVal">₹--</span>
+            <span class="r-sub">Holt-Winters forecast</span>
+          </div>
+          <div class="roi-stat-pill highlight-green">
+            <span class="r-label">Projected Net Dukan Profit</span>
+            <span class="r-value" id="roiProfitVal">₹--</span>
+            <span class="r-sub" id="roiProfitPctBadge">+--% Net Return (ROI)</span>
+          </div>
+          <div class="roi-stat-pill highlight-red">
+            <span class="r-label">Dead Capital at Risk</span>
+            <span class="r-value" id="roiDeadCapitalVal">₹--</span>
+            <span class="r-sub" id="roiDeadSkusSub">In slow movers (>60d)</span>
+          </div>
+          <div class="roi-stat-pill highlight-purple">
+            <span class="r-label">Cash Unlocked via Promos</span>
+            <span class="r-value" id="roiUnlockedCashVal">₹--</span>
+            <span class="r-sub" id="roiPromoBoostSub">+₹-- Net Promo Boost</span>
+          </div>
+        </div>
+
+        <!-- Interactive "What-If" ROI Scenario Simulator Drawer -->
+        <div class="roi-simulator-drawer hidden" id="roiSimulatorDrawer">
+          <div class="sim-header">
+            <h4>🔮 Interactive "What-If" Retail ROI Scenario Simulator</h4>
+            <p>Simulate how adjusting your bundle discount depth and expected volume lift changes your net profit rupees and cash turnover cycle:</p>
+          </div>
+          
+          <div class="sim-controls-grid">
+            <div class="sim-slider-group">
+              <div class="slider-label-row">
+                <span>Proposed Promotional Discount Depth:</span>
+                <strong id="simDiscountBadge">16% OFF</strong>
+              </div>
+              <input type="range" id="simDiscountSlider" min="5" max="30" value="16" step="1" oninput="runInteractiveRoiSimulation()">
+            </div>
+
+            <div class="sim-slider-group">
+              <div class="slider-label-row">
+                <span>Expected Sales Volume Lift:</span>
+                <strong id="simVolumeBadge">+35% Units</strong>
+              </div>
+              <input type="range" id="simVolumeSlider" min="10" max="80" value="35" step="5" oninput="runInteractiveRoiSimulation()">
+            </div>
+          </div>
+
+          <!-- Simulation Live Output -->
+          <div class="sim-output-strip" id="simOutputStrip">
+            <div class="sim-out-item">
+              <span class="so-label">Simulated Turnover</span>
+              <strong class="so-val" id="simTurnoverVal">₹--</strong>
+            </div>
+            <div class="sim-out-item">
+              <span class="so-label">Simulated Net Profit</span>
+              <strong class="so-val green" id="simProfitVal">₹--</strong>
+            </div>
+            <div class="sim-out-item">
+              <span class="so-label">Effective ROI</span>
+              <strong class="so-val" id="simRoiVal">--%</strong>
+            </div>
+            <div class="sim-out-item">
+              <span class="so-label">Capital Turnover Speedup</span>
+              <strong class="so-val blue" id="simSpeedupVal">-- Days Faster</strong>
+            </div>
+            <div class="sim-out-item">
+              <span class="so-label">Verdict</span>
+              <span class="badge-safe" id="simVerdictBadge">PROFIT POSITIVE</span>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -194,151 +293,145 @@
     <section class="app-screen" id="screen-promos">
       <div class="screen-header">
         <div>
-          <h2>Smart Promotional Bundle & Copy Generator</h2>
-          <p class="section-desc">Generate AI-optimized product bundles using Apriori co-purchase probability, Holt's demand surge, and conflict prevention.</p>
+          <h2>AI Retail Copilot & Sales Growth Advisor</h2>
+          <p class="section-desc">Zero jargon, zero complicated forms. Ask in plain words how to increase sales, diagnose failing products, and launch customer-ready promotions.</p>
         </div>
         <div class="screen-header-actions">
-          <button class="btn btn-secondary" onclick="resetPromoForm()">
-            <span>🔄</span> Reset Form
-          </button>
+          <span class="badge-blue" id="copilotStorePill">📍 Bengaluru (Karnataka) • Active Copilot</span>
         </div>
       </div>
 
-      <!-- Conflict Pre-Check Alert Banner (Dynamic) -->
-      <div class="conflict-alert-banner hidden" id="promoConflictAlertBanner">
-        <div class="conflict-alert-icon">⚠️</div>
-        <div class="conflict-alert-text">
-          <strong id="promoConflictTitle">Active Campaign Conflict Detected!</strong>
-          <p id="promoConflictMessage">This product is already part of an active promotion. Overlapping discounts may erode retailer margins.</p>
-        </div>
-        <button class="btn btn-sm btn-outline-danger" onclick="switchScreen('calendar')">View Active Offers</button>
+      <!-- Quick 1-Click Retail Action Prompts Strip -->
+      <div class="copilot-action-cards-grid">
+        <button type="button" class="copilot-action-card danger" onclick="sendMainChatMessage('Which products are failing or stuck in my store?')">
+          <span class="cac-icon">⚠️</span>
+          <div class="cac-text">
+            <strong>Which products are failing or stuck?</strong>
+            <span>Identify slow movers & recover trapped cash</span>
+          </div>
+        </button>
+
+        <button type="button" class="copilot-action-card primary" onclick="sendMainChatMessage('Suggest 3 best offers for this week')">
+          <span class="cac-icon">💡</span>
+          <div class="cac-text">
+            <strong>Suggest 3 best offers for this week</strong>
+            <span>AI curated high-margin bundles</span>
+          </div>
+        </button>
+
+        <button type="button" class="copilot-action-card festive" onclick="sendMainChatMessage('Create a festive gift hamper for Diwali')">
+          <span class="cac-icon">🪔</span>
+          <div class="cac-text">
+            <strong>Diwali Festive Gift Hamper</strong>
+            <span>Ghee & dry fruits bundle with WhatsApp copy</span>
+          </div>
+        </button>
+
+        <button type="button" class="copilot-action-card success" onclick="sendMainChatMessage('How can I increase my sales by 20%?')">
+          <span class="cac-icon">📈</span>
+          <div class="cac-text">
+            <strong>How can I increase sales by 20%?</strong>
+            <span>Actionable strategies to boost basket sizes</span>
+          </div>
+        </button>
       </div>
 
-      <div class="promo-generator-layout">
-        <!-- Generator Controls Card -->
-        <div class="generator-controls-card">
-          <div class="card-header">
-            <h3>1. Campaign Parameters & Goal</h3>
-            <span class="step-badge">Step 1</span>
+      <div class="promo-generator-layout copilot-workspace-layout">
+        <!-- Left Pane: AI Chatbot Stream & Dialogue -->
+        <div class="copilot-main-chat-card">
+          <div class="chat-card-top-bar">
+            <div class="cct-left">
+              <span class="cct-avatar">🏪</span>
+              <div>
+                <h4 class="cct-title">AI Retail Sales Strategist</h4>
+                <span class="cct-sub"><span class="ch-dot"></span> Live Gemini AI & Store Sales Engine Active</span>
+              </div>
+            </div>
+            <button class="btn btn-sm btn-secondary" onclick="clearMainChatHistory()">
+              <span>🔄</span> Clear Chat
+            </button>
           </div>
 
-          <!-- Goal Quick Presets -->
-          <div class="form-group">
-            <label class="form-label">Promotional Objective:</label>
-            <div class="goal-presets-grid">
-              <button class="goal-btn active" onclick="selectGoalPreset('diwali_festive', this)">
-                <span class="goal-icon">🪔</span>
-                <div>
-                  <div class="goal-title">Diwali Festive Saver</div>
-                  <div class="goal-sub">+75% lift on Ghee & Sweets</div>
+          <!-- Message Thread -->
+          <div class="copilot-main-thread" id="mainCopilotThread">
+            <div class="chat-msg bot">
+              <div class="chat-bubble">
+                Namaskara / Namaste! 👋 I am your AI Retail Sales Copilot.<br><br>
+                <strong>No complicated forms or marketing jargon here!</strong> Think of me as your personal retail growth advisor. Just ask me naturally:
+                <div class="chat-examples">
+                  <em>• "Which product is failing or stuck on my shelves?"</em><br>
+                  <em>• "Suggest 3 best offers for this week"</em><br>
+                  <em>• "How can I increase this weekend's sales?"</em><br>
+                  <em>• "Create a Diwali sweet & dry fruit gift pack"</em>
                 </div>
-              </button>
-              <button class="goal-btn" onclick="selectGoalPreset('clear_slow', this)">
-                <span class="goal-icon">🏷️</span>
-                <div>
-                  <div class="goal-title">Clear Slow Movers</div>
-                  <div class="goal-sub">BOGO Overstock Rescue</div>
-                </div>
-              </button>
-              <button class="goal-btn" onclick="selectGoalPreset('high_margin', this)">
-                <span class="goal-icon">💰</span>
-                <div>
-                  <div class="goal-title">High Margin Basket</div>
-                  <div class="goal-sub">Smart Pair high profit items</div>
-                </div>
-              </button>
-              <button class="goal-btn" onclick="selectGoalPreset('weekend_rush', this)">
-                <span class="goal-icon">⚡</span>
-                <div>
-                  <div class="goal-title">Weekend Kirana Rush</div>
-                  <div class="goal-sub">Quick 48h stock turnover</div>
-                </div>
-              </button>
+              </div>
+              <span class="chat-time">Just now</span>
             </div>
           </div>
 
-          <!-- Product Pair Selector -->
-          <div class="form-row-2">
-            <div class="form-group">
-              <label class="form-label" for="promoAnchorSelect">
-                Primary Anchor Product:
-                <span class="help-text">(High velocity or festive driver)</span>
-              </label>
-              <select id="promoAnchorSelect" class="form-select" onchange="onAnchorProductSelected(this.value)">
-                <option value="">Loading store inventory...</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label class="form-label" for="promoAttachedSelect">
-                Smart Co-Purchase Partner:
-                <span class="help-text" id="smartPairProbLabel">(Apriori Probability)</span>
-              </label>
-              <select id="promoAttachedSelect" class="form-select" onchange="checkConflictForSelectedProducts()">
-                <option value="">Select Anchor first...</option>
-              </select>
-            </div>
+          <!-- Chat Input Bar -->
+          <div class="main-chat-input-bar">
+            <input type="text" id="mainCopilotInput" placeholder="Ask anything (e.g. 'Which product is failing?', 'Suggest 3 best offers for this week')..." onkeydown="if(event.key === 'Enter') sendMainChatMessage()">
+            <button class="btn btn-primary main-chat-send-btn" id="mainCopilotSendBtn" onclick="sendMainChatMessage()">
+              <span>🚀 Send</span>
+            </button>
           </div>
-
-          <!-- Format, Event & Margin Sliders -->
-          <div class="form-row-3">
-            <div class="form-group">
-              <label class="form-label" for="promoOfferType">Offer Structure:</label>
-              <select id="promoOfferType" class="form-select">
-                <option value="COMBO_DISCOUNT">Special Bundle Discount (15-20% Off)</option>
-                <option value="BOGO">Buy 1 Get 1 (BOGO Clearance)</option>
-                <option value="FLAT_DISCOUNT">Flat Festival Price Cut</option>
-                <option value="GIFT_HAMPER">Festive Gift Hamper Box</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label class="form-label" for="promoEventSelect">Festive / Seasonal Theme:</label>
-              <select id="promoEventSelect" class="form-select">
-                <option value="Diwali Maha Utsav (Big Billion Days Edition)">🪔 Diwali Maha Utsav (Peak)</option>
-                <option value="Ayudha Puja & Vijayadashami Special">🌾 Ayudha Puja Special</option>
-                <option value="Monsoon Warmth Refresh">🌧️ Monsoon Refresh Bonanza</option>
-                <option value="Super Weekend Kirana Rush">⚡ Super Weekend Kirana Rush</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label class="form-label">
-                Target Margin Floor:
-                <span class="margin-badge" id="marginDisplayBadge">18%</span>
-              </label>
-              <input type="range" id="promoMarginSlider" min="10" max="30" value="18" step="1" oninput="document.getElementById('marginDisplayBadge').innerText = this.value + '%'">
-            </div>
-          </div>
-
-          <!-- Prompt Customization -->
-          <div class="form-group">
-            <label class="form-label" for="promoPromptInput">Retail Strategy Prompt / Custom Instructions:</label>
-            <textarea id="promoPromptInput" class="form-textarea" rows="2" placeholder="e.g., Create a festival combo using my slow-moving biscuits and fast-selling tea for Diwali with WhatsApp broadcast copy..."></textarea>
-          </div>
-
-          <!-- Action Button -->
-          <button class="btn btn-primary btn-block btn-lg" id="generatePlanBtn" onclick="generatePromotionPlan()">
-            <span class="btn-spinner hidden" id="generateSpinner"></span>
-            <span>✨ Generate AI Promotional Plan & Omnichannel Copy</span>
-          </button>
         </div>
 
         <!-- Generated Plan & Omnichannel Preview Card -->
         <div class="generator-preview-card" id="promoOutputCard">
           <div class="empty-preview-placeholder" id="emptyPromoPlaceholder">
-            <div class="placeholder-icon">💡</div>
-            <h3>No Campaign Generated Yet</h3>
-            <p>Select your anchor product and goal above, then click <strong>Generate AI Promotional Plan</strong> to view margin calculations, Gemini copy, and print-ready creatives.</p>
+            <div class="placeholder-icon">💬</div>
+            <h3>Campaign Collateral Studio</h3>
+            <p>Ask the AI Copilot on the left to suggest an offer or rescue failing stock, and your <strong>customer-ready WhatsApp broadcasts, in-store posters, and cashier upsell scripts</strong> will appear here instantly!</p>
+            <div style="margin-top:14px;display:flex;justify-content:center;gap:8px;">
+              <button class="btn btn-sm btn-primary" onclick="sendMainChatMessage('Suggest 3 best offers for this week')">
+                <span>💡</span> Suggest 3 Offers Now
+              </button>
+            </div>
           </div>
 
           <div class="plan-result-container hidden" id="planResultContainer">
+            <!-- Dynamic Promotion Varieties Matrix (Non-Static Multi-Persona Offers) -->
+            <div class="promo-varieties-section">
+              <div class="varieties-header-box">
+                <div class="vh-badge-line">
+                  <span class="badge-blue">✨ AI Dynamic Elasticity Engine</span>
+                  <span class="badge-variety-count" id="varietyCountBadge">5 Offers Modeled</span>
+                </div>
+                <h4 class="varieties-title">Dynamic Promotion Varieties (Targeted Customer Personas)</h4>
+                <p class="varieties-subtitle">
+                  Retail offers should never be static. We evaluated category price elasticity, stock expiry, and shopping demographics to generate 5 targeted variations. <strong>Click any card</strong> to instantly preview pricing, margin health, WhatsApp copy, and cashier scripts:
+                </p>
+              </div>
+
+              <!-- Variety Cards Carousel/Grid -->
+              <div class="variety-cards-grid" id="promoVarietiesGrid">
+                <!-- Dynamically populated via renderGeneratedPlan -->
+              </div>
+
+              <!-- Active Selection Bar -->
+              <div class="active-variety-pill-bar" id="activeVarietyBar">
+                <div class="avb-left">
+                  <span class="avb-icon" id="avbIcon">👑</span>
+                  <div>
+                    <div class="avb-status">CURRENTLY ACTIVE PROMOTION:</div>
+                    <strong class="avb-title" id="avbTitle">Margin-Preserver Duo</strong>
+                  </div>
+                </div>
+                <div class="avb-right">
+                  <span class="avb-target" id="avbTarget">🎯 Target: Everyday Value Shoppers</span>
+                  <span class="avb-turnover" id="avbTurnover">⚡ 6 Days Capital Recovery</span>
+                </div>
+              </div>
+            </div>
+
             <!-- Plan Header & Economics -->
             <div class="plan-header-box">
               <div class="plan-title-row">
                 <div>
                   <span class="plan-theme-tag" id="planThemeTag">Diwali Maha Utsav</span>
-                  <h3 class="plan-title" id="planTitle">Festive Kirana Bundle</h3>
+                  <h3 class="plan-title" id="planTitle">Festive Retail Saver Bundle</h3>
                 </div>
                 <div class="margin-health-badge" id="planMarginBadge">20.4% Net Margin</div>
               </div>
@@ -373,6 +466,72 @@
               <p id="planRationaleText">Calculating optimal retail pricing...</p>
             </div>
 
+            <!-- Neuro-Symbolic Hybrid Architecture: AI Reasoning + Mathematical Proof -->
+            <div class="hybrid-engine-card">
+              <div class="hec-header">
+                <div class="hec-title-line">
+                  <span class="badge-hybrid">⚡ Neuro-Symbolic Hybrid Engine</span>
+                  <h4>AI Contextual Reasoning + Mathematical Optimization Fusion</h4>
+                </div>
+                <span class="hec-badge-active">Active Dual-Pipeline</span>
+              </div>
+              <p class="hec-subtitle">
+                <strong>Why AI + Math Combined?</strong> Generative AI alone hallucinates loss-making discounts; pure math alone produces rigid, unpersuasive copy. PromoMind AI fuses both: <strong>Generative AI (Gemini)</strong> crafts regional cultural storytelling and customer psychology, while <strong>Mathematical Equations</strong> compute price elasticity and enforce strict margin preservation floors.
+              </p>
+
+              <div class="hybrid-dual-grid">
+                <!-- AI Reasoning Layer -->
+                <div class="hybrid-pillar-box ai-pillar">
+                  <div class="hpb-header">
+                    <span class="hpb-icon">🧠</span>
+                    <div>
+                      <strong class="hpb-name">1. Generative AI Layer (Gemini)</strong>
+                      <span class="hpb-sub">Contextual, Cultural & Regional Copy</span>
+                    </div>
+                  </div>
+                  <ul class="hpb-list">
+                    <li>
+                      <span class="hpb-label">Cultural Context:</span>
+                      <strong id="hybridAiContext">Diwali Maha Utsav</strong>
+                    </li>
+                    <li>
+                      <span class="hpb-label">Vernacular Framing:</span>
+                      <strong id="hybridAiVernacular">Local Greeting + Direct ₹ Bachat</strong>
+                    </li>
+                    <li>
+                      <span class="hpb-label">Shopper Motivation:</span>
+                      <strong id="hybridAiPsychology">Gifting & High Basket Urgency</strong>
+                    </li>
+                  </ul>
+                </div>
+
+                <!-- Mathematical Precision Layer -->
+                <div class="hybrid-pillar-box math-pillar">
+                  <div class="hpb-header">
+                    <span class="hpb-icon">📐</span>
+                    <div>
+                      <strong class="hpb-name">2. Mathematical Guardrails (Open-Source)</strong>
+                      <span class="hpb-sub">Elasticity, Margin Floors & Apriori</span>
+                    </div>
+                  </div>
+                  <ul class="hpb-list">
+                    <li>
+                      <span class="hpb-label">Price Elasticity (PED):</span>
+                      <strong id="hybridMathPED">-1.45 (Category Elastic)</strong>
+                    </li>
+                    <li>
+                      <span class="hpb-label">Apriori Confidence:</span>
+                      <strong id="hybridMathApriori">P(B|A) = 68% (Lift: 2.2x)</strong>
+                    </li>
+                    <li>
+                      <span class="hpb-label">Margin Safeguard:</span>
+                      <strong id="hybridMathMargin" style="color:var(--g-green);">✓ Strictly Protected Net Profit</strong>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
             <!-- Omnichannel Marketing Collateral Tabs -->
             <div class="collateral-tabs-container">
               <div class="collateral-tab-nav">
@@ -381,6 +540,9 @@
                 </button>
                 <button class="c-tab-btn" onclick="switchCollateralTab('poster', this)">
                   <span>🖼️</span> In-Store Poster
+                </button>
+                <button class="c-tab-btn" onclick="switchCollateralTab('cashier', this)">
+                  <span>🗣️</span> Cashier Counter Script
                 </button>
               </div>
 
@@ -431,6 +593,35 @@
                   </button>
                 </div>
               </div>
+
+              <!-- Cashier Checkout Verbal Pitch Panel -->
+              <div class="c-tab-panel" id="cTabCashier">
+                <div class="cashier-card-container">
+                  <div class="cashier-header-bar">
+                    <span class="cashier-icon">🛒</span>
+                    <div>
+                      <h4>Cashier Counter Cheat-Sheet (POS Upsell Script)</h4>
+                      <p>Instant verbal prompt for counter staff when a customer brings anchor SKU to billing:</p>
+                    </div>
+                  </div>
+                  <div class="cashier-bubble" id="cashierScriptText">
+                    "Namaskara / Namaste! Sir, along with your Tea today, if you take Marie Gold Biscuits, you save flat ₹81 on this festive combo! Should I add it to your bag?"
+                  </div>
+                  <div class="cashier-guidance">
+                    <div class="guidance-item">
+                      <span>🗣️ <strong>Vernacular Grounded:</strong> Greeting & wording auto-aligns with retailer store region (Namaskara, Namaste, Nomoshkar, Pranam).</span>
+                    </div>
+                    <div class="guidance-item">
+                      <span>💡 <strong>Rupee Savings Anchor:</strong> Speaking precise rupee savings ("₹81 Direct Bachat") boosts Indian POS basket conversion by up to 2.3x compared to percentage claims.</span>
+                    </div>
+                  </div>
+                  <div class="wa-actions-row">
+                    <button class="btn btn-secondary" onclick="copyCashierScript()">
+                      <span>📋</span> Copy Verbal Pitch
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <!-- Activation Action Button -->
@@ -450,19 +641,35 @@
     <section class="app-screen" id="screen-calendar">
       <div class="screen-header">
         <div>
-          <h2>Regional Festival Calendar & Conflict Tracker</h2>
-          <p class="section-desc">Track local festive demand surges (e.g. Deepavali requiring Deepas/Diyas and Cow Ghee) and prevent promotional offer collisions.</p>
+          <h2>Dynamic Regional Festival Calendar & FMCG Demand Surge Engine</h2>
+          <p class="section-desc">Type your State or City. Gemini AI dynamically discovers the top 3 upcoming regional festivals and predicts FMCG inventory demand surges.</p>
         </div>
         <div class="screen-header-actions">
-          <div class="region-select-wrapper">
-            <label for="calendarRegionSelect">Active Store Region:</label>
-            <select id="calendarRegionSelect" class="form-select" onchange="onRegionChanged(this.value)">
-              <option value="Karnataka & South India" selected>Karnataka & South India</option>
-              <option value="Maharashtra & West India">Maharashtra & West India</option>
-              <option value="Delhi-NCR & North India">Delhi-NCR & North India</option>
-              <option value="West Bengal & East India">West Bengal & East India</option>
-            </select>
+          <span class="badge-blue" id="calActiveRegionBadge">📍 Active Region: Karnataka (India)</span>
+        </div>
+      </div>
+
+      <!-- Dynamic Regional AI Discovery Bar -->
+      <div class="calendar-discovery-bar">
+        <div class="cdb-input-row">
+          <div class="cdb-input-group">
+            <span class="cdb-icon">📍</span>
+            <input type="text" id="calendarCustomRegionInput" placeholder="Type your State, Province or Region (e.g. California, Texas, Karnataka, Maharashtra, London...)" onkeydown="if(event.key === 'Enter') discoverCustomRegionFestivals()">
           </div>
+          <button class="btn btn-primary cdb-search-btn" id="discoverFestivalsBtn" onclick="discoverCustomRegionFestivals()">
+            <span>🔍 AI Festival Discovery</span>
+          </button>
+        </div>
+        <!-- Quick State & Cultural Region Pills -->
+        <div class="cdb-pills-row">
+          <span class="cdb-pills-label">Quick States:</span>
+          <button type="button" class="cdb-pill active" onclick="onSelectRegionPill('Karnataka', this)">👑 Karnataka (Dasara, Ugadi, Deepavali)</button>
+          <button type="button" class="cdb-pill" onclick="onSelectRegionPill('Maharashtra', this)">🐘 Maharashtra (Ganesh Utsav, Faral)</button>
+          <button type="button" class="cdb-pill" onclick="onSelectRegionPill('West Bengal', this)">🌸 West Bengal (Durga Puja, Kali Puja)</button>
+          <button type="button" class="cdb-pill" onclick="onSelectRegionPill('Tamil Nadu', this)">🌾 Tamil Nadu (Pongal, Karthigai)</button>
+          <button type="button" class="cdb-pill" onclick="onSelectRegionPill('Gujarat', this)">💃 Gujarat (Navratri, Uttarayan)</button>
+          <button type="button" class="cdb-pill" onclick="onSelectRegionPill('Kerala', this)">🌼 Kerala (Onam Sadya, Vishu)</button>
+          <button type="button" class="cdb-pill" onclick="onSelectRegionPill('Delhi-NCR', this)">🪔 Delhi-NCR (Diwali, Holi)</button>
         </div>
       </div>
 
@@ -471,23 +678,23 @@
         <div class="intel-header">
           <span class="intel-pin">📍</span>
           <div>
-            <h3>Regional Demand Rules for <span id="intelRegionName">Karnataka & South India</span></h3>
+            <h3>AI Cultural Retail Intelligence for <span id="intelRegionName">Karnataka, India</span></h3>
             <p>Festive demand in retail is heavily localized. Demand for specific SKUs fluctuates dramatically by calendar dates.</p>
           </div>
         </div>
-        <div class="intel-facts-grid">
+        <div class="intel-facts-grid" id="intelFactsGrid">
           <div class="intel-fact-item">
-            <span class="fact-icon">🪔</span>
+            <span class="fact-icon">👑</span>
             <div>
-              <strong>Deepavali / Karthika Deepotsava:</strong>
-              <p>Demand for <strong>Clay Deepas / Diyas, Pure Cow Ghee, and Cotton Wicks</strong> spikes by <strong>+140%</strong>. For non-festival months, Clay Deepa demand is near zero (&lt;5 units/month).</p>
+              <strong>Mysuru Dasara & Vijayadashami (Nada Habba):</strong>
+              <p>Demand for <strong>Pure Cow Ghee, Traditional Sweets, Puffed Rice (Pori), and Lemons</strong> surges by <strong>+125%</strong>.</p>
             </div>
           </div>
           <div class="intel-fact-item">
-            <span class="fact-icon">🌾</span>
+            <span class="fact-icon">🪔</span>
             <div>
-              <strong>Ayudha Puja & Vijayadashami:</strong>
-              <p>Requires localized stock of <strong>Ash Gourd (Kumbalakai), Puffed Rice (Pori), Lemons, and Jaggery (Bella)</strong> (+60% surge for 3 days).</p>
+              <strong>Deepavali & Naraka Chaturdashi:</strong>
+              <p>Demand for <strong>Clay Deepas / Diyas, Pure Cow Ghee, and Cotton Wicks</strong> spikes by <strong>+140%</strong>. For non-festival months, Clay Deepa demand is near zero (&lt;5 units/month).</p>
             </div>
           </div>
           <div class="intel-fact-item">
@@ -681,7 +888,7 @@
           <div class="form-row-2">
             <div class="form-group">
               <label class="form-label" for="profStoreName">Store Name:</label>
-              <input type="text" id="profStoreName" class="form-input" value="Sharma Supermarket & Kirana">
+              <input type="text" id="profStoreName" class="form-input" value="Metro Supermarket & Retail Mart">
             </div>
             <div class="form-group">
               <label class="form-label" for="profOwnerName">Retailer Owner / Manager:</label>
@@ -705,7 +912,7 @@
               <label class="form-label" for="profStoreType">Store Format:</label>
               <select id="profStoreType" class="form-select">
                 <option value="Supermarket" selected>Supermarket / Self-Service Mart</option>
-                <option value="Kirana">Neighborhood Kirana Store</option>
+                <option value="Retail">Neighborhood Retail Mart</option>
                 <option value="Departmental">Departmental Grocery</option>
                 <option value="Organic">Organic & Gourmet Store</option>
               </select>
@@ -713,6 +920,17 @@
             <div class="form-group">
               <label class="form-label" for="profAudienceSize">Active WhatsApp Customer List Size:</label>
               <input type="number" id="profAudienceSize" class="form-input" value="1420">
+            </div>
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label class="form-label" for="profWorkingCapital">Total Working Capital Budget (₹):</label>
+              <input type="number" id="profWorkingCapital" class="form-input" value="500000" step="25000">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="profMinMargin">Store Margin Threshold (%):</label>
+              <input type="number" id="profMinMargin" class="form-input" value="15.0" step="0.5">
             </div>
           </div>
         </div>
@@ -786,8 +1004,16 @@
 
           <div class="profile-metrics-list">
             <div class="p-metric-row">
-              <span class="p-metric-label">Store Database Status:</span>
-              <span class="p-metric-val">🟢 Online & Persistent (JSON + Markdown)</span>
+              <span class="p-metric-label">Dual-Mode Storage Adapter:</span>
+              <span class="p-metric-val" id="storageStatusBadge">🟢 Cloud / Local Hybrid Adapter</span>
+            </div>
+            <div class="p-metric-row">
+              <span class="p-metric-label">Firestore Collections:</span>
+              <span class="p-metric-val" id="storageCollectionsBadge" style="font-size:0.82rem;font-family:monospace;">stores/{store_id}/...</span>
+            </div>
+            <div class="p-metric-row">
+              <span class="p-metric-label">Google Cloud Firestore:</span>
+              <span class="p-metric-val" id="cloudStatusBadge">🟡 Dual-Mode Sync Active</span>
             </div>
             <div class="p-metric-row">
               <span class="p-metric-label">Open-Source Forecasting Engine:</span>
@@ -798,8 +1024,8 @@
               <span class="p-metric-val">Apriori Market Basket Probability (Support/Lift)</span>
             </div>
             <div class="p-metric-row">
-              <span class="p-metric-label">AI Agent Reasoning Grounding:</span>
-              <span class="p-metric-val">Grounding via <code>store_knowledge.md</code></span>
+              <span class="p-metric-label">AI Knowledge Base Sync:</span>
+              <span class="p-metric-val" id="storageSyncBadge">⚡ Instant Re-compilation Grounded in <code>data/store_knowledge.md</code></span>
             </div>
           </div>
         </div>
@@ -957,6 +1183,62 @@
       </div>
     </div>
   </div>
+
+  <!-- Floating AI Retail Sales Copilot Launcher -->
+  <button class="copilot-floating-btn" id="copilotFloatingBtn" onclick="openRetailCopilot()" title="Open AI Retail Sales Copilot">
+    <span class="cfb-pulse"></span>
+    <span class="cfb-icon">🤖</span>
+    <span class="cfb-label">AI Retail Copilot</span>
+  </button>
+
+  <!-- Copilot Chat Drawer & Backdrop -->
+  <div class="copilot-drawer-backdrop hidden" id="copilotBackdrop" onclick="closeCopilotDrawer()"></div>
+  <aside class="copilot-drawer hidden" id="copilotDrawer">
+    <div class="copilot-header">
+      <div class="ch-left">
+        <span class="ch-avatar">🏪</span>
+        <div>
+          <h4 class="ch-name">PromoMind AI Copilot</h4>
+          <span class="ch-status"><span class="ch-dot"></span> Backside Math & AI Engine Active</span>
+        </div>
+      </div>
+      <button class="btn btn-icon btn-sm" onclick="closeCopilotDrawer()" title="Close Copilot">✕</button>
+    </div>
+
+    <!-- Quick Margin / Action Prompts -->
+    <div class="copilot-chips-strip">
+      <button class="c-chip" onclick="sendQuickChatMessage('Suggest 3 best offers for this week')">💡 3 Weekly Offers</button>
+      <button class="c-chip" onclick="sendQuickChatMessage('Diwali sweet and dry fruit gift hamper')">🪔 Diwali Gift Hamper</button>
+      <button class="c-chip" onclick="sendQuickChatMessage('Clear my expiring stock before date')">⚡ Clear Expiring Stock</button>
+      <button class="c-chip" onclick="sendQuickChatMessage('How much dead capital is trapped in my store right now?')">💰 Dead Capital Audit</button>
+    </div>
+
+    <!-- Message Thread -->
+    <div class="copilot-thread" id="copilotThread">
+      <div class="chat-msg bot">
+        <div class="chat-bubble">
+          Namaskara / Namaste! 👋 I am your AI Retail Sales Copilot.<br><br>
+          Ask me anything naturally—no manual product dropdowns needed! I automatically analyze your regional festive calendar and inventory to suggest profitable deals:
+          <div class="chat-examples">
+            <em>• "Suggest 3 best offers for this week"</em><br>
+            <em>• "Create a Diwali gift hamper with sweets & dry fruits"</em><br>
+            <em>• "How much dead capital is trapped in my biscuits?"</em>
+          </div>
+        </div>
+        <span class="chat-time">Just now</span>
+      </div>
+    </div>
+
+    <!-- Chat Input Bar -->
+    <div class="copilot-input-bar">
+      <div class="chat-input-wrapper">
+        <input type="text" id="copilotInputText" placeholder="Ask anything (e.g. 'Suggest 3 best offers for this week', 'Diwali combo')..." onkeydown="if(event.key === 'Enter') sendCopilotChatMessage()">
+        <button class="btn btn-primary btn-sm chat-send-btn" id="copilotSendBtn" onclick="sendCopilotChatMessage()">
+          <span>🚀</span>
+        </button>
+      </div>
+    </div>
+  </aside>
 
   <!-- Toast Notification Container -->
   <div class="toast-container" id="toastContainer"></div>

@@ -7,21 +7,47 @@ from fastapi.responses import FileResponse
 from typing import List, Dict, Any, Optional
 
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.dirname(CURRENT_DIR)
+# Auto-load environment variables from backend/.env and project root .env
+try:
+    from dotenv import load_dotenv
+    load_dotenv(os.path.join(CURRENT_DIR, ".env"))
+    load_dotenv(os.path.join(PROJECT_ROOT, ".env"))
+except Exception:
+    pass
 if CURRENT_DIR not in sys.path:
     sys.path.insert(0, CURRENT_DIR)
+
+# Auto-load environment variables from .env if present
+dotenv_file = os.path.join(PROJECT_ROOT, ".env")
+if os.path.exists(dotenv_file):
+    try:
+        with open(dotenv_file, "r", encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith("#") and "=" in line:
+                    k, v = line.split("=", 1)
+                    k = k.strip()
+                    v = v.strip().strip('"').strip("'")
+                    if k and k not in os.environ:
+                        os.environ[k] = v
+    except Exception:
+        pass
 
 from models import (
     Product, ProductCreate, DemandForecast, ComboQuery, ComboPlan,
     BrandComparisonResponse, RegionalFestivalEvent, ScheduledOffer,
-    ConflictCheckRequest, ConflictCheckResponse
+    ConflictCheckRequest, ConflictCheckResponse, StoreProfile,
+    InvestmentROISimulation, ROIScenarioRequest, ChatQuery, ChatResponse,
+    FestivalDiscoveryRequest, StoreProfileUpdate, StorageStatusResponse
 )
 from mock_data import (
     DEMAND_FORECASTS, CATEGORY_BRAND_COMPARISONS, 
     REGIONAL_FESTIVAL_CALENDAR, SCHEDULED_OFFERS
 )
-from agents import PromoMindEngine
-from storage import StoreDataManager
-from forecasting import OpenSourceForecastingEngine
+from agents import PromoMindEngine, RetailCopilotAgent, DynamicFestivalEngine
+from storage import StoreDataManager, DualModeStorageAdapter
+from forecasting import OpenSourceForecastingEngine, InvestmentROIEngine
 
 app = FastAPI(
     title="PromoMind AI API",
@@ -43,55 +69,165 @@ StoreDataManager.load_products()
 
 @app.get("/api/health")
 def health_check():
+    status = StoreDataManager.get_storage_status()
     return {
         "status": "healthy",
         "service": "PromoMind AI",
         "version": "2.5.0",
         "region": "asia-south1 (Google Cloud)",
         "model": "Gemini 1.5 Flash / Open-Source Holt-Winters Forecaster",
+        "storage_mode": status["mode"],
+        "firestore_connected": status["firestore_connected"],
+        "store_id": status["store_id"],
         "active_theme": "Google Material 3 Responsive Multi-Screen"
     }
 
+@app.get("/api/storage/status", response_model=StorageStatusResponse)
+def get_storage_status():
+    """Retrieve Dual-Mode Hybrid Storage Adapter connection status and Firestore collections."""
+    return StoreDataManager.get_storage_status()
+
+@app.get("/api/system/cloud-status")
+def get_cloud_storage_status():
+    """Returns Google Cloud Firestore live synchronization status and credentials state."""
+    status = dict(StoreDataManager.get_storage_status())
+    status["is_connected"] = status.get("firestore_connected", False)
+    status["credentials_found"] = status.get("firestore_connected", False) or bool(os.getenv("GCP_SERVICE_ACCOUNT_KEY") or os.getenv("GOOGLE_APPLICATION_CREDENTIALS"))
+    return status
+
 # ==============================================================================
-# Regional Festival Calendar & Conflict Tracker
+# Store Profile, Regional Settings & Financial ROI Intelligence
+# ==============================================================================
+
+@app.get("/api/profile", response_model=StoreProfile)
+def get_profile_compat():
+    """Retrieve retailer store profile, regional demographic settings, and working capital."""
+    return StoreDataManager.load_profile()
+
+@app.post("/api/profile", response_model=StoreProfile)
+def update_profile_compat(profile: StoreProfile):
+    """Update store profile, cultural region, and immediately recompile store_knowledge.md."""
+    return StoreDataManager.save_profile(profile)
+
+@app.get("/api/store/profile", response_model=Dict[str, Any])
+def get_store_profile():
+    """Retrieve store metadata, regional location, and customer list from stores/{store_id}/store_profile."""
+    return StoreDataManager.get_store_profile()
+
+@app.post("/api/store/profile", response_model=Dict[str, Any])
+def update_store_profile(payload: StoreProfileUpdate):
+    """Update store metadata, regional location, and customer list in Firestore / local fallback."""
+    current = StoreDataManager.get_store_profile()
+    updates = payload.model_dump(exclude_unset=True)
+    current.update(updates)
+    return StoreDataManager.save_store_profile(current)
+
+@app.get("/api/store/financial-roi", response_model=InvestmentROISimulation)
+def get_store_financial_roi():
+    """
+    Computes store-wide working capital invested, projected turnover revenue,
+    net profit, dead capital trapped in slow movers, and cash unlocked via promotions.
+    """
+    products = StoreDataManager.load_products()
+    profile = StoreDataManager.load_profile()
+    budget = profile.total_working_capital_inr if hasattr(profile, "total_working_capital_inr") and profile.total_working_capital_inr else 500000.0
+    roi = InvestmentROIEngine.compute_store_roi(products, store_capital_budget=budget)
+    return InvestmentROISimulation(**roi)
+
+@app.post("/api/store/simulate-roi")
+def simulate_roi_scenario(payload: ROIScenarioRequest):
+    """
+    Simulates What-If scenario: Adjust discount depth and expected volume lift
+    to predict resulting net profit Rupees and turnover days acceleration.
+    """
+    products = StoreDataManager.load_products()
+    profile = StoreDataManager.load_profile()
+    budget = profile.total_working_capital_inr if hasattr(profile, "total_working_capital_inr") and profile.total_working_capital_inr else 500000.0
+    roi_base = InvestmentROIEngine.compute_store_roi(products, store_capital_budget=budget)
+    
+    sim = InvestmentROIEngine.simulate_scenario(
+        base_invested=roi_base["total_inventory_invested_inr"],
+        base_revenue=roi_base["projected_sales_revenue_inr"],
+        proposed_discount_pct=payload.proposed_discount_depth_pct,
+        expected_volume_lift_pct=payload.expected_volume_lift_pct
+    )
+    return sim
+
+# ==============================================================================
+# Regional Festival Calendar & Conflict Tracker (stores/{store_id}/calendar_events)
 # ==============================================================================
 
 @app.get("/api/calendar/events", response_model=List[RegionalFestivalEvent])
-def get_festival_events(region: Optional[str] = None):
-    """Retrieve regional festival calendar with specific regional demand surge items (e.g. Deepas/Diyas for Diwali)."""
-    if region:
-        filtered = [e for e in REGIONAL_FESTIVAL_CALENDAR if region.lower() in e["region"].lower()]
-        if filtered:
-            return filtered
-    return REGIONAL_FESTIVAL_CALENDAR
+def get_festival_events(
+    region: Optional[str] = None,
+    country: Optional[str] = None,
+    city: Optional[str] = None,
+    refresh: bool = False
+):
+    """Retrieve dynamic regional festival calendar with live AI discovery and matched store inventory."""
+    profile = StoreDataManager.load_profile()
+    active_region = region or profile.region or "Karnataka & South India"
+    active_city = city or profile.city or "Bengaluru"
+    active_country = country or getattr(profile, "country", None)
+    
+    events = DynamicFestivalEngine.discover_festivals(
+        region=active_region,
+        country=active_country,
+        city=active_city,
+        force_refresh=refresh
+    )
+    return events
+
+@app.post("/api/calendar/discover", response_model=List[RegionalFestivalEvent])
+def discover_regional_festivals(payload: FestivalDiscoveryRequest):
+    """Trigger AI search and discovery of regional festivals for any custom state, place, or country."""
+    profile = StoreDataManager.load_profile()
+    active_city = payload.city or profile.city or "Bengaluru"
+    events = DynamicFestivalEngine.discover_festivals(
+        region=payload.region,
+        country=payload.country or None,
+        city=active_city,
+        force_refresh=payload.force_refresh or False
+    )
+    return events
 
 @app.get("/api/offers/active", response_model=List[ScheduledOffer])
 def get_active_offers():
     """Retrieve currently active and scheduled offers across POS and WhatsApp channels."""
-    return SCHEDULED_OFFERS
+    return StoreDataManager.get_promotions()
 
 @app.post("/api/offers/check-conflict", response_model=ConflictCheckResponse)
 def check_offer_conflict(payload: ConflictCheckRequest):
     """
     Detect overlapping promotional offers for the same anchor or attached products
     to prevent margin cannibalization and retailer discount fatigue.
+    Logs conflict to stores/{store_id}/promotions when detected.
     """
+    offers = StoreDataManager.get_promotions()
     conflicts = []
-    for offer in SCHEDULED_OFFERS:
+    for offer in offers:
         if offer.get("status") in ["ACTIVE", "SCHEDULED"]:
-            if payload.anchor_id in [offer["anchor_id"], offer["attached_id"]]:
+            if payload.anchor_id in [offer.get("anchor_id"), offer.get("attached_id")]:
                 conflicts.append(offer)
-            elif payload.attached_id in [offer["anchor_id"], offer["attached_id"]]:
+            elif payload.attached_id in [offer.get("anchor_id"), offer.get("attached_id")]:
                 conflicts.append(offer)
 
     if conflicts:
         first = conflicts[0]
+        reason = (
+            f"Overlap detected with active offer '{first.get('title')}' (scheduled {first.get('start_date')} to {first.get('end_date')}). "
+            f"Discounting the same SKU across two campaigns creates price confusion and eats profit margin."
+        )
+        # Log detected conflict into Firestore collection stores/{store_id}/promotions
+        StoreDataManager.log_conflict({
+            "anchor_id": payload.anchor_id,
+            "attached_id": payload.attached_id,
+            "conflict_reason": reason,
+            "conflicting_offers": conflicts
+        })
         return ConflictCheckResponse(
             has_conflict=True,
-            conflict_reason=(
-                f"Overlap detected with active offer '{first['title']}' (scheduled {first['start_date']} to {first['end_date']}). "
-                f"Discounting the same SKU across two campaigns creates price confusion and eats profit margin."
-            ),
+            conflict_reason=reason,
             conflicting_offers=conflicts,
             recommended_action="Stagger campaign start date until existing promotion finishes or select an alternative attached SKU."
         )
@@ -102,6 +238,7 @@ def check_offer_conflict(payload: ConflictCheckRequest):
         conflicting_offers=[],
         recommended_action="Clear to schedule. No conflicting promotions active for selected SKUs."
     )
+
 
 # ==============================================================================
 # Inventory, Multi-Brand Curves & CSV Upload
@@ -295,6 +432,39 @@ def get_demand_forecasts():
 # Offer Generation & Channel Dispatch
 # ==============================================================================
 
+@app.get("/api/weekly-offer-ideas")
+def get_weekly_offer_ideas(region: Optional[str] = None):
+    """
+    Returns autonomous weekly offer recommendations across multiple products in the store.
+    No product selection is needed by the merchant.
+    """
+    try:
+        ideas = PromoMindEngine.generate_weekly_recommendations(region=region)
+        return {
+            "status": "SUCCESS",
+            "count": len(ideas),
+            "ideas": ideas
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/chat", response_model=ChatResponse)
+def copilot_chat(query: ChatQuery):
+    """
+    Conversational AI Copilot for Retailers.
+    Processes natural language commands, extracts requested profit margin %,
+    and runs backend econometric, pricing, and collateral tools silently.
+    """
+    try:
+        response = RetailCopilotAgent.process_message(
+            message=query.message,
+            user_margin_pct=query.min_margin_pct,
+            region=query.region or query.store_region
+        )
+        return response
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 @app.post("/api/generate-combo", response_model=ComboPlan)
 def generate_combo(query: ComboQuery):
     """
@@ -306,7 +476,11 @@ def generate_combo(query: ComboQuery):
             query=query.prompt,
             min_margin_pct=query.min_margin_pct or 18.0,
             event_theme=query.event_theme or "Diwali Maha Utsav",
-            offer_type=query.offer_type or "COMBO_DISCOUNT"
+            offer_type=query.offer_type or "COMBO_DISCOUNT",
+            primary_product_id=query.primary_product_id,
+            secondary_product_id=query.secondary_product_id,
+            region=query.region,
+            archetype=query.archetype or "ANCHOR_MARGIN_BOOSTER"
         )
         return plan
     except Exception as e:
@@ -324,9 +498,10 @@ def publish_offer(payload: Dict[str, Any]):
     disc = payload.get("discount_pct", 17.5)
     theme = payload.get("event_theme", "Active Campaign")
 
-    # Schedule into calendar
+    # Schedule into promotions collection (stores/{store_id}/promotions)
+    current_offers = StoreDataManager.get_promotions()
     new_offer = {
-        "id": f"OFFER_LIVE_{len(SCHEDULED_OFFERS) + 1:02d}",
+        "id": f"OFFER_LIVE_{len(current_offers) + 1:02d}",
         "combo_id": combo_id,
         "title": title,
         "anchor_id": anchor_id,
@@ -338,7 +513,7 @@ def publish_offer(payload: Dict[str, Any]):
         "event_theme": theme,
         "status": "ACTIVE"
     }
-    SCHEDULED_OFFERS.insert(0, new_offer)
+    StoreDataManager.save_promotion(new_offer)
 
     return {
         "status": "SUCCESS",
@@ -360,6 +535,11 @@ if os.path.exists(frontend_dir):
     @app.get("/problem-statement")
     def serve_problem_statement():
         return FileResponse(os.path.join(frontend_dir, "problem_statement.html"))
+
+    @app.get("/deck")
+    @app.get("/presentation")
+    def serve_pitch_deck():
+        return FileResponse(os.path.join(frontend_dir, "presentation_deck.html"))
 
 if __name__ == "__main__":
     import uvicorn

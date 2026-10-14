@@ -420,51 +420,214 @@ CATEGORY_BRAND_COMPARISONS: Dict[str, Dict[str, Any]] = {
     }
 }
 
-# Regional Festival Calendar with Specific Regional SKU Demands
+# Comprehensive Multi-Regional Festival Calendar with Cultural Traditions & Advance Planning Horizons
 REGIONAL_FESTIVAL_CALENDAR: List[Dict[str, Any]] = [
+    # --------------------------------------------------------------------------
+    # 1. KARNATAKA & SOUTH INDIA
+    # --------------------------------------------------------------------------
     {
-        "id": "EVT_DIWALI_2026",
-        "name": "Diwali / Deepavali (Deepa & Lakshmi Puja)",
+        "id": "EVT_DIWALI_SOUTH_2026",
+        "name": "Deepavali & Naraka Chaturdashi",
         "region": "Karnataka & South India",
         "date_window": "Oct 24 - Oct 29, 2026",
         "status": "UPCOMING",
-        "key_items": ["Clay Diyas & Deepas", "Pure Cow Ghee", "Gulab Jamun & Sweets", "California Almonds", "Puja Camphor & Wicks"],
-        "demand_lift_pct": 85.0,
+        "key_items": ["Clay Diyas & Deepas", "Pure Cow Ghee", "Gulab Jamun & Sweets", "California Almonds", "Puja Camphor & Cotton Wicks"],
+        "demand_lift_pct": 140.0,
         "icon": "🪔",
-        "description": "Peak festive season in Bengaluru. Deepas and Cow Ghee require 3x normal stock. Non-festive days require only minimal puja stock."
+        "description": "Peak celebration season across Bengaluru & South India. High surge in Deepas and Pure Cow Ghee for festive lighting and sweet-making.",
+        "tradition_notes": "Deepavali in Karnataka centers on early-morning oil baths, lighting clay deepas at dusk, and gifting home-made sweets. Earthen deepa demand drops to <5 units/month during non-festival days.",
+        "advance_procurement_window": "T-14 Days (Oct 10 - Oct 15): Order Clay Diyas and Cow Ghee cartons before distributor festival price hikes.",
+        "promo_launch_window": "T-7 Days (Oct 17 - Oct 24): Early-Bird Festive Gift Hamper (Ghee + Dry Fruits + Sweets) via WhatsApp.",
+        "clearance_window": "T+2 Days (Oct 30 - Nov 2): Clear remaining earthen diyas and sweet boxes at cost price to prevent 100% loss.",
+        "recommended_promo_type": "FESTIVE_CELEBRATION_HAMPER"
     },
     {
         "id": "EVT_AYUDHA_PUJA_2026",
         "name": "Ayudha Puja & Vijayadashami",
-        "region": "Karnataka",
+        "region": "Karnataka & South India",
         "date_window": "Oct 10 - Oct 13, 2026",
         "status": "UPCOMING",
-        "key_items": ["Puffed Rice (Pori)", "Jaggery (Bella)", "Sunflower Oil", "Ash Gourd", "Flowers & Lemon"],
-        "demand_lift_pct": 60.0,
+        "key_items": ["Puffed Rice (Pori)", "Organic Jaggery (Bella)", "Sunflower Oil", "Ash Gourd (Kumbalakai)", "Puja Kumkum & Lemons"],
+        "demand_lift_pct": 90.0,
         "icon": "🌾",
-        "description": "Massive corporate and vehicle puja demand. Bulk restocking of sweets and sunflower oil for frying."
+        "description": "State-wide commercial, factory, store, and vehicle puja rush. 3-day extreme volume surge.",
+        "tradition_notes": "Every business, auto, car, and household washes tools and vehicles, crushes lemons, and breaks ash gourd (kumbalakai) to ward off the evil eye. Puffed rice (pori) and jaggery are distributed as ubiquitous prasadam.",
+        "advance_procurement_window": "T-7 Days (Oct 3 - Oct 8): Restock bulk bags of Pori (puffed rice), Bella, and Sunflower oil.",
+        "promo_launch_window": "T-3 Days (Oct 7 - Oct 10): 'Ayudha Puja Shop & Vehicle Blessing Kit' cross-sell.",
+        "clearance_window": "T+1 Day (Oct 14): Sell leftover pori bags to local street food vendors at 20% off.",
+        "recommended_promo_type": "ANCHOR_MARGIN_BOOSTER"
     },
     {
         "id": "EVT_KARTHIKA_DEEPAM_2026",
-        "name": "Karthika Deepotsava",
-        "region": "Karnataka & Tamil Nadu",
+        "name": "Karthika Deepotsava (Month of Lights)",
+        "region": "Karnataka & South India",
         "date_window": "Nov 14 - Nov 20, 2026",
         "status": "UPCOMING",
         "key_items": ["Earthen Deepas (Clay Lamps)", "Sesame Gingelly Oil", "Cotton Wicks", "Cow Ghee"],
-        "demand_lift_pct": 45.0,
+        "demand_lift_pct": 55.0,
         "icon": "🕯️",
-        "description": "Month of lights across temples and households. Heavy surge in clay deepas and lighting oils."
+        "description": "Full-month evening lighting in temples and home courtyards across Karnataka & Tamil Nadu.",
+        "tradition_notes": "Continuous evening lighting using clay deepas with sesame oil and cow ghee throughout the sacred Karthika month.",
+        "advance_procurement_window": "T-10 Days (Nov 4 - Nov 10): Stock sesame lighting oil and extra cotton wicks.",
+        "promo_launch_window": "T-5 Days (Nov 9 - Nov 14): 'Karthika Deepam Lighting Duo' (Gingelly Oil + Cotton Wicks bundle).",
+        "clearance_window": "T+3 Days (Nov 23): Clear remaining unlit terracotta lamps.",
+        "recommended_promo_type": "VOLUME_TIER_SLAB"
     },
     {
-        "id": "EVT_MONSOON_BONANZA_2026",
-        "name": "Monsoon Refresh Bonanza",
-        "region": "Karnataka Urban",
-        "date_window": "Jul 15 - Aug 30, 2026",
-        "status": "COMPLETED",
-        "key_items": ["Premium Tea", "Biscuits", "Garam Masala", "Ginger", "Snacks"],
-        "demand_lift_pct": 35.0,
-        "icon": "🌧️",
-        "description": "Cool monsoon evenings trigger evening chai & biscuit combo demand."
+        "id": "EVT_UGADI_2026",
+        "name": "Ugadi (Kannada & Telugu New Year)",
+        "region": "Karnataka & South India",
+        "date_window": "Mar 28 - Apr 2, 2026",
+        "status": "UPCOMING",
+        "key_items": ["Neem Flowers (Bevu)", "Organic Jaggery (Bella)", "Raw Mango", "Tamarind", "Chana Dal for Obbattu"],
+        "demand_lift_pct": 75.0,
+        "icon": "🥭",
+        "description": "Traditional New Year celebrations. High demand for Bevu-Bella ingredients and festival feast staples.",
+        "tradition_notes": "Eating Bevu-Bella (neem and jaggery) symbolizes accepting both bitter and sweet experiences of life. High demand for Obbattu/Holige (sweet flatbread) ingredients.",
+        "advance_procurement_window": "T-10 Days: Secure raw mangoes, Chana Dal, and organic jaggery blocks.",
+        "promo_launch_window": "T-5 Days: 'Ugadi Feast Combo' (Jaggery + Chana Dal + Pure Ghee).",
+        "clearance_window": "T+1 Day: Normal clearance on perishable raw mangoes.",
+        "recommended_promo_type": "ANCHOR_MARGIN_BOOSTER"
+    },
+
+    # --------------------------------------------------------------------------
+    # 2. MAHARASHTRA & WEST INDIA
+    # --------------------------------------------------------------------------
+    {
+        "id": "EVT_GANESH_UTSAV_2026",
+        "name": "Ganeshotsav (10-Day Mahotsav)",
+        "region": "Maharashtra & West India",
+        "date_window": "Sept 7 - Sept 17, 2026",
+        "status": "UPCOMING",
+        "key_items": ["Ukadiche Modak Rice Flour", "Organic Jaggery (Gul)", "Desiccated Coconut", "Nutmeg & Cardamom", "Pure Cow Ghee"],
+        "demand_lift_pct": 160.0,
+        "icon": "🐘",
+        "description": "Maharashtra's grandest festival. Continuous 10-day demand surge for modak ingredients and prasad staples.",
+        "tradition_notes": "Steamed Ukadiche Modak and fried modaks are made fresh daily as holy offering to Lord Ganesha across Mumbai, Pune, and beyond.",
+        "advance_procurement_window": "T-14 Days: Restock Modak special fine rice flour, jaggery, coconut, and ghee.",
+        "promo_launch_window": "T-7 Days: 'Ganesh Chaturthi Modak Kit' with free cardamom pack.",
+        "clearance_window": "T+2 Days post Anant Chaturdashi: Clearance on bulk puja dry goods.",
+        "recommended_promo_type": "FESTIVE_CELEBRATION_HAMPER"
+    },
+    {
+        "id": "EVT_DIWALI_WEST_2026",
+        "name": "Diwali (Faral & Lakshmi Pujan)",
+        "region": "Maharashtra & West India",
+        "date_window": "Oct 24 - Oct 29, 2026",
+        "status": "UPCOMING",
+        "key_items": ["Besan (Gram Flour)", "Rava (Semolina)", "Chakli Bhajani Flour", "Sunflower Oil", "Pure Desi Ghee", "Dry Fruits"],
+        "demand_lift_pct": 130.0,
+        "icon": "✨",
+        "description": "Massive bulk frying and sweet-making for traditional Diwali Faral (Chakli, Karanji, Ladoo, Shankarpali).",
+        "tradition_notes": "Households prepare multi-item Faral gift boxes for visiting friends and family. Huge spikes in bulk frying oils and Besan.",
+        "advance_procurement_window": "T-14 Days: Bulk cartons of Refined Oil, Besan, and Desi Ghee.",
+        "promo_launch_window": "T-7 Days: 'Diwali Faral Essentials Combo' (Besan + Rava + Oil + Ghee).",
+        "clearance_window": "T+2 Days: Clearance on excess sweet boxes.",
+        "recommended_promo_type": "VOLUME_TIER_SLAB"
+    },
+    {
+        "id": "EVT_GUDI_PADWA_2026",
+        "name": "Gudi Padwa (Marathi New Year)",
+        "region": "Maharashtra & West India",
+        "date_window": "Mar 28 - Apr 2, 2026",
+        "status": "UPCOMING",
+        "key_items": ["Shrikhand", "Puran Poli Chana Dal", "Jaggery (Gul)", "Pure Ghee", "Basmati Rice"],
+        "demand_lift_pct": 80.0,
+        "icon": "🚩",
+        "description": "Auspicious new beginnings. High surge in Puran Poli cooking ingredients and Shrikhand.",
+        "tradition_notes": "Hoisting the sacred Gudi outside homes and preparing traditional festive lunch with sweet Puran Poli.",
+        "advance_procurement_window": "T-7 Days: Stock premium Chana Dal, Jaggery, and Shrikhand cups.",
+        "promo_launch_window": "T-4 Days: 'Gudi Padwa Sweets Duo' via WhatsApp broadcast.",
+        "clearance_window": "T+1 Day: Standard clearance.",
+        "recommended_promo_type": "ANCHOR_MARGIN_BOOSTER"
+    },
+
+    # --------------------------------------------------------------------------
+    # 3. NORTH INDIA (DELHI-NCR, UP, PUNJAB, RAJASTHAN)
+    # --------------------------------------------------------------------------
+    {
+        "id": "EVT_DIWALI_NORTH_2026",
+        "name": "Diwali Maha Utsav & Dhanteras",
+        "region": "Delhi-NCR & North India",
+        "date_window": "Oct 24 - Oct 29, 2026",
+        "status": "UPCOMING",
+        "key_items": ["Kaju Katli Sweets", "California Almonds & Cashews", "Brass & Clay Diyas", "Pure Mustard Oil", "Desi Cow Ghee"],
+        "demand_lift_pct": 165.0,
+        "icon": "🎇",
+        "description": "Peak festive gifting and family gatherings in Delhi-NCR and Northern markets. Unprecedented dry fruit and ghee surge.",
+        "tradition_notes": "Corporate and family dry-fruit gifting dominates retail trade. Mustard oil and ghee are bought in bulk tins for clay diyas.",
+        "advance_procurement_window": "T-18 Days: Lock distributor rates on 500g and 1kg dry fruit gift boxes.",
+        "promo_launch_window": "T-10 Days: 'Royal Dry Fruits & Pure Ghee Gift Box' with WhatsApp broadcast.",
+        "clearance_window": "T+2 Days: Clearance on remaining sweet hampers.",
+        "recommended_promo_type": "FESTIVE_CELEBRATION_HAMPER"
+    },
+    {
+        "id": "EVT_KARWA_CHAUTH_2026",
+        "name": "Karwa Chauth",
+        "region": "Delhi-NCR & North India",
+        "date_window": "Oct 19 - Oct 21, 2026",
+        "status": "UPCOMING",
+        "key_items": ["Sargi Dry Fruits", "Feni & Roasted Vermicelli", "Mathri", "Mehendi Cones", "Earthen Karwa Pots"],
+        "demand_lift_pct": 125.0,
+        "icon": "🌙",
+        "description": "Pre-dawn Sargi meal demand and evening fasting rituals across North Indian households.",
+        "tradition_notes": "Mothers-in-law gift Sargi boxes (dry fruits, feni, mathri) to daughters-in-law for pre-dawn consumption before fasting.",
+        "advance_procurement_window": "T-7 Days: Restock fresh Feni, Mathri tins, and Almonds/Cashews.",
+        "promo_launch_window": "T-4 Days: 'Traditional Sargi Basket' (Feni + Dry Fruits + Mathri).",
+        "clearance_window": "T+1 Day: Fast discount on remaining Feni.",
+        "recommended_promo_type": "ANCHOR_MARGIN_BOOSTER"
+    },
+    {
+        "id": "EVT_NAVRATRI_DUSSEHRA_2026",
+        "name": "Navratri Fasting (Vrat) & Dussehra",
+        "region": "Delhi-NCR & North India",
+        "date_window": "Oct 3 - Oct 12, 2026",
+        "status": "UPCOMING",
+        "key_items": ["Kuttu Atta (Buckwheat)", "Singhara Atta (Water Chestnut)", "Sendha Namak (Rock Salt)", "Sabudana (Tapioca)", "Makhana (Fox Nuts)"],
+        "demand_lift_pct": 115.0,
+        "icon": "🕉️",
+        "description": "9-day fasting diet across Delhi and Northern states. Routine grains are strictly replaced with Vrat flours.",
+        "tradition_notes": "Millions of households observe strict fasting for 9 nights, consuming only Sendha Namak, Kuttu, Singhara, and Sabudana.",
+        "advance_procurement_window": "T-10 Days: Bulk bags of clean, fresh-milled Kuttu and Singhara flours.",
+        "promo_launch_window": "T-5 Days: 'Navratri Shudh Vrat Pack' (Kuttu + Sabudana + Sendha Namak).",
+        "clearance_window": "T+2 Days: Clearance on open fasting flour bags.",
+        "recommended_promo_type": "EXPIRY_RESCUE_CLEARANCE"
+    },
+
+    # --------------------------------------------------------------------------
+    # 4. WEST BENGAL & EAST INDIA
+    # --------------------------------------------------------------------------
+    {
+        "id": "EVT_DURGA_PUJA_2026",
+        "name": "Durga Puja (Sharodotsav - 5 Days)",
+        "region": "West Bengal & East India",
+        "date_window": "Oct 8 - Oct 13, 2026",
+        "status": "UPCOMING",
+        "key_items": ["Kachi Ghani Mustard Oil", "Gobindobhog Rice", "Pure Jharna Ghee", "Rosogolla & Sandesh Tins", "Basmati Rice & Cashews"],
+        "demand_lift_pct": 180.0,
+        "icon": "🥁",
+        "description": "Bengal's biggest cultural extravaganza. Five days of non-stop pandal hopping, feast cooking, and gifting.",
+        "tradition_notes": "Traditional Bhog cooked with Gobindobhog rice, Jharna ghee, and rich mustard oil. Gifting tins of Rosogolla and dry fruits is a cultural staple.",
+        "advance_procurement_window": "T-20 Days: Bulk stocking of Gobindobhog rice, Mustard Oil tins, and Jharna Ghee.",
+        "promo_launch_window": "T-10 Days: 'Pujo Maha Bhog Combo' (Gobindobhog Rice + Jharna Ghee + Cashews).",
+        "clearance_window": "T+3 Days: Post-Bijoya Dashami sweet clearances.",
+        "recommended_promo_type": "FESTIVE_CELEBRATION_HAMPER"
+    },
+    {
+        "id": "EVT_KALI_PUJA_2026",
+        "name": "Kali Puja & Diwali Lights",
+        "region": "West Bengal & East India",
+        "date_window": "Oct 24 - Oct 27, 2026",
+        "status": "UPCOMING",
+        "key_items": ["Earthen Pradip (Lamps)", "Mustard Lighting Oil", "Puja Camphor", "Bhog Sweets"],
+        "demand_lift_pct": 120.0,
+        "icon": "🔥",
+        "description": "Night of 14 lamps (Choddo Saak & Choddo Pradip). Midnight temple and home Kali Puja.",
+        "tradition_notes": "Lighting 14 clay lamps outside homes to ward off negative spirits, accompanied by evening sweets.",
+        "advance_procurement_window": "T-7 Days: Stock terracotta Pradips and Mustard oil.",
+        "promo_launch_window": "T-4 Days: 'Choddo Pradip Blessing Duo' bundle.",
+        "clearance_window": "T+1 Day: Leftover lamp clearance.",
+        "recommended_promo_type": "VOLUME_TIER_SLAB"
     }
 ]
 

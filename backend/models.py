@@ -54,29 +54,60 @@ class BrandComparisonResponse(BaseModel):
     brands: List[BrandSalesCurve]
     recommendation: str
 
+class StoreProfile(BaseModel):
+    store_name: str = "Sharma Supermarket & Kirana"
+    owner_name: str = "Ramesh Sharma"
+    region: str = "Karnataka & South India"
+    city: str = "Bengaluru"
+    country: Optional[str] = "India"
+    locality: str = "Koramangala 4th Block"
+    pin_code: str = "560034"
+    phone: str = "+91 98450 12345"
+    store_format: str = "Supermarket" # Supermarket, Kirana, Mart, Organic
+    whatsapp_audience_size: int = 1420
+    default_min_margin_pct: float = 18.0
+    total_working_capital_inr: float = 350000.0
+
 class RegionalFestivalEvent(BaseModel):
     id: str
     name: str
-    region: str          # e.g. "Karnataka / South India", "Pan-India", "Maharashtra"
+    region: str          # e.g. "Karnataka & South India", "Maharashtra & West India", etc.
     date_window: str     # e.g. "Oct 24 - Oct 29 (Peak Diwali)"
-    status: str          # "UPCOMING", "ACTIVE", "PAST"
+    status: Optional[str] = "UPCOMING"  # "UPCOMING", "ACTIVE", "PAST"
+    demand_lift_pct: Optional[float] = 80.0
     key_items: List[str] # e.g. ["Diyas / Deepas", "Pure Cow Ghee", "Gulab Jamun", "Almonds"]
-    demand_lift_pct: float
-    icon: str
-    description: str
+    icon: Optional[str] = "🪔"
+    description: Optional[str] = "Significant regional shopping demand spike for retail grocery."
+    tradition_notes: Optional[str] = None               # Cultural and traditional rationale
+    advance_procurement_window: Optional[str] = None    # When retailer should buy from distributor (T-14d)
+    promo_launch_window: Optional[str] = None           # When to run early-bird offers (T-7d)
+    clearance_window: Optional[str] = None              # Post-festival clearance window (T+2d)
+    recommended_promo_type: Optional[str] = None        # e.g. "Festive Gifting Hamper", "Advance Booking Combo"
+    matched_inventory_items: Optional[List[Dict[str, Any]]] = None # Matched products from current store inventory
+    suggested_combo_title: Optional[str] = None        # e.g. "Mysuru Dasara Ghee & Sweets Pack"
+    country: Optional[str] = "India"
+    city: Optional[str] = None
+
+class FestivalDiscoveryRequest(BaseModel):
+    region: str
+    country: Optional[str] = "India"
+    city: Optional[str] = None
+    force_refresh: Optional[bool] = False
 
 class ScheduledOffer(BaseModel):
     id: str
-    combo_id: str
+    combo_id: Optional[str] = "COMBO_DEFAULT"
     title: str
     anchor_id: str
     attached_id: str
-    start_date: str
-    end_date: str
+    start_date: Optional[str] = "2026-10-15"
+    end_date: Optional[str] = "2026-10-25"
     discount_pct: float
     combo_price: float
-    event_theme: str
-    status: str  # "ACTIVE", "SCHEDULED", "COMPLETED"
+    event_theme: Optional[str] = "Active Campaign"
+    status: Optional[str] = "ACTIVE"  # "ACTIVE", "SCHEDULED", "COMPLETED"
+    type: Optional[str] = "promotion"
+    updated_at: Optional[str] = None
 
 class ConflictCheckRequest(BaseModel):
     anchor_id: str
@@ -104,6 +135,10 @@ class ComboQuery(BaseModel):
     target_segment: Optional[str] = "General Customers"
     event_theme: Optional[str] = "Diwali Maha Utsav"
     offer_type: Optional[str] = "COMBO_DISCOUNT"
+    region: Optional[str] = "Karnataka & South India"
+    archetype: Optional[str] = "ANCHOR_MARGIN_BOOSTER"
+    primary_product_id: Optional[str] = None
+    secondary_product_id: Optional[str] = None
 
 class CreativeAssets(BaseModel):
     poster_headline: str
@@ -112,6 +147,7 @@ class CreativeAssets(BaseModel):
     poster_body: str
     whatsapp_message: str
     pos_tagline: str
+    cashier_counter_pitch: Optional[str] = None
 
 class ROIMetrics(BaseModel):
     baseline_units_10d: int
@@ -123,6 +159,43 @@ class ROIMetrics(BaseModel):
     projected_gross_margin_pct: float
     projected_net_profit_inr: float
 
+class InvestmentROISimulation(BaseModel):
+    total_inventory_invested_inr: float
+    projected_sales_revenue_inr: float
+    projected_gross_profit_inr: float
+    overall_roi_pct: float
+    dead_capital_at_risk_inr: float
+    unlocked_capital_from_promos_inr: float
+    net_promo_profit_boost_inr: float
+    capital_turnover_days: int
+    recommendation_action: str
+
+class ROIScenarioRequest(BaseModel):
+    proposed_discount_depth_pct: float = 16.0
+    expected_volume_lift_pct: float = 35.0
+
+class PromotionVariety(BaseModel):
+    id: str
+    variety_type: str
+    title: str
+    tagline: str
+    badge: str
+    badge_class: str
+    icon: str
+    combo_price: float
+    original_mrp: float
+    discount_amount: float
+    discount_pct: float
+    net_margin_pct: float
+    projected_volume_lift_pct: float
+    capital_turnover_days: int
+    customer_target: str
+    cashier_counter_pitch: str
+    whatsapp_copy: str
+    poster_headline: str
+    poster_savings: str
+    is_recommended: bool = False
+
 class ComboPlan(BaseModel):
     combo_id: str
     title: str
@@ -133,6 +206,8 @@ class ComboPlan(BaseModel):
     demand_driver: str
     original_combined_mrp: float
     recommended_combo_price: float
+    combo_price: Optional[float] = None
+    original_total_mrp: Optional[float] = None
     discount_amount: float
     discount_pct: float
     net_margin_pct: float
@@ -142,5 +217,79 @@ class ComboPlan(BaseModel):
     roi_prediction: ROIMetrics
     event_theme: Optional[str] = "Diwali Maha Utsav"
     offer_type: Optional[str] = "COMBO_DISCOUNT"
+    archetype: Optional[str] = "ANCHOR_MARGIN_BOOSTER"
+    region: Optional[str] = "Karnataka & South India"
     co_purchase_probability: Optional[Dict[str, Any]] = None
     forecasting_summary: Optional[Dict[str, Any]] = None
+    varieties: Optional[List[PromotionVariety]] = None
+    hybrid_architecture: Optional[Dict[str, Any]] = None
+
+class ChatQuery(BaseModel):
+    message: str
+    min_margin_pct: Optional[float] = None
+    store_region: Optional[str] = None
+    region: Optional[str] = None
+    history: Optional[List[Dict[str, str]]] = []
+
+class ChatResponse(BaseModel):
+    reply: str
+    intent: str  # "PROMOTION_GENERATED", "WEEKLY_IDEAS", "ROI_INSIGHT", "GENERAL_ASSISTANCE"
+    detected_margin_pct: float
+    plan: Optional[ComboPlan] = None
+    ideas: Optional[List[Dict[str, Any]]] = None
+    roi_summary: Optional[Dict[str, Any]] = None
+
+class CustomerInfo(BaseModel):
+    name: str
+    phone: str
+    segment: Optional[str] = "General"
+    preferred_channel: Optional[str] = "WhatsApp"
+
+class StoreProfile(BaseModel):
+    store_id: str = "store_bengaluru_01"
+    store_name: str = "Metro Supermarket & Retail Mart"
+    owner_name: str = "Ramesh Sharma"
+    phone: str = "+91 98450 12345"
+    gstin: Optional[str] = "29AAAAA0000A1Z5"
+    store_type: Optional[str] = "Supermarket"
+    store_format: Optional[str] = "Supermarket"
+    audience_size: Optional[int] = 1420
+    whatsapp_audience_size: Optional[int] = 1420
+    region: str = "Karnataka & South India"
+    city: str = "Bengaluru"
+    country: Optional[str] = "India"
+    locality: Optional[str] = "Koramangala 4th Block"
+    pin_code: Optional[str] = "560034"
+    default_min_margin_pct: Optional[float] = 16.5
+    total_working_capital_inr: Optional[float] = 500000.0
+    customer_list: Optional[List[Dict[str, Any]]] = None
+    updated_at: Optional[str] = None
+
+class StoreProfileUpdate(BaseModel):
+    store_name: Optional[str] = None
+    owner_name: Optional[str] = None
+    phone: Optional[str] = None
+    gstin: Optional[str] = None
+    store_type: Optional[str] = None
+    store_format: Optional[str] = None
+    audience_size: Optional[int] = None
+    whatsapp_audience_size: Optional[int] = None
+    default_min_margin_pct: Optional[float] = None
+    total_working_capital_inr: Optional[float] = None
+    region: Optional[str] = None
+    city: Optional[str] = None
+    country: Optional[str] = None
+    locality: Optional[str] = None
+    pin_code: Optional[str] = None
+    customer_list: Optional[List[Dict[str, Any]]] = None
+
+class StorageStatusResponse(BaseModel):
+    mode: str
+    firestore_connected: bool
+    store_id: str
+    collections: Dict[str, str]
+    instant_sync_active: bool
+    fallback_reason: Optional[str] = None
+    last_sync_timestamp: Optional[str] = None
+    local_cache_files: Dict[str, str]
+

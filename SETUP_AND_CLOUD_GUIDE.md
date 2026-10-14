@@ -222,6 +222,7 @@ The primary next milestone is to transition from local testing and mock fallback
      run.googleapis.com \
      artifactregistry.googleapis.com \
      aiplatform.googleapis.com \
+     firestore.googleapis.com \
      storage.googleapis.com \
      secretmanager.googleapis.com \
      cloudbuild.googleapis.com
@@ -234,10 +235,14 @@ The primary next milestone is to transition from local testing and mock fallback
      --description="Runtime Service Account for PromoMind AI" \
      --display-name="PromoMind-SA"
 
-   # Grant Vertex AI User and Cloud Storage Object Admin
+   # Grant Vertex AI User, Firestore User, and Cloud Storage Object Admin
    gcloud projects add-iam-policy-binding promomind-ai-prod \
      --member="serviceAccount:promomind-sa@promomind-ai-prod.iam.gserviceaccount.com" \
      --role="roles/aiplatform.user"
+
+   gcloud projects add-iam-policy-binding promomind-ai-prod \
+     --member="serviceAccount:promomind-sa@promomind-ai-prod.iam.gserviceaccount.com" \
+     --role="roles/datastore.user"
 
    gcloud projects add-iam-policy-binding promomind-ai-prod \
      --member="serviceAccount:promomind-sa@promomind-ai-prod.iam.gserviceaccount.com" \
@@ -339,26 +344,46 @@ Deploy PromoMind AI as a fully managed, auto-scaling serverless web service.
 
 ---
 
-### Step 4: Cloud Storage (GCS) Data Lake & Knowledge Sync
+### Step 4: Google Cloud Firestore Data Architecture & Instant AI Sync
 
-For multi-tenant retail deployments, store uploaded distributor CSVs and compiled `store_knowledge.md` files in Google Cloud Storage:
+PromoMind AI integrates directly with **Google Cloud Firestore** via the **Dual-Mode Hybrid Storage Adapter** (`backend/storage.py`), replacing local data mounts with enterprise cloud document collections while preserving 100% offline fallback capabilities.
 
-1. **Create GCS Bucket:**
+1. **Firestore Collections Hierarchy:**
+   All multi-tenant store assets are organized under the `stores/{store_id}/` root:
+
+   | Firestore Collection Path | Document Schema & Contents | Instant Sync Behavior |
+   |---|---|---|
+   | `stores/{store_id}/inventory` | Real-time stock levels, MRP, cost price, velocity status, past 6-week curves, and 4-week forecasts. | Automatically triggers re-compilation of AI grounding catalog on write. |
+   | `stores/{store_id}/promotions` | Active & scheduled bundle campaigns, pricing tiers, and conflict logs (`type: "conflict_log"`). | Checked during `/api/offers/check-conflict` to prevent cannibalization. |
+   | `stores/{store_id}/calendar_events` | Regional festive event calendar (e.g. Deepavali Deepas, Ayudha Puja). | Dynamically referenced during AI combo grounding. |
+   | `stores/{store_id}/store_profile` | Store metadata, owner name, locality, GSTIN, and active customer broadcast list. | Synced with retailer app profile screen. |
+   | `stores/{store_id}/knowledge_catalog` | Compiled Markdown catalog (`store_knowledge.md`) snapshot with timestamps. | Dual-persisted to Firestore doc `current` and local `data/store_knowledge.md`. |
+
+2. **Dual-Mode Operation:**
+   - **Cloud Mode:** Activated automatically when Google Cloud credentials or `GCP_PROJECT_ID` / `FIRESTORE_PROJECT_ID` are configured. All reads and writes target Firestore collections directly.
+   - **Offline / Local Fallback Mode:** Operates automatically when running without internet or credentials. All data safely persists to `data/*.json` and `data/store_knowledge.md`, guaranteeing zero downtime.
+   - **Real-Time Snapshot Sync:** Real-time listeners on `stores/{store_id}/inventory` detect external updates in Firestore and instantly re-compile `data/store_knowledge.md` for AI agent grounding.
+
+3. **Verify Firestore Connection:**
+   Query the new storage diagnostic endpoint:
    ```bash
-   gcloud storage buckets create gs://promomind-store-vault-prod \
-     --location=asia-south1 \
-     --uniform-bucket-level-access
+   curl http://localhost:8080/api/storage/status
    ```
-
-2. **Connect `backend/storage.py` to GCS:**
-   ```python
-   from google.cloud import storage
-
-   def upload_knowledge_to_gcs(store_id: str, markdown_content: str):
-       client = storage.Client()
-       bucket = client.bucket("promomind-store-vault-prod")
-       blob = bucket.blob(f"tenants/{store_id}/store_knowledge.md")
-       blob.upload_from_string(markdown_content, content_type="text/markdown")
+   Example response:
+   ```json
+   {
+     "mode": "CLOUD",
+     "firestore_connected": true,
+     "store_id": "sharma_supermarket_01",
+     "collections": {
+       "inventory": "stores/sharma_supermarket_01/inventory",
+       "promotions": "stores/sharma_supermarket_01/promotions",
+       "calendar_events": "stores/sharma_supermarket_01/calendar_events",
+       "store_profile": "stores/sharma_supermarket_01/store_profile",
+       "knowledge_catalog": "stores/sharma_supermarket_01/knowledge_catalog"
+     },
+     "instant_sync_active": true
+   }
    ```
 
 ---
@@ -393,3 +418,4 @@ python -c "import urllib.request; print(urllib.request.urlopen('http://localhost
 ---
 
 *PromoMind AI — Empowering Neighborhood Retailers with Intelligent Forecasting & Google Cloud AI.*
+
