@@ -26,10 +26,20 @@
    - Deepavali in South India models a **+140% surge in Clay Deepas/Diyas, Pure Cow Ghee, and Cotton Wicks**, while dropping back to baseline (<5 units/month) during non-festival periods.
    - Tracks Ayudha Puja (Ash Gourd, Puffed Rice, Lemons) and Karthika Deepotsava.
 
-5. **📄 AI Knowledge Catalog Base (`data/store_knowledge.md`):**
+5. **🔥 Direct Google Cloud Firestore Integration (Dual-Mode Hybrid Storage Adapter):**
+   - **Cloud Mode:** Directly reads & writes to Firestore collections under `stores/{store_id}/`:
+     - `stores/{store_id}/inventory`: Real-time stock levels, MRP, cost, and velocities.
+     - `stores/{store_id}/promotions`: Active/scheduled campaigns, pricing tiers, and conflict logs.
+     - `stores/{store_id}/calendar_events`: Regional festive event calendar.
+     - `stores/{store_id}/store_profile`: Store metadata, location, and customer list.
+     - `stores/{store_id}/knowledge_catalog`: Compiled Markdown catalog (`store_knowledge.md`).
+   - **Offline / Local Fallback Mode:** Automatically falls back to local JSON + Markdown when running without internet or credentials, ensuring 100% zero downtime.
+   - **Instant Sync with AI Knowledge Base:** Any update to Firestore triggers an automatic re-compilation of `data/store_knowledge.md` for AI agent grounding.
+
+6. **📄 AI Knowledge Catalog Base (`data/store_knowledge.md`):**
    - Automatically synchronizes all inventory records, time-series velocities, and Apriori matrices into a structured Markdown catalog that AI agents consult for grounding.
 
-6. **💡 Executive Problem Statement & Whitepaper:**
+7. **💡 Executive Problem Statement & Whitepaper:**
    - Visit `/problem-statement` or open [`frontend/problem_statement.html`](frontend/problem_statement.html) for a complete analysis of retail challenges, solutions, and multi-stakeholder impact.
 
 ---
@@ -57,10 +67,23 @@
                                          │
                                          ▼
 ┌─────────────────────────────────────────────────────────────────────────────────┐
-│                         Persistence & Knowledge Store                           │
-│     • data/inventory_store.json (Dynamic SKU Records & Historical Curves)       │
-│     • data/store_knowledge.md   (Grounding Catalog for Multi-Agent Reasoning)   │
-└─────────────────────────────────────────────────────────────────────────────────┘
+│                 Dual-Mode Hybrid Storage Adapter (storage.py)                   │
+│   ┌─────────────────────────────────────┐ ┌───────────────────────────────────┐ │
+│   │   Cloud Mode (Firestore Live)       │ │   Offline / Local Fallback Mode   │ │
+│   │   stores/{store_id}/inventory       │ │   • data/inventory_store.json     │ │
+│   │   stores/{store_id}/promotions      │ │   • data/promotions_store.json    │ │
+│   │   stores/{store_id}/calendar_events │ │   • data/calendar_events.json     │ │
+│   │   stores/{store_id}/store_profile   │ │   • data/store_profile.json       │ │
+│   │   stores/{store_id}/knowledge_cat   │ │   • data/conflict_logs.json       │ │
+│   └──────────────────┬──────────────────┘ └─────────────────┬─────────────────┘ │
+└──────────────────────┼──────────────────────────────────────┼───────────────────┘
+                       │                                      │
+                       ▼                                      ▼
+               ┌──────────────────────────────────────────────────────┐
+               │         Instant AI Grounding Knowledge Base          │
+               │               data/store_knowledge.md                │
+               │   (Auto-recompiled on every inventory / cloud event) │
+               └──────────────────────────────────────────────────────┘
 ```
 
 ---
@@ -148,7 +171,11 @@ Key integration stages:
 |---|---|---|
 | `GET` | `/` | Responsive React-Native inspired 5-screen web app |
 | `GET` | `/problem-statement` | Problem statement, retail solution & impact whitepaper |
+| `GET` | `/api/storage/status` | Hybrid storage adapter telemetry (Cloud vs Local, Firestore collections) |
+| `GET` | `/api/store/profile` | Retrieve store metadata, regional location, and customer list |
+| `POST` | `/api/store/profile` | Update store identity, regional demographics, and customer list |
 | `GET` | `/api/inventory` | Retailer inventory, velocities, cost, MRP, and stock status |
+| `POST` | `/api/products` | Add new SKU, run Holt-Winters forecasts, and instant-sync AI Knowledge Base |
 | `GET` | `/api/inventory/{id}/brand-comparison` | Multi-brand sales curves (e.g., Amul vs Nandini vs Mother Dairy) |
 | `GET` | `/api/calendar/events` | Regional festival events (Deepavali Deepas, Ayudha Puja, etc.) |
 | `GET` | `/api/offers/active` | Currently scheduled and active in-store promotional offers |

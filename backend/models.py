@@ -59,24 +59,26 @@ class RegionalFestivalEvent(BaseModel):
     name: str
     region: str          # e.g. "Karnataka / South India", "Pan-India", "Maharashtra"
     date_window: str     # e.g. "Oct 24 - Oct 29 (Peak Diwali)"
-    status: str          # "UPCOMING", "ACTIVE", "PAST"
+    status: Optional[str] = "UPCOMING"  # "UPCOMING", "ACTIVE", "PAST"
     key_items: List[str] # e.g. ["Diyas / Deepas", "Pure Cow Ghee", "Gulab Jamun", "Almonds"]
     demand_lift_pct: float
-    icon: str
-    description: str
+    icon: Optional[str] = "🪔"
+    description: Optional[str] = ""
 
 class ScheduledOffer(BaseModel):
     id: str
-    combo_id: str
+    combo_id: Optional[str] = "COMBO_DEFAULT"
     title: str
     anchor_id: str
     attached_id: str
-    start_date: str
-    end_date: str
+    start_date: Optional[str] = "2026-10-15"
+    end_date: Optional[str] = "2026-10-25"
     discount_pct: float
     combo_price: float
-    event_theme: str
-    status: str  # "ACTIVE", "SCHEDULED", "COMPLETED"
+    event_theme: Optional[str] = "Active Campaign"
+    status: Optional[str] = "ACTIVE"  # "ACTIVE", "SCHEDULED", "COMPLETED"
+    type: Optional[str] = "promotion"
+    updated_at: Optional[str] = None
 
 class ConflictCheckRequest(BaseModel):
     anchor_id: str
@@ -144,3 +146,48 @@ class ComboPlan(BaseModel):
     offer_type: Optional[str] = "COMBO_DISCOUNT"
     co_purchase_probability: Optional[Dict[str, Any]] = None
     forecasting_summary: Optional[Dict[str, Any]] = None
+
+class CustomerInfo(BaseModel):
+    name: str
+    phone: str
+    segment: Optional[str] = "General"
+    preferred_channel: Optional[str] = "WhatsApp"
+
+class StoreProfile(BaseModel):
+    store_id: str = "sharma_supermarket_01"
+    store_name: str = "Sharma Supermarket & Kirana"
+    owner_name: str = "Ramesh Sharma"
+    phone: str = "+91 98450 12345"
+    gstin: Optional[str] = "29AAAAA0000A1Z5"
+    store_type: Optional[str] = "Supermarket"
+    audience_size: Optional[int] = 1420
+    region: str = "Karnataka & South India"
+    city: str = "Bengaluru"
+    locality: Optional[str] = "Koramangala 4th Block"
+    pin_code: Optional[str] = "560034"
+    customer_list: Optional[List[Dict[str, Any]]] = None
+    updated_at: Optional[str] = None
+
+class StoreProfileUpdate(BaseModel):
+    store_name: Optional[str] = None
+    owner_name: Optional[str] = None
+    phone: Optional[str] = None
+    gstin: Optional[str] = None
+    store_type: Optional[str] = None
+    audience_size: Optional[int] = None
+    region: Optional[str] = None
+    city: Optional[str] = None
+    locality: Optional[str] = None
+    pin_code: Optional[str] = None
+    customer_list: Optional[List[Dict[str, Any]]] = None
+
+class StorageStatusResponse(BaseModel):
+    mode: str
+    firestore_connected: bool
+    store_id: str
+    collections: Dict[str, str]
+    instant_sync_active: bool
+    fallback_reason: Optional[str] = None
+    last_sync_timestamp: Optional[str] = None
+    local_cache_files: Dict[str, str]
+

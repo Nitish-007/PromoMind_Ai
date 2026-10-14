@@ -120,16 +120,66 @@ function loadStoreProfile() {
   // Sync calendar region select
   const calRegion = document.getElementById("calendarRegionSelect");
   if (calRegion) calRegion.value = savedRegion;
+
+  // Fetch live storage status and store profile from backend
+  fetchStorageStatus();
+  fetchStoreProfile();
 }
 
-function saveStoreProfile() {
+async function fetchStorageStatus() {
+  try {
+    const res = await fetch("/api/storage/status");
+    if (!res.ok) return;
+    const data = await res.json();
+    const badgeEl = document.getElementById("storageStatusBadge");
+    const collsEl = document.getElementById("storageCollectionsBadge");
+    if (badgeEl) {
+      if (data.mode === "CLOUD" && data.firestore_connected) {
+        badgeEl.innerHTML = `🟢 <strong>Cloud Mode (Firestore Live)</strong>`;
+        badgeEl.style.color = "#15803d";
+      } else {
+        badgeEl.innerHTML = `🟡 <strong>Local Fallback Mode (Zero Downtime)</strong>`;
+        badgeEl.style.color = "#b45309";
+      }
+    }
+    if (collsEl && data.collections) {
+      collsEl.innerText = `stores/${data.store_id}/[inventory, promotions, calendar_events, store_profile, knowledge_catalog]`;
+    }
+  } catch (err) {
+    console.warn("Could not query /api/storage/status:", err);
+  }
+}
+
+async function fetchStoreProfile() {
+  try {
+    const res = await fetch("/api/store/profile");
+    if (!res.ok) return;
+    const profile = await res.json();
+    if (profile.store_name) {
+      document.getElementById("topStoreName").innerText = profile.store_name;
+      const elStore = document.getElementById("profStoreName");
+      if (elStore) elStore.value = profile.store_name;
+    }
+    if (profile.owner_name) {
+      const elOwner = document.getElementById("profOwnerName");
+      if (elOwner) elOwner.value = profile.owner_name;
+    }
+    if (profile.city && profile.region) {
+      document.getElementById("topStoreLocation").innerText = `${profile.city} • ${profile.region.split("&")[0].trim()}`;
+    }
+  } catch (err) {
+    console.warn("Could not fetch remote store profile:", err);
+  }
+}
+
+async function saveStoreProfile() {
   const storeName = document.getElementById("profStoreName").value.trim() || "Sharma Supermarket";
   const owner = document.getElementById("profOwnerName").value.trim();
   const region = document.getElementById("profStateRegion").value;
   const city = document.getElementById("profCity").value.trim();
   const pin = document.getElementById("profPin").value.trim();
   const phone = document.getElementById("profPhone").value.trim();
-  const audience = document.getElementById("profAudienceSize").value.trim();
+  const audience = parseInt(document.getElementById("profAudienceSize").value.trim()) || 1420;
 
   localStorage.setItem("promomind_store_name", storeName);
   localStorage.setItem("promomind_owner_name", owner);
@@ -137,13 +187,32 @@ function saveStoreProfile() {
   localStorage.setItem("promomind_city", city);
   localStorage.setItem("promomind_pin", pin);
   localStorage.setItem("promomind_phone", phone);
-  localStorage.setItem("promomind_audience", audience);
+  localStorage.setItem("promomind_audience", String(audience));
 
   // Update header and calendar
   document.getElementById("topStoreName").innerText = storeName;
   document.getElementById("topStoreLocation").innerText = `${city} • ${region.split("&")[0].trim()}`;
   document.getElementById("intelRegionName").innerText = region;
   document.getElementById("calendarRegionSelect").value = region;
+
+  // Persist to backend / Firestore
+  try {
+    await fetch("/api/store/profile", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        store_name: storeName,
+        owner_name: owner,
+        region: region,
+        city: city,
+        pin_code: pin,
+        phone: phone,
+        audience_size: audience
+      })
+    });
+  } catch (err) {
+    console.warn("Could not push profile to server:", err);
+  }
 
   showToast("Store profile & regional preferences saved successfully!");
 }

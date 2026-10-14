@@ -1,5 +1,6 @@
 # 🏪 PromoMind AI — Retail Store Knowledge & Catalog Base
-> *Persistent AI Knowledge Catalog for Sharma Supermarket (Bengaluru)*
+> *Persistent AI Knowledge Catalog for Store ID: `sharma_kirana_cloud`*
+> *Storage Mode: **CLOUD** | Synchronized: 2026-10-14 11:46:25 UTC*
 > *Auto-generated from retail inventory data & open-source demand forecasting engine.*
 
 ---
@@ -79,10 +80,10 @@
 
 | Event Name | Focus Categories | Projected Demand Lift | Strategic Recommendation |
 |---|---|---|---|
-| **Diwali Maha Utsav (Big Festive Days)** | Pure Ghee, Dry Fruits, Gulab Jamun, Cooking Oil | **+75% to +110%** | Bundle high-margin dry fruits with fast-selling cow ghee for festive gifting. |
-| **Monsoon Refresh Bonanza** | Premium Teas, Biscuits, Spices, Hot Snacks | **+35% to +45%** | Pair evening chai with near-expiry cookies at 17% discount. |
-| **Great Indian Grocery Super Saver** | Staples, Sunflower Oil, Garam Masala | **+40% to +50%** | Volume tier pricing / Buy cooking oil & get spice pack at 50% off. |
-| **Super Weekend Kirana Rush** | All Kitchen Staples & Snacks | **+25% to +35%** | Run fast-moving basket driver offers with clear POS receipt taglines. |
+| **Diwali / Deepavali (Deepa & Lakshmi Puja)** | Clay Diyas & Deepas, Pure Cow Ghee, Gulab Jamun & Sweets, California Almonds, Puja Camphor & Wicks | **+85.0%** | Peak festive season in Bengaluru. Deepas and Cow Ghee require 3x normal stock. Non-festive days require only minimal puja stock. |
+| **Ayudha Puja & Vijayadashami** | Puffed Rice (Pori), Jaggery (Bella), Sunflower Oil, Ash Gourd, Flowers & Lemon | **+60.0%** | Massive corporate and vehicle puja demand. Bulk restocking of sweets and sunflower oil for frying. |
+| **Karthika Deepotsava** | Earthen Deepas (Clay Lamps), Sesame Gingelly Oil, Cotton Wicks, Cow Ghee | **+45.0%** | Month of lights across temples and households. Heavy surge in clay deepas and lighting oils. |
+| **Monsoon Refresh Bonanza** | Premium Tea, Biscuits, Garam Masala, Ginger, Snacks | **+35.0%** | Cool monsoon evenings trigger evening chai & biscuit combo demand. |
 
 ---
 ## 🤖 4. Guidelines for Multi-Agent Combo Generation
