@@ -1,11 +1,8 @@
 [
   {
     "date_window": "Oct 10 - Oct 13, 2026",
-    "region": "Karnataka",
-    "name": "Ayudha Puja & Vijayadashami",
     "demand_lift_pct": 60.0,
-    "id": "EVT_AYUDHA_PUJA_2026",
-    "status": "UPCOMING",
+    "icon": "🌾",
     "key_items": [
       "Puffed Rice (Pori)",
       "Jaggery (Bella)",
@@ -13,16 +10,16 @@
       "Ash Gourd",
       "Flowers & Lemon"
     ],
+    "region": "Karnataka",
+    "status": "UPCOMING",
     "description": "Massive corporate and vehicle puja demand. Bulk restocking of sweets and sunflower oil for frying.",
-    "icon": "🌾"
+    "name": "Ayudha Puja & Vijayadashami",
+    "id": "EVT_AYUDHA_PUJA_2026"
   },
   {
     "date_window": "Oct 24 - Oct 29, 2026",
-    "region": "Karnataka & South India",
-    "name": "Diwali / Deepavali (Deepa & Lakshmi Puja)",
     "demand_lift_pct": 85.0,
-    "id": "EVT_DIWALI_2026",
-    "status": "UPCOMING",
+    "icon": "🪔",
     "key_items": [
       "Clay Diyas & Deepas",
       "Pure Cow Ghee",
@@ -30,32 +27,32 @@
       "California Almonds",
       "Puja Camphor & Wicks"
     ],
+    "region": "Karnataka & South India",
+    "status": "UPCOMING",
     "description": "Peak festive season in Bengaluru. Deepas and Cow Ghee require 3x normal stock. Non-festive days require only minimal puja stock.",
-    "icon": "🪔"
+    "name": "Diwali / Deepavali (Deepa & Lakshmi Puja)",
+    "id": "EVT_DIWALI_2026"
   },
   {
     "date_window": "Nov 14 - Nov 20, 2026",
-    "region": "Karnataka & Tamil Nadu",
-    "name": "Karthika Deepotsava",
     "demand_lift_pct": 45.0,
-    "id": "EVT_KARTHIKA_DEEPAM_2026",
-    "status": "UPCOMING",
+    "icon": "🕯️",
     "key_items": [
       "Earthen Deepas (Clay Lamps)",
       "Sesame Gingelly Oil",
       "Cotton Wicks",
       "Cow Ghee"
     ],
+    "region": "Karnataka & Tamil Nadu",
+    "status": "UPCOMING",
     "description": "Month of lights across temples and households. Heavy surge in clay deepas and lighting oils.",
-    "icon": "🕯️"
+    "name": "Karthika Deepotsava",
+    "id": "EVT_KARTHIKA_DEEPAM_2026"
   },
   {
     "date_window": "Jul 15 - Aug 30, 2026",
-    "region": "Karnataka Urban",
-    "name": "Monsoon Refresh Bonanza",
     "demand_lift_pct": 35.0,
-    "id": "EVT_MONSOON_BONANZA_2026",
-    "status": "COMPLETED",
+    "icon": "🌧️",
     "key_items": [
       "Premium Tea",
       "Biscuits",
@@ -63,7 +60,10 @@
       "Ginger",
       "Snacks"
     ],
+    "region": "Karnataka Urban",
+    "status": "COMPLETED",
     "description": "Cool monsoon evenings trigger evening chai & biscuit combo demand.",
-    "icon": "🌧️"
+    "name": "Monsoon Refresh Bonanza",
+    "id": "EVT_MONSOON_BONANZA_2026"
   }
 ]
