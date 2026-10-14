@@ -54,16 +54,34 @@ class BrandComparisonResponse(BaseModel):
     brands: List[BrandSalesCurve]
     recommendation: str
 
+class StoreProfile(BaseModel):
+    store_name: str = "Sharma Supermarket & Kirana"
+    owner_name: str = "Ramesh Sharma"
+    region: str = "Karnataka & South India"
+    city: str = "Bengaluru"
+    locality: str = "Koramangala 4th Block"
+    pin_code: str = "560034"
+    phone: str = "+91 98450 12345"
+    store_format: str = "Supermarket" # Supermarket, Kirana, Mart, Organic
+    whatsapp_audience_size: int = 1420
+    default_min_margin_pct: float = 18.0
+    total_working_capital_inr: float = 350000.0
+
 class RegionalFestivalEvent(BaseModel):
     id: str
     name: str
-    region: str          # e.g. "Karnataka / South India", "Pan-India", "Maharashtra"
+    region: str          # e.g. "Karnataka & South India", "Maharashtra & West India", etc.
     date_window: str     # e.g. "Oct 24 - Oct 29 (Peak Diwali)"
     status: str          # "UPCOMING", "ACTIVE", "PAST"
     key_items: List[str] # e.g. ["Diyas / Deepas", "Pure Cow Ghee", "Gulab Jamun", "Almonds"]
     demand_lift_pct: float
     icon: str
     description: str
+    tradition_notes: Optional[str] = None               # Cultural and traditional rationale
+    advance_procurement_window: Optional[str] = None    # When retailer should buy from distributor (T-14d)
+    promo_launch_window: Optional[str] = None           # When to run early-bird offers (T-7d)
+    clearance_window: Optional[str] = None              # Post-festival clearance window (T+2d)
+    recommended_promo_type: Optional[str] = None        # e.g. "Festive Gifting Hamper", "Advance Booking Combo"
 
 class ScheduledOffer(BaseModel):
     id: str
@@ -104,6 +122,8 @@ class ComboQuery(BaseModel):
     target_segment: Optional[str] = "General Customers"
     event_theme: Optional[str] = "Diwali Maha Utsav"
     offer_type: Optional[str] = "COMBO_DISCOUNT"
+    region: Optional[str] = "Karnataka & South India"
+    archetype: Optional[str] = "ANCHOR_MARGIN_BOOSTER"
 
 class CreativeAssets(BaseModel):
     poster_headline: str
@@ -112,6 +132,7 @@ class CreativeAssets(BaseModel):
     poster_body: str
     whatsapp_message: str
     pos_tagline: str
+    cashier_counter_pitch: Optional[str] = None
 
 class ROIMetrics(BaseModel):
     baseline_units_10d: int
@@ -122,6 +143,21 @@ class ROIMetrics(BaseModel):
     dead_stock_cleared_pct: float
     projected_gross_margin_pct: float
     projected_net_profit_inr: float
+
+class InvestmentROISimulation(BaseModel):
+    total_inventory_invested_inr: float
+    projected_sales_revenue_inr: float
+    projected_gross_profit_inr: float
+    overall_roi_pct: float
+    dead_capital_at_risk_inr: float
+    unlocked_capital_from_promos_inr: float
+    net_promo_profit_boost_inr: float
+    capital_turnover_days: int
+    recommendation_action: str
+
+class ROIScenarioRequest(BaseModel):
+    proposed_discount_depth_pct: float = 16.0
+    expected_volume_lift_pct: float = 35.0
 
 class ComboPlan(BaseModel):
     combo_id: str
@@ -142,5 +178,7 @@ class ComboPlan(BaseModel):
     roi_prediction: ROIMetrics
     event_theme: Optional[str] = "Diwali Maha Utsav"
     offer_type: Optional[str] = "COMBO_DISCOUNT"
+    archetype: Optional[str] = "ANCHOR_MARGIN_BOOSTER"
+    region: Optional[str] = "Karnataka & South India"
     co_purchase_probability: Optional[Dict[str, Any]] = None
     forecasting_summary: Optional[Dict[str, Any]] = None

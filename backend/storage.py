@@ -10,23 +10,77 @@ DATA_DIR = os.path.join(PROJECT_ROOT, "data")
 if CURRENT_DIR not in sys.path:
     sys.path.insert(0, CURRENT_DIR)
 
-from models import Product
-from mock_data import INVENTORY_DATA, DEMAND_FORECASTS
-from forecasting import OpenSourceForecastingEngine
+from models import Product, StoreProfile
+from mock_data import INVENTORY_DATA, DEMAND_FORECASTS, REGIONAL_FESTIVAL_CALENDAR
+from forecasting import OpenSourceForecastingEngine, InvestmentROIEngine
+from firestore_service import FirestoreService
 
 STORE_JSON_FILE = os.path.join(DATA_DIR, "inventory_store.json")
+PROFILE_JSON_FILE = os.path.join(DATA_DIR, "store_profile.json")
 KNOWLEDGE_MD_FILE = os.path.join(DATA_DIR, "store_knowledge.md")
 
 class StoreDataManager:
-    """Manages persistent inventory storage and builds markdown knowledge files for AI."""
+    """Manages persistent inventory storage, store profile, and builds markdown knowledge files for AI."""
 
     @classmethod
     def ensure_data_directory(cls):
         os.makedirs(DATA_DIR, exist_ok=True)
 
     @classmethod
+    def load_profile(cls) -> StoreProfile:
+        cls.ensure_data_directory()
+
+        # Try Google Cloud Firestore if connected
+        if FirestoreService.is_connected():
+            fs_data = FirestoreService.load_profile()
+            if fs_data:
+                try:
+                    prof = StoreProfile(**fs_data)
+                    with open(PROFILE_JSON_FILE, "w", encoding="utf-8") as f:
+                        json.dump(prof.model_dump(), f, indent=2, ensure_ascii=False)
+                    return prof
+                except Exception:
+                    pass
+
+        if not os.path.exists(PROFILE_JSON_FILE):
+            default_prof = StoreProfile()
+            cls.save_profile(default_prof)
+            return default_prof
+        try:
+            with open(PROFILE_JSON_FILE, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                return StoreProfile(**data)
+        except Exception:
+            return StoreProfile()
+
+    @classmethod
+    def save_profile(cls, profile: StoreProfile) -> StoreProfile:
+        cls.ensure_data_directory()
+        data_dict = profile.model_dump()
+        with open(PROFILE_JSON_FILE, "w", encoding="utf-8") as f:
+            json.dump(data_dict, f, indent=2, ensure_ascii=False)
+
+        # Dual-write to Google Cloud Firestore if connected
+        if FirestoreService.is_connected():
+            FirestoreService.save_profile(data_dict)
+
+        cls.rebuild_knowledge_markdown(profile=profile)
+        return profile
+
+    @classmethod
     def load_products(cls) -> List[Product]:
         cls.ensure_data_directory()
+
+        # Try Google Cloud Firestore if connected
+        if FirestoreService.is_connected():
+            fs_prods = FirestoreService.load_products()
+            if fs_prods:
+                try:
+                    loaded = [Product(**item) for item in fs_prods]
+                    return loaded
+                except Exception:
+                    pass
+
         if not os.path.exists(STORE_JSON_FILE):
             # Seed with baseline inventory data
             cls.save_products(INVENTORY_DATA)
@@ -45,6 +99,11 @@ class StoreDataManager:
         data = [p.model_dump() for p in products]
         with open(STORE_JSON_FILE, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=2, ensure_ascii=False)
+
+        # Dual-write batch to Google Cloud Firestore if connected
+        if FirestoreService.is_connected():
+            FirestoreService.save_products_batch(data)
+
         cls.rebuild_knowledge_markdown(products)
 
     @classmethod
@@ -58,6 +117,11 @@ class StoreDataManager:
             products.append(product)
 
         cls.save_products(products)
+
+        # Dual-write single SKU to Firestore if connected
+        if FirestoreService.is_connected():
+            FirestoreService.save_product(product.model_dump())
+
         return products
 
     @classmethod
@@ -123,17 +187,37 @@ class StoreDataManager:
         return imported, cls.get_knowledge_markdown()
 
     @classmethod
-    def rebuild_knowledge_markdown(cls, products: Optional[List[Product]] = None) -> str:
+    def rebuild_knowledge_markdown(
+        cls, 
+        products: Optional[List[Product]] = None,
+        profile: Optional[StoreProfile] = None
+    ) -> str:
         cls.ensure_data_directory()
         if products is None:
             products = cls.load_products()
+        if profile is None:
+            profile = cls.load_profile()
+
+        # Compute Store ROI & Financial Metrics
+        roi_stats = InvestmentROIEngine.compute_store_roi(products, store_capital_budget=profile.total_working_capital_inr)
 
         lines = [
-            "# 🏪 PromoMind AI — Retail Store Knowledge & Catalog Base",
-            "> *Persistent AI Knowledge Catalog for Sharma Supermarket (Bengaluru)*",
-            "> *Auto-generated from retail inventory data & open-source demand forecasting engine.*\n",
+            "# 🏪 PromoMind AI — Retail Store Knowledge & Grounding Catalog",
+            f"> *Store Name*: **{profile.store_name}** | *Owner*: **{profile.owner_name}**",
+            f"> *Cultural Region*: **{profile.region}** ({profile.city}, {profile.pin_code})",
+            f"> *Store Format*: **{profile.store_format}** | *WhatsApp Broadcast Reach*: **{profile.whatsapp_audience_size} Families**",
+            f"> *Working Capital Invested*: **₹{int(roi_stats['total_inventory_invested_inr']):,}** | *Target Net Margin*: **{profile.default_min_margin_pct}%**\n",
             "---",
-            "## 📦 1. Tracked Inventory & Predictive Velocity Status\n",
+            "## 💰 1. Working Capital Investment & Return on Capital (ROI) Intelligence\n",
+            f"- **Total Inventory Capital Invested**: ₹{int(roi_stats['total_inventory_invested_inr']):,}",
+            f"- **Projected 30-Day Sales Turnover**: ₹{int(roi_stats['projected_sales_revenue_inr']):,}",
+            f"- **Projected Net Dukan Profit**: ₹{int(roi_stats['projected_gross_profit_inr']):,} (**{roi_stats['overall_roi_pct']}% Net Return on Capital**)",
+            f"- **Dead Working Capital Trapped in Slow Movers**: ₹{int(roi_stats['dead_capital_at_risk_inr']):,} ({roi_stats['slow_mover_skus_count']} at-risk SKUs)",
+            f"- **Capital Unlocked via Smart Promo Bundles**: **₹{int(roi_stats['unlocked_capital_from_promos_inr']):,}** cash freed within 12 days (+₹{int(roi_stats['net_promo_profit_boost_inr']):,} net promo profit)",
+            f"- **Cash Turnover Velocity**: Every **{roi_stats['capital_turnover_days']} days**",
+            f"- **System Capital Status**: {roi_stats['recommendation_action']}\n",
+            "---",
+            "## 📦 2. Tracked SKU Inventory & Predictive Velocity Status\n",
             "| SKU ID | Product Name | Category | Stock | Cost (₹) | MRP (₹) | Margin (%) | Velocity | Days Left | Reorder Verdict |",
             "|---|---|---|---|---|---|---|---|---|---|"
         ]
@@ -148,7 +232,7 @@ class StoreDataManager:
 
         lines.extend([
             "\n---",
-            "## 📈 2. Demand Velocity & 10-Week Growth Trajectories\n"
+            "## 📈 3. Demand Velocity & 10-Week Growth Trajectories\n"
         ])
 
         for p in products:
@@ -172,21 +256,34 @@ class StoreDataManager:
                 lines.append(f"- **Market Alternatives**: {'; '.join(p.alternative_brands)}")
             lines.append("")
 
+        # Filter calendar events matching store's selected region
+        reg_events = [e for e in REGIONAL_FESTIVAL_CALENDAR if profile.region.lower().split("&")[0].strip() in e["region"].lower()]
+        if not reg_events:
+            reg_events = REGIONAL_FESTIVAL_CALENDAR[:4]
+
         lines.extend([
             "---",
-            "## 🪔 3. Active Festival Events & Demand Surge Calendar\n",
-            "| Event Name | Focus Categories | Projected Demand Lift | Strategic Recommendation |",
-            "|---|---|---|---|",
-            "| **Diwali Maha Utsav (Big Festive Days)** | Pure Ghee, Dry Fruits, Gulab Jamun, Cooking Oil | **+75% to +110%** | Bundle high-margin dry fruits with fast-selling cow ghee for festive gifting. |",
-            "| **Monsoon Refresh Bonanza** | Premium Teas, Biscuits, Spices, Hot Snacks | **+35% to +45%** | Pair evening chai with near-expiry cookies at 17% discount. |",
-            "| **Great Indian Grocery Super Saver** | Staples, Sunflower Oil, Garam Masala | **+40% to +50%** | Volume tier pricing / Buy cooking oil & get spice pack at 50% off. |",
-            "| **Super Weekend Kirana Rush** | All Kitchen Staples & Snacks | **+25% to +35%** | Run fast-moving basket driver offers with clear POS receipt taglines. |\n",
+            f"## 🪔 4. Regional Festival Calendar & Planning Deadlines for {profile.region}\n"
+        ])
+
+        for evt in reg_events:
+            lines.append(f"### {evt['icon']} {evt['name']} ({evt['date_window']}) — +{evt['demand_lift_pct']}% Surge")
+            lines.append(f"- **Regional Tradition**: {evt.get('tradition_notes', evt.get('description', ''))}")
+            lines.append(f"- **Key Regional SKUs**: {', '.join(evt.get('key_items', []))}")
+            lines.append(f"- **Advance Procurement Window**: {evt.get('advance_procurement_window', 'T-14 days')}")
+            lines.append(f"- **Customer Promo Launch**: {evt.get('promo_launch_window', 'T-7 days')}")
+            lines.append(f"- **Clearance Deadline**: {evt.get('clearance_window', 'T+2 days')}")
+            lines.append(f"- **Optimal Promo Archetype**: `{evt.get('recommended_promo_type', 'ANCHOR_MARGIN_BOOSTER')}`")
+            lines.append("")
+
+        lines.extend([
             "---",
-            "## 🤖 4. Guidelines for Multi-Agent Combo Generation",
-            "1. **Anchor Selection**: Identify items with positive growth momentum (>+30%) or seasonal surge.",
-            "2. **Attached Selection**: Pair anchors with items that have high co-purchase affinity (>50%) or slow velocity to clear near-expiry capital.",
-            "3. **Margin Floor**: Never breach retailer minimum margin (18% by default).",
-            "4. **Copy Persona**: Punchy Indian retail phrasing with WhatsApp emojis and clear rupee savings."
+            "## 🤖 5. Grounding Rules for AI Promotion & Offer Generation",
+            f"1. **Store Identity Grounding**: Personalize campaign titles and WhatsApp copy with store name '{profile.store_name}' and locality '{profile.locality}, {profile.city}'.",
+            f"2. **Cultural Tradition Respect**: Acknowledge local regional customs for {profile.region} (e.g. Diyas and Cow Ghee for Deepavali; Bevu-Bella for Ugadi; Modak for Ganesh Chaturthi).",
+            f"3. **Margin Safeguard**: Never breach the store's minimum net margin of {profile.default_min_margin_pct}%.",
+            "4. **Archetype Alignment**: Align bundle structure with the target goal (Anchor Booster, Expiry Rescue, Festive Hamper, or Volume Slab).",
+            "5. **Cashier Counter Pitch**: Always generate a 1-sentence friendly vernacular checkout pitch for billing counter staff."
         ])
 
         md_content = "\n".join(lines)

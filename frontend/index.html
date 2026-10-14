@@ -40,6 +40,11 @@
         💡 Whitepaper
       </a>
 
+      <!-- Presentation Slide Deck Link -->
+      <a href="/deck" target="_blank" class="icon-btn" title="View Interactive Hackathon & Investor Presentation Deck" style="text-decoration:none;font-size:13px;font-weight:600;width:auto;padding:0 12px;gap:6px;background:var(--g-blue-subtle);color:var(--g-blue);border-color:rgba(26,115,232,0.3);">
+        📊 Pitch Deck
+      </a>
+
       <!-- Theme Switcher -->
       <button class="icon-btn theme-btn" onclick="toggleTheme()" id="themeToggleBtn" title="Toggle Light / Dark Mode">
         🌙
@@ -110,6 +115,100 @@
           <button class="btn btn-primary" onclick="switchScreen('upload')">
             <span>📥</span> Import CSV
           </button>
+        </div>
+      </div>
+
+      <!-- Dukan Capital Investment & Returns / Profit Predictor Card -->
+      <div class="financial-roi-card" id="financialRoiCard">
+        <div class="roi-card-header">
+          <div class="roi-title-block">
+            <span class="roi-main-icon">💰</span>
+            <div>
+              <h3>Dukan Capital Investment & Returns / Profit Predictor</h3>
+              <p class="roi-subtext">Open-source financial intelligence: Predicts turnover, gross profit rupees, dead capital risk, and promo-unlocked cash.</p>
+            </div>
+          </div>
+          <button class="btn btn-sm btn-secondary" onclick="toggleRoiSimulator()">
+            <span id="simToggleIcon">⚡</span> <span id="simToggleText">Open "What-If" ROI Simulator</span>
+          </button>
+        </div>
+
+        <div class="roi-metrics-grid">
+          <div class="roi-stat-pill">
+            <span class="r-label">Total Capital Invested</span>
+            <span class="r-value" id="roiInvestedVal">₹--</span>
+            <span class="r-sub" id="roiInvestedSub">In Store Inventory</span>
+          </div>
+          <div class="roi-stat-pill highlight-blue">
+            <span class="r-label">Projected 30-Day Turnover</span>
+            <span class="r-value" id="roiRevenueVal">₹--</span>
+            <span class="r-sub">Holt-Winters forecast</span>
+          </div>
+          <div class="roi-stat-pill highlight-green">
+            <span class="r-label">Projected Net Dukan Profit</span>
+            <span class="r-value" id="roiProfitVal">₹--</span>
+            <span class="r-sub" id="roiProfitPctBadge">+--% Net Return (ROI)</span>
+          </div>
+          <div class="roi-stat-pill highlight-red">
+            <span class="r-label">Dead Capital at Risk</span>
+            <span class="r-value" id="roiDeadCapitalVal">₹--</span>
+            <span class="r-sub" id="roiDeadSkusSub">In slow movers (>60d)</span>
+          </div>
+          <div class="roi-stat-pill highlight-purple">
+            <span class="r-label">Cash Unlocked via Promos</span>
+            <span class="r-value" id="roiUnlockedCashVal">₹--</span>
+            <span class="r-sub" id="roiPromoBoostSub">+₹-- Net Promo Boost</span>
+          </div>
+        </div>
+
+        <!-- Interactive "What-If" ROI Scenario Simulator Drawer -->
+        <div class="roi-simulator-drawer hidden" id="roiSimulatorDrawer">
+          <div class="sim-header">
+            <h4>🔮 Interactive "What-If" Retail ROI Scenario Simulator</h4>
+            <p>Simulate how adjusting your bundle discount depth and expected volume lift changes your net profit rupees and cash turnover cycle:</p>
+          </div>
+          
+          <div class="sim-controls-grid">
+            <div class="sim-slider-group">
+              <div class="slider-label-row">
+                <span>Proposed Promotional Discount Depth:</span>
+                <strong id="simDiscountBadge">16% OFF</strong>
+              </div>
+              <input type="range" id="simDiscountSlider" min="5" max="30" value="16" step="1" oninput="runInteractiveRoiSimulation()">
+            </div>
+
+            <div class="sim-slider-group">
+              <div class="slider-label-row">
+                <span>Expected Sales Volume Lift:</span>
+                <strong id="simVolumeBadge">+35% Units</strong>
+              </div>
+              <input type="range" id="simVolumeSlider" min="10" max="80" value="35" step="5" oninput="runInteractiveRoiSimulation()">
+            </div>
+          </div>
+
+          <!-- Simulation Live Output -->
+          <div class="sim-output-strip" id="simOutputStrip">
+            <div class="sim-out-item">
+              <span class="so-label">Simulated Turnover</span>
+              <strong class="so-val" id="simTurnoverVal">₹--</strong>
+            </div>
+            <div class="sim-out-item">
+              <span class="so-label">Simulated Net Profit</span>
+              <strong class="so-val green" id="simProfitVal">₹--</strong>
+            </div>
+            <div class="sim-out-item">
+              <span class="so-label">Effective ROI</span>
+              <strong class="so-val" id="simRoiVal">--%</strong>
+            </div>
+            <div class="sim-out-item">
+              <span class="so-label">Capital Turnover Speedup</span>
+              <strong class="so-val blue" id="simSpeedupVal">-- Days Faster</strong>
+            </div>
+            <div class="sim-out-item">
+              <span class="so-label">Verdict</span>
+              <span class="badge-safe" id="simVerdictBadge">PROFIT POSITIVE</span>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -280,6 +379,45 @@
             </div>
           </div>
 
+          <!-- Open-Source Promotional Strategy Archetype -->
+          <div class="form-group">
+            <label class="form-label">
+              Open-Source Strategy Archetype (PED Optimized):
+              <span class="help-text">Mathematical elasticity model</span>
+            </label>
+            <div class="archetype-chips-grid">
+              <button type="button" class="archetype-chip active" data-archetype="ANCHOR_MARGIN_BOOSTER" onclick="selectPromoArchetype('ANCHOR_MARGIN_BOOSTER', this)">
+                <span class="arch-icon">🚀</span>
+                <div class="arch-meta">
+                  <strong>Anchor Booster</strong>
+                  <span>High-velocity anchor lifts slow mover</span>
+                </div>
+              </button>
+              <button type="button" class="archetype-chip" data-archetype="EXPIRY_RESCUE_CLEARANCE" onclick="selectPromoArchetype('EXPIRY_RESCUE_CLEARANCE', this)">
+                <span class="arch-icon">⏳</span>
+                <div class="arch-meta">
+                  <strong>Expiry Rescue</strong>
+                  <span>Dynamic markdown before dead loss</span>
+                </div>
+              </button>
+              <button type="button" class="archetype-chip" data-archetype="FESTIVE_CELEBRATION_HAMPER" onclick="selectPromoArchetype('FESTIVE_CELEBRATION_HAMPER', this)">
+                <span class="arch-icon">🎁</span>
+                <div class="arch-meta">
+                  <strong>Festive Hamper</strong>
+                  <span>Max basket size with festive items</span>
+                </div>
+              </button>
+              <button type="button" class="archetype-chip" data-archetype="VOLUME_TIER_SLAB" onclick="selectPromoArchetype('VOLUME_TIER_SLAB', this)">
+                <span class="arch-icon">📦</span>
+                <div class="arch-meta">
+                  <strong>Volume Tier Slab</strong>
+                  <span>Multi-unit bulk discounts (Buy 2+)</span>
+                </div>
+              </button>
+            </div>
+            <input type="hidden" id="selectedArchetypeInput" value="ANCHOR_MARGIN_BOOSTER">
+          </div>
+
           <!-- Format, Event & Margin Sliders -->
           <div class="form-row-3">
             <div class="form-group">
@@ -382,6 +520,9 @@
                 <button class="c-tab-btn" onclick="switchCollateralTab('poster', this)">
                   <span>🖼️</span> In-Store Poster
                 </button>
+                <button class="c-tab-btn" onclick="switchCollateralTab('cashier', this)">
+                  <span>🗣️</span> Cashier Counter Script
+                </button>
               </div>
 
               <!-- WhatsApp Chat Preview -->
@@ -429,6 +570,35 @@
                   <button class="btn btn-secondary" onclick="window.print()">
                     <span>🖨️</span> Print Poster
                   </button>
+                </div>
+              </div>
+
+              <!-- Cashier Checkout Verbal Pitch Panel -->
+              <div class="c-tab-panel" id="cTabCashier">
+                <div class="cashier-card-container">
+                  <div class="cashier-header-bar">
+                    <span class="cashier-icon">🛒</span>
+                    <div>
+                      <h4>Cashier Counter Cheat-Sheet (POS Upsell Script)</h4>
+                      <p>Instant verbal prompt for counter staff when a customer brings anchor SKU to billing:</p>
+                    </div>
+                  </div>
+                  <div class="cashier-bubble" id="cashierScriptText">
+                    "Namaskara / Namaste! Sir, along with your Tea today, if you take Marie Gold Biscuits, you save flat ₹81 on this festive combo! Should I add it to your bag?"
+                  </div>
+                  <div class="cashier-guidance">
+                    <div class="guidance-item">
+                      <span>🗣️ <strong>Vernacular Grounded:</strong> Greeting & wording auto-aligns with retailer store region (Namaskara, Namaste, Nomoshkar, Pranam).</span>
+                    </div>
+                    <div class="guidance-item">
+                      <span>💡 <strong>Rupee Savings Anchor:</strong> Speaking precise rupee savings ("₹81 Direct Bachat") boosts Indian POS basket conversion by up to 2.3x compared to percentage claims.</span>
+                    </div>
+                  </div>
+                  <div class="wa-actions-row">
+                    <button class="btn btn-secondary" onclick="copyCashierScript()">
+                      <span>📋</span> Copy Verbal Pitch
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -715,6 +885,17 @@
               <input type="number" id="profAudienceSize" class="form-input" value="1420">
             </div>
           </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label class="form-label" for="profWorkingCapital">Total Working Capital Budget (₹):</label>
+              <input type="number" id="profWorkingCapital" class="form-input" value="500000" step="25000">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="profMinMargin">Store Margin Threshold (%):</label>
+              <input type="number" id="profMinMargin" class="form-input" value="15.0" step="0.5">
+            </div>
+          </div>
         </div>
 
         <!-- Regional Location & Demographics -->
@@ -788,6 +969,10 @@
             <div class="p-metric-row">
               <span class="p-metric-label">Store Database Status:</span>
               <span class="p-metric-val">🟢 Online & Persistent (JSON + Markdown)</span>
+            </div>
+            <div class="p-metric-row">
+              <span class="p-metric-label">Google Cloud Firestore:</span>
+              <span class="p-metric-val" id="cloudStatusBadge">🟡 Dual-Mode Sync Active</span>
             </div>
             <div class="p-metric-row">
               <span class="p-metric-label">Open-Source Forecasting Engine:</span>

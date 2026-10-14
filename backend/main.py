@@ -13,7 +13,8 @@ if CURRENT_DIR not in sys.path:
 from models import (
     Product, ProductCreate, DemandForecast, ComboQuery, ComboPlan,
     BrandComparisonResponse, RegionalFestivalEvent, ScheduledOffer,
-    ConflictCheckRequest, ConflictCheckResponse
+    ConflictCheckRequest, ConflictCheckResponse, StoreProfile,
+    InvestmentROISimulation, ROIScenarioRequest
 )
 from mock_data import (
     DEMAND_FORECASTS, CATEGORY_BRAND_COMPARISONS, 
@@ -21,7 +22,8 @@ from mock_data import (
 )
 from agents import PromoMindEngine
 from storage import StoreDataManager
-from forecasting import OpenSourceForecastingEngine
+from forecasting import OpenSourceForecastingEngine, InvestmentROIEngine
+from firestore_service import FirestoreService
 
 app = FastAPI(
     title="PromoMind AI API",
@@ -51,6 +53,54 @@ def health_check():
         "model": "Gemini 1.5 Flash / Open-Source Holt-Winters Forecaster",
         "active_theme": "Google Material 3 Responsive Multi-Screen"
     }
+
+@app.get("/api/system/cloud-status")
+def get_cloud_storage_status():
+    """Returns Google Cloud Firestore live synchronization status and credentials state."""
+    return FirestoreService.get_status()
+
+# ==============================================================================
+# Store Profile, Regional Settings & Financial ROI Intelligence
+# ==============================================================================
+
+@app.get("/api/profile", response_model=StoreProfile)
+def get_store_profile():
+    """Retrieve retailer store profile, regional demographic settings, and working capital."""
+    return StoreDataManager.load_profile()
+
+@app.post("/api/profile", response_model=StoreProfile)
+def update_store_profile(profile: StoreProfile):
+    """Update store profile, cultural region, and immediately recompile store_knowledge.md."""
+    return StoreDataManager.save_profile(profile)
+
+@app.get("/api/store/financial-roi", response_model=InvestmentROISimulation)
+def get_store_financial_roi():
+    """
+    Computes store-wide working capital invested, projected turnover revenue,
+    net profit, dead capital trapped in slow movers, and cash unlocked via promotions.
+    """
+    products = StoreDataManager.load_products()
+    profile = StoreDataManager.load_profile()
+    roi = InvestmentROIEngine.compute_store_roi(products, store_capital_budget=profile.total_working_capital_inr)
+    return InvestmentROISimulation(**roi)
+
+@app.post("/api/store/simulate-roi")
+def simulate_roi_scenario(payload: ROIScenarioRequest):
+    """
+    Simulates What-If scenario: Adjust discount depth and expected volume lift
+    to predict resulting net profit Rupees and turnover days acceleration.
+    """
+    products = StoreDataManager.load_products()
+    profile = StoreDataManager.load_profile()
+    roi_base = InvestmentROIEngine.compute_store_roi(products, store_capital_budget=profile.total_working_capital_inr)
+    
+    sim = InvestmentROIEngine.simulate_scenario(
+        base_invested=roi_base["total_inventory_invested_inr"],
+        base_revenue=roi_base["projected_sales_revenue_inr"],
+        proposed_discount_pct=payload.proposed_discount_depth_pct,
+        expected_volume_lift_pct=payload.expected_volume_lift_pct
+    )
+    return sim
 
 # ==============================================================================
 # Regional Festival Calendar & Conflict Tracker
@@ -306,7 +356,9 @@ def generate_combo(query: ComboQuery):
             query=query.prompt,
             min_margin_pct=query.min_margin_pct or 18.0,
             event_theme=query.event_theme or "Diwali Maha Utsav",
-            offer_type=query.offer_type or "COMBO_DISCOUNT"
+            offer_type=query.offer_type or "COMBO_DISCOUNT",
+            region=query.region,
+            archetype=query.archetype or "ANCHOR_MARGIN_BOOSTER"
         )
         return plan
     except Exception as e:
@@ -360,6 +412,11 @@ if os.path.exists(frontend_dir):
     @app.get("/problem-statement")
     def serve_problem_statement():
         return FileResponse(os.path.join(frontend_dir, "problem_statement.html"))
+
+    @app.get("/deck")
+    @app.get("/presentation")
+    def serve_pitch_deck():
+        return FileResponse(os.path.join(frontend_dir, "presentation_deck.html"))
 
 if __name__ == "__main__":
     import uvicorn

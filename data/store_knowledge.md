@@ -1,9 +1,22 @@
-# 🏪 PromoMind AI — Retail Store Knowledge & Catalog Base
-> *Persistent AI Knowledge Catalog for Sharma Supermarket (Bengaluru)*
-> *Auto-generated from retail inventory data & open-source demand forecasting engine.*
+# 🏪 PromoMind AI — Retail Store Knowledge & Grounding Catalog
+> *Store Name*: **Test Bangalore Mart** | *Owner*: **Suresh Kumar**
+> *Cultural Region*: **Karnataka & South India** (Bengaluru, 560038)
+> *Store Format*: **Supermarket** | *WhatsApp Broadcast Reach*: **2500 Families**
+> *Working Capital Invested*: **₹191,920** | *Target Net Margin*: **16.5%**
 
 ---
-## 📦 1. Tracked Inventory & Predictive Velocity Status
+## 💰 1. Working Capital Investment & Return on Capital (ROI) Intelligence
+
+- **Total Inventory Capital Invested**: ₹191,920
+- **Projected 30-Day Sales Turnover**: ₹468,556
+- **Projected Net Dukan Profit**: ₹99,135 (**51.7% Net Return on Capital**)
+- **Dead Working Capital Trapped in Slow Movers**: ₹62,970 (3 at-risk SKUs)
+- **Capital Unlocked via Smart Promo Bundles**: **₹40,930** cash freed within 12 days (+₹9,005 net promo profit)
+- **Cash Turnover Velocity**: Every **16 days**
+- **System Capital Status**: 🟢 Excellent Capital Health: Fast-moving inventory is generating healthy cash turnover.
+
+---
+## 📦 2. Tracked SKU Inventory & Predictive Velocity Status
 
 | SKU ID | Product Name | Category | Stock | Cost (₹) | MRP (₹) | Margin (%) | Velocity | Days Left | Reorder Verdict |
 |---|---|---|---|---|---|---|---|---|---|
@@ -16,7 +29,7 @@
 | `PROD_SWEET_01` | Haldiram's Gulab Jamun Traditional Tin (1kg) | Sweets & Confectionery | 120 | ₹190.0 | ₹260.0 | 26.9% | FAST_MOVING | 18d | 🟢 Strong Buy / Festive Peak (+110%) |
 
 ---
-## 📈 2. Demand Velocity & 10-Week Growth Trajectories
+## 📈 3. Demand Velocity & 10-Week Growth Trajectories
 
 ### Taj Mahal Premium Gold Tea (500g) (`PROD_TEA_01`)
 - **Past 6-Week Sales Units**: `[42, 45, 48, 50, 52, 55]` (Weekly Avg: **48.7**)
@@ -75,18 +88,44 @@
 - **Market Alternatives**: Bikaji Traditional Gulab Jamun (1kg) — 31% margin, ₹30 lower MRP; Bikanervala Tin Sweets (1kg) — 28% margin, comparable brand; Gits Instant Gulab Jamun Mix (500g) — 35% margin, DIY segment
 
 ---
-## 🪔 3. Active Festival Events & Demand Surge Calendar
+## 🪔 4. Regional Festival Calendar & Planning Deadlines for Karnataka & South India
 
-| Event Name | Focus Categories | Projected Demand Lift | Strategic Recommendation |
-|---|---|---|---|
-| **Diwali Maha Utsav (Big Festive Days)** | Pure Ghee, Dry Fruits, Gulab Jamun, Cooking Oil | **+75% to +110%** | Bundle high-margin dry fruits with fast-selling cow ghee for festive gifting. |
-| **Monsoon Refresh Bonanza** | Premium Teas, Biscuits, Spices, Hot Snacks | **+35% to +45%** | Pair evening chai with near-expiry cookies at 17% discount. |
-| **Great Indian Grocery Super Saver** | Staples, Sunflower Oil, Garam Masala | **+40% to +50%** | Volume tier pricing / Buy cooking oil & get spice pack at 50% off. |
-| **Super Weekend Kirana Rush** | All Kitchen Staples & Snacks | **+25% to +35%** | Run fast-moving basket driver offers with clear POS receipt taglines. |
+### 🪔 Deepavali & Naraka Chaturdashi (Oct 24 - Oct 29, 2026) — +140.0% Surge
+- **Regional Tradition**: Deepavali in Karnataka centers on early-morning oil baths, lighting clay deepas at dusk, and gifting home-made sweets. Earthen deepa demand drops to <5 units/month during non-festival days.
+- **Key Regional SKUs**: Clay Diyas & Deepas, Pure Cow Ghee, Gulab Jamun & Sweets, California Almonds, Puja Camphor & Cotton Wicks
+- **Advance Procurement Window**: T-14 Days (Oct 10 - Oct 15): Order Clay Diyas and Cow Ghee cartons before distributor festival price hikes.
+- **Customer Promo Launch**: T-7 Days (Oct 17 - Oct 24): Early-Bird Festive Gift Hamper (Ghee + Dry Fruits + Sweets) via WhatsApp.
+- **Clearance Deadline**: T+2 Days (Oct 30 - Nov 2): Clear remaining earthen diyas and sweet boxes at cost price to prevent 100% loss.
+- **Optimal Promo Archetype**: `FESTIVE_CELEBRATION_HAMPER`
+
+### 🌾 Ayudha Puja & Vijayadashami (Oct 10 - Oct 13, 2026) — +90.0% Surge
+- **Regional Tradition**: Every business, auto, car, and household washes tools and vehicles, crushes lemons, and breaks ash gourd (kumbalakai) to ward off the evil eye. Puffed rice (pori) and jaggery are distributed as ubiquitous prasadam.
+- **Key Regional SKUs**: Puffed Rice (Pori), Organic Jaggery (Bella), Sunflower Oil, Ash Gourd (Kumbalakai), Puja Kumkum & Lemons
+- **Advance Procurement Window**: T-7 Days (Oct 3 - Oct 8): Restock bulk bags of Pori (puffed rice), Bella, and Sunflower oil.
+- **Customer Promo Launch**: T-3 Days (Oct 7 - Oct 10): 'Ayudha Puja Shop & Vehicle Blessing Kit' cross-sell.
+- **Clearance Deadline**: T+1 Day (Oct 14): Sell leftover pori bags to local street food vendors at 20% off.
+- **Optimal Promo Archetype**: `ANCHOR_MARGIN_BOOSTER`
+
+### 🕯️ Karthika Deepotsava (Month of Lights) (Nov 14 - Nov 20, 2026) — +55.0% Surge
+- **Regional Tradition**: Continuous evening lighting using clay deepas with sesame oil and cow ghee throughout the sacred Karthika month.
+- **Key Regional SKUs**: Earthen Deepas (Clay Lamps), Sesame Gingelly Oil, Cotton Wicks, Cow Ghee
+- **Advance Procurement Window**: T-10 Days (Nov 4 - Nov 10): Stock sesame lighting oil and extra cotton wicks.
+- **Customer Promo Launch**: T-5 Days (Nov 9 - Nov 14): 'Karthika Deepam Lighting Duo' (Gingelly Oil + Cotton Wicks bundle).
+- **Clearance Deadline**: T+3 Days (Nov 23): Clear remaining unlit terracotta lamps.
+- **Optimal Promo Archetype**: `VOLUME_TIER_SLAB`
+
+### 🥭 Ugadi (Kannada & Telugu New Year) (Mar 28 - Apr 2, 2026) — +75.0% Surge
+- **Regional Tradition**: Eating Bevu-Bella (neem and jaggery) symbolizes accepting both bitter and sweet experiences of life. High demand for Obbattu/Holige (sweet flatbread) ingredients.
+- **Key Regional SKUs**: Neem Flowers (Bevu), Organic Jaggery (Bella), Raw Mango, Tamarind, Chana Dal for Obbattu
+- **Advance Procurement Window**: T-10 Days: Secure raw mangoes, Chana Dal, and organic jaggery blocks.
+- **Customer Promo Launch**: T-5 Days: 'Ugadi Feast Combo' (Jaggery + Chana Dal + Pure Ghee).
+- **Clearance Deadline**: T+1 Day: Normal clearance on perishable raw mangoes.
+- **Optimal Promo Archetype**: `ANCHOR_MARGIN_BOOSTER`
 
 ---
-## 🤖 4. Guidelines for Multi-Agent Combo Generation
-1. **Anchor Selection**: Identify items with positive growth momentum (>+30%) or seasonal surge.
-2. **Attached Selection**: Pair anchors with items that have high co-purchase affinity (>50%) or slow velocity to clear near-expiry capital.
-3. **Margin Floor**: Never breach retailer minimum margin (18% by default).
-4. **Copy Persona**: Punchy Indian retail phrasing with WhatsApp emojis and clear rupee savings.
+## 🤖 5. Grounding Rules for AI Promotion & Offer Generation
+1. **Store Identity Grounding**: Personalize campaign titles and WhatsApp copy with store name 'Test Bangalore Mart' and locality 'Indiranagar, Bengaluru'.
+2. **Cultural Tradition Respect**: Acknowledge local regional customs for Karnataka & South India (e.g. Diyas and Cow Ghee for Deepavali; Bevu-Bella for Ugadi; Modak for Ganesh Chaturthi).
+3. **Margin Safeguard**: Never breach the store's minimum net margin of 16.5%.
+4. **Archetype Alignment**: Align bundle structure with the target goal (Anchor Booster, Expiry Rescue, Festive Hamper, or Volume Slab).
+5. **Cashier Counter Pitch**: Always generate a 1-sentence friendly vernacular checkout pitch for billing counter staff.

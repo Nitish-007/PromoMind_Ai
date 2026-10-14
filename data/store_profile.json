@@ -1,0 +1,13 @@
+{
+  "store_name": "Test Bangalore Mart",
+  "owner_name": "Suresh Kumar",
+  "region": "Karnataka & South India",
+  "city": "Bengaluru",
+  "locality": "Indiranagar",
+  "pin_code": "560038",
+  "phone": "+91 99887 76655",
+  "store_format": "Supermarket",
+  "whatsapp_audience_size": 2500,
+  "default_min_margin_pct": 16.5,
+  "total_working_capital_inr": 650000.0
+}

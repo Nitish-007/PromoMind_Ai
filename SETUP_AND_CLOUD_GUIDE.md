@@ -393,3 +393,4 @@ python -c "import urllib.request; print(urllib.request.urlopen('http://localhost
 ---
 
 *PromoMind AI — Empowering Neighborhood Retailers with Intelligent Forecasting & Google Cloud AI.*
+

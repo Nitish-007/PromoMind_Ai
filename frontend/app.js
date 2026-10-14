@@ -33,7 +33,26 @@ document.addEventListener("DOMContentLoaded", () => {
   fetchCalendarEvents();
   fetchActiveOffers();
   fetchKnowledgeMarkdown();
+  fetchCloudStatus();
 });
+
+async function fetchCloudStatus() {
+  try {
+    const res = await fetch("/api/system/cloud-status");
+    if (!res.ok) return;
+    const data = await res.json();
+    const badge = document.getElementById("cloudStatusBadge");
+    if (badge) {
+      if (data.is_connected) {
+        badge.innerText = `🟢 Cloud Firestore Live (${data.project_id})`;
+      } else {
+        badge.innerText = `🟡 Dual-Mode Ready (Local JSON Sync)`;
+      }
+    }
+  } catch (e) {
+    console.error("Error fetching cloud status:", e);
+  }
+}
 
 // ==============================================================================
 // App Navigation & Screen Management
@@ -84,68 +103,115 @@ function switchScreen(screenId) {
 // Store Profile, Region & Theme Engine
 // ==============================================================================
 
-function loadStoreProfile() {
+async function loadStoreProfile() {
   const savedTheme = localStorage.getItem("promomind_theme") || "light";
   setThemeMode(savedTheme);
 
-  const savedStoreName = localStorage.getItem("promomind_store_name") || "Sharma Supermarket & Kirana";
-  const savedOwner = localStorage.getItem("promomind_owner_name") || "Ramesh Sharma";
-  const savedRegion = localStorage.getItem("promomind_region") || "Karnataka & South India";
-  const savedCity = localStorage.getItem("promomind_city") || "Bengaluru";
-  const savedPin = localStorage.getItem("promomind_pin") || "560034";
-  const savedPhone = localStorage.getItem("promomind_phone") || "+91 98450 12345";
-  const savedAudience = localStorage.getItem("promomind_audience") || "1420";
+  // Attempt to load from server backend first
+  try {
+    const res = await fetch("/api/profile");
+    if (res.ok) {
+      const prof = await res.json();
+      applyProfileToUI(prof);
+      return;
+    }
+  } catch (e) {
+    console.log("Using cached localStorage profile");
+  }
+
+  // Fallback to localStorage
+  const fallbackProf = {
+    store_name: localStorage.getItem("promomind_store_name") || "Sharma Supermarket & Kirana",
+    owner_name: localStorage.getItem("promomind_owner_name") || "Ramesh Sharma",
+    state_region: localStorage.getItem("promomind_region") || "Karnataka & South India",
+    city: localStorage.getItem("promomind_city") || "Bengaluru",
+    locality: "Koramangala 4th Block",
+    pincode: localStorage.getItem("promomind_pin") || "560034",
+    phone: localStorage.getItem("promomind_phone") || "+91 98450 12345",
+    audience_reach: parseInt(localStorage.getItem("promomind_audience") || "1420", 10),
+    working_capital: parseFloat(localStorage.getItem("promomind_capital") || "500000"),
+    min_gross_margin_target_pct: parseFloat(localStorage.getItem("promomind_margin") || "15.0")
+  };
+  applyProfileToUI(fallbackProf);
+}
+
+function applyProfileToUI(prof) {
+  const storeName = prof.store_name || "Sharma Supermarket & Kirana";
+  const city = prof.city || "Bengaluru";
+  const region = prof.state_region || "Karnataka & South India";
 
   // Apply to Header and Profile Screen
-  document.getElementById("topStoreName").innerText = savedStoreName;
-  document.getElementById("topStoreLocation").innerText = `${savedCity} • ${savedRegion.split("&")[0].trim()}`;
-  document.getElementById("intelRegionName").innerText = savedRegion;
+  const topStore = document.getElementById("topStoreName");
+  if (topStore) topStore.innerText = storeName;
+  const topLoc = document.getElementById("topStoreLocation");
+  if (topLoc) topLoc.innerText = `${city} • ${region.split("&")[0].trim()}`;
+  const intelReg = document.getElementById("intelRegionName");
+  if (intelReg) intelReg.innerText = region;
 
   // Set Profile fields
   const elStoreName = document.getElementById("profStoreName");
-  if (elStoreName) elStoreName.value = savedStoreName;
+  if (elStoreName) elStoreName.value = storeName;
   const elOwner = document.getElementById("profOwnerName");
-  if (elOwner) elOwner.value = savedOwner;
+  if (elOwner) elOwner.value = prof.owner_name || "Ramesh Sharma";
   const elRegion = document.getElementById("profStateRegion");
-  if (elRegion) elRegion.value = savedRegion;
+  if (elRegion) elRegion.value = region;
   const elCity = document.getElementById("profCity");
-  if (elCity) elCity.value = savedCity;
+  if (elCity) elCity.value = city;
   const elPin = document.getElementById("profPin");
-  if (elPin) elPin.value = savedPin;
+  if (elPin) elPin.value = prof.pincode || "560034";
   const elPhone = document.getElementById("profPhone");
-  if (elPhone) elPhone.value = savedPhone;
+  if (elPhone) elPhone.value = prof.phone || "+91 98450 12345";
   const elAudience = document.getElementById("profAudienceSize");
-  if (elAudience) elAudience.value = savedAudience;
+  if (elAudience) elAudience.value = prof.audience_reach || 1420;
+  const elCapital = document.getElementById("profWorkingCapital");
+  if (elCapital) elCapital.value = prof.working_capital || 500000;
+  const elMargin = document.getElementById("profMinMargin");
+  if (elMargin) elMargin.value = prof.min_gross_margin_target_pct || 15.0;
 
   // Sync calendar region select
   const calRegion = document.getElementById("calendarRegionSelect");
-  if (calRegion) calRegion.value = savedRegion;
+  if (calRegion) calRegion.value = region;
 }
 
-function saveStoreProfile() {
-  const storeName = document.getElementById("profStoreName").value.trim() || "Sharma Supermarket";
-  const owner = document.getElementById("profOwnerName").value.trim();
-  const region = document.getElementById("profStateRegion").value;
-  const city = document.getElementById("profCity").value.trim();
-  const pin = document.getElementById("profPin").value.trim();
-  const phone = document.getElementById("profPhone").value.trim();
-  const audience = document.getElementById("profAudienceSize").value.trim();
+async function saveStoreProfile() {
+  const prof = {
+    store_name: document.getElementById("profStoreName").value.trim() || "Sharma Supermarket",
+    owner_name: document.getElementById("profOwnerName").value.trim() || "Ramesh Sharma",
+    phone: document.getElementById("profPhone").value.trim() || "+91 98450 12345",
+    store_type: (document.getElementById("profStoreType") && document.getElementById("profStoreType").value) || "Supermarket",
+    audience_reach: parseInt(document.getElementById("profAudienceSize").value || "1420", 10),
+    working_capital: parseFloat(document.getElementById("profWorkingCapital").value || "500000"),
+    min_gross_margin_target_pct: parseFloat(document.getElementById("profMinMargin").value || "15.0"),
+    state_region: document.getElementById("profStateRegion").value,
+    city: document.getElementById("profCity").value.trim() || "Bengaluru",
+    locality: (document.getElementById("profLocality") && document.getElementById("profLocality").value.trim()) || "Koramangala 4th Block",
+    pincode: document.getElementById("profPin").value.trim() || "560034"
+  };
 
-  localStorage.setItem("promomind_store_name", storeName);
-  localStorage.setItem("promomind_owner_name", owner);
-  localStorage.setItem("promomind_region", region);
-  localStorage.setItem("promomind_city", city);
-  localStorage.setItem("promomind_pin", pin);
-  localStorage.setItem("promomind_phone", phone);
-  localStorage.setItem("promomind_audience", audience);
+  localStorage.setItem("promomind_store_name", prof.store_name);
+  localStorage.setItem("promomind_owner_name", prof.owner_name);
+  localStorage.setItem("promomind_region", prof.state_region);
+  localStorage.setItem("promomind_city", prof.city);
+  localStorage.setItem("promomind_pin", prof.pincode);
+  localStorage.setItem("promomind_phone", prof.phone);
+  localStorage.setItem("promomind_audience", prof.audience_reach);
+  localStorage.setItem("promomind_capital", prof.working_capital);
+  localStorage.setItem("promomind_margin", prof.min_gross_margin_target_pct);
 
-  // Update header and calendar
-  document.getElementById("topStoreName").innerText = storeName;
-  document.getElementById("topStoreLocation").innerText = `${city} • ${region.split("&")[0].trim()}`;
-  document.getElementById("intelRegionName").innerText = region;
-  document.getElementById("calendarRegionSelect").value = region;
+  try {
+    await fetch("/api/profile", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(prof)
+    });
+  } catch (err) {
+    console.error("Error saving profile to server:", err);
+  }
 
-  showToast("Store profile & regional preferences saved successfully!");
+  applyProfileToUI(prof);
+  fetchKnowledgeMarkdown();
+  fetchStoreROI();
+  showToast("Store profile & regional preferences saved & synced to AI Knowledge Base!");
 }
 
 function onProfileRegionChanged(region) {
@@ -215,11 +281,123 @@ async function fetchInventory() {
     renderInventory(inventoryItems);
     populateAnchorDropdown(inventoryItems);
     populateSandboxSKUDropdown(inventoryItems);
+    fetchStoreROI();
   } catch (err) {
     console.error("Error fetching inventory:", err);
     document.getElementById("inventoryTableBody").innerHTML = `
       <tr><td colspan="8" class="loading-td" style="color:var(--g-red);">⚠️ Failed to connect to inventory service. Retrying...</td></tr>
     `;
+  }
+}
+
+async function fetchStoreROI() {
+  try {
+    const res = await fetch("/api/store/financial-roi");
+    if (!res.ok) return;
+    const data = await res.json();
+
+    const invested = data.total_inventory_invested_inr ?? data.total_capital_invested ?? 0;
+    const turnover = data.projected_sales_revenue_inr ?? data.projected_monthly_turnover ?? 0;
+    const profit = data.projected_gross_profit_inr ?? data.projected_monthly_profit ?? 0;
+    const roi = data.overall_roi_pct ?? data.effective_roi_pct ?? 0;
+    const deadCap = data.dead_capital_at_risk_inr ?? data.dead_capital_at_risk ?? 0;
+    const unlocked = data.unlocked_capital_from_promos_inr ?? data.unlocked_cash_via_promos ?? 0;
+    const boost = data.net_promo_profit_boost_inr ?? data.promo_profit_boost ?? 0;
+
+    const elInv = document.getElementById("roiInvestedVal");
+    if (elInv) elInv.innerText = `₹${Math.round(invested).toLocaleString("en-IN")}`;
+    const elInvSub = document.getElementById("roiInvestedSub");
+    if (elInvSub) elInvSub.innerText = `In Store Inventory`;
+
+    const elRev = document.getElementById("roiRevenueVal");
+    if (elRev) elRev.innerText = `₹${Math.round(turnover).toLocaleString("en-IN")}`;
+    const elProf = document.getElementById("roiProfitVal");
+    if (elProf) elProf.innerText = `₹${Math.round(profit).toLocaleString("en-IN")}`;
+    const elRoiBadge = document.getElementById("roiProfitPctBadge");
+    if (elRoiBadge) elRoiBadge.innerText = `+${roi}% Net Return (ROI)`;
+
+    const elDead = document.getElementById("roiDeadCapitalVal");
+    if (elDead) elDead.innerText = `₹${Math.round(deadCap).toLocaleString("en-IN")}`;
+    const elDeadSub = document.getElementById("roiDeadSkusSub");
+    if (elDeadSub) elDeadSub.innerText = `In slow movers (>60d)`;
+
+    const elCash = document.getElementById("roiUnlockedCashVal");
+    if (elCash) elCash.innerText = `₹${Math.round(unlocked).toLocaleString("en-IN")}`;
+    const elBoost = document.getElementById("roiPromoBoostSub");
+    if (elBoost) elBoost.innerText = `+₹${Math.round(boost).toLocaleString("en-IN")} Net Promo Boost`;
+  } catch (err) {
+    console.error("Error fetching store financial ROI:", err);
+  }
+}
+
+function toggleRoiSimulator() {
+  const drawer = document.getElementById("roiSimulatorDrawer");
+  const icon = document.getElementById("simToggleIcon");
+  const text = document.getElementById("simToggleText");
+  if (!drawer) return;
+  const isHidden = drawer.classList.contains("hidden");
+
+  if (isHidden) {
+    drawer.classList.remove("hidden");
+    if (icon) icon.innerText = "✖";
+    if (text) text.innerText = "Close Simulator";
+    runInteractiveRoiSimulation();
+  } else {
+    drawer.classList.add("hidden");
+    if (icon) icon.innerText = "⚡";
+    if (text) text.innerText = 'Open "What-If" ROI Simulator';
+  }
+}
+
+async function runInteractiveRoiSimulation() {
+  const discSlider = document.getElementById("simDiscountSlider");
+  const volSlider = document.getElementById("simVolumeSlider");
+  const discount = discSlider ? parseFloat(discSlider.value) : 16;
+  const volume = volSlider ? parseFloat(volSlider.value) : 35;
+
+  const discBadge = document.getElementById("simDiscountBadge");
+  if (discBadge) discBadge.innerText = `${discount}% OFF`;
+  const volBadge = document.getElementById("simVolumeBadge");
+  if (volBadge) volBadge.innerText = `+${volume}% Units`;
+
+  try {
+    const res = await fetch("/api/store/simulate-roi", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        proposed_discount_depth_pct: discount,
+        expected_volume_lift_pct: volume
+      })
+    });
+    if (!res.ok) return;
+    const sim = await res.json();
+
+    const simRev = sim.simulated_revenue_inr ?? sim.simulated_turnover ?? 0;
+    const simProf = sim.simulated_net_profit_inr ?? sim.simulated_net_profit ?? 0;
+    const simRoi = sim.simulated_roi_pct ?? 0;
+    const speedup = sim.capital_turnover_days_saved ?? sim.capital_turnover_speedup_days ?? 0;
+
+    const elTurnover = document.getElementById("simTurnoverVal");
+    if (elTurnover) elTurnover.innerText = `₹${Math.round(simRev).toLocaleString("en-IN")}`;
+    const elProfit = document.getElementById("simProfitVal");
+    if (elProfit) elProfit.innerText = `₹${Math.round(simProf).toLocaleString("en-IN")}`;
+    const elRoi = document.getElementById("simRoiVal");
+    if (elRoi) elRoi.innerText = `+${simRoi}%`;
+    const elSpeed = document.getElementById("simSpeedupVal");
+    if (elSpeed) elSpeed.innerText = `${speedup} Days Faster`;
+
+    const verdictEl = document.getElementById("simVerdictBadge");
+    if (verdictEl) {
+      if (sim.is_profit_positive) {
+        verdictEl.className = "badge-safe";
+        verdictEl.innerText = "PROFIT POSITIVE";
+      } else {
+        verdictEl.className = "badge-warning";
+        verdictEl.innerText = "MARGIN DILUTION RISK";
+      }
+    }
+  } catch (err) {
+    console.error("Error running ROI simulation:", err);
   }
 }
 
@@ -682,6 +860,23 @@ function resetPromoForm() {
   document.getElementById("emptyPromoPlaceholder").classList.remove("hidden");
 }
 
+function selectPromoArchetype(archetype, btn) {
+  document.querySelectorAll(".archetype-chips-grid .archetype-chip").forEach(el => el.classList.remove("active"));
+  btn.classList.add("active");
+  const input = document.getElementById("selectedArchetypeInput");
+  if (input) input.value = archetype;
+}
+
+function copyCashierScript() {
+  const el = document.getElementById("cashierScriptText");
+  if (!el) return;
+  navigator.clipboard.writeText(el.innerText).then(() => {
+    showToast("Cashier verbal pitch copied to clipboard!");
+  }).catch(() => {
+    showToast("Copied script text!");
+  });
+}
+
 async function generatePromotionPlan() {
   const prompt = document.getElementById("promoPromptInput").value.trim() || "Create an optimal festive combo";
   const margin = parseFloat(document.getElementById("promoMarginSlider").value) || 18.0;
@@ -689,10 +884,12 @@ async function generatePromotionPlan() {
   const offerType = document.getElementById("promoOfferType").value;
   const anchorId = document.getElementById("promoAnchorSelect").value;
   const attachedId = document.getElementById("promoAttachedSelect").value;
+  const archetype = (document.getElementById("selectedArchetypeInput") && document.getElementById("selectedArchetypeInput").value) || "ANCHOR_MARGIN_BOOSTER";
+  const region = (document.getElementById("profStateRegion") && document.getElementById("profStateRegion").value) || "Karnataka & South India";
 
   const btn = document.getElementById("generatePlanBtn");
   btn.disabled = true;
-  btn.innerHTML = `<span>⏳ Synthesizing Demand Models & Collateral...</span>`;
+  btn.innerHTML = `<span>⏳ Synthesizing Open-Source Models & Copy...</span>`;
 
   try {
     const res = await fetch("/api/generate-combo", {
@@ -704,7 +901,9 @@ async function generatePromotionPlan() {
         event_theme: eventTheme,
         offer_type: offerType,
         primary_product_id: anchorId || null,
-        secondary_product_id: attachedId || null
+        secondary_product_id: attachedId || null,
+        region: region,
+        archetype: archetype
       })
     });
 
@@ -763,6 +962,16 @@ function renderGeneratedPlan(plan) {
   document.getElementById("posterDealPrice").innerText = `₹${plan.bundle_selling_price}`;
   document.getElementById("posterSavings").innerText = `YOU SAVE ₹${plan.savings_amount} (${plan.discount_pct}% OFF)`;
   document.getElementById("posterStoreLoc").innerText = `${document.getElementById('topStoreName').innerText}, ${document.getElementById('topStoreLocation').innerText}`;
+
+  // Cashier POS counter script
+  const cashierScriptEl = document.getElementById("cashierScriptText");
+  if (cashierScriptEl) {
+    if (plan.cashier_counter_pitch) {
+      cashierScriptEl.innerText = plan.cashier_counter_pitch;
+    } else {
+      cashierScriptEl.innerText = `"Namaskara / Namaste! Sir, along with your ${plan.items && plan.items[0] ? plan.items[0].name : 'purchase'}, if you take ${plan.items && plan.items[1] ? plan.items[1].name : 'this item'} today, you get ₹${plan.savings_amount} flat savings! Shall I add it?"`;
+    }
+  }
 }
 
 function switchCollateralTab(tabName, btn) {
@@ -772,8 +981,11 @@ function switchCollateralTab(tabName, btn) {
 
   if (tabName === "whatsapp") {
     document.getElementById("cTabWhatsapp").classList.add("active");
-  } else {
+  } else if (tabName === "poster") {
     document.getElementById("cTabPoster").classList.add("active");
+  } else if (tabName === "cashier") {
+    const pane = document.getElementById("cTabCashier");
+    if (pane) pane.classList.add("active");
   }
 }
 
@@ -818,7 +1030,10 @@ async function activateCurrentOffer() {
 
 async function fetchCalendarEvents() {
   try {
-    const res = await fetch("/api/calendar/events");
+    const regionSelect = document.getElementById("calendarRegionSelect");
+    const region = regionSelect ? regionSelect.value : (localStorage.getItem("promomind_region") || "Karnataka & South India");
+    const url = `/api/calendar/events?region=${encodeURIComponent(region)}`;
+    const res = await fetch(url);
     if (!res.ok) throw new Error("Failed to load calendar events");
     regionalEvents = await res.json();
     renderFestivalCards(regionalEvents);
@@ -851,12 +1066,33 @@ function renderFestivalCards(events) {
 
       <p class="fest-desc">${evt.description}</p>
 
+      ${evt.tradition_notes ? `<div class="fest-tradition-box">✨ <strong>Cultural Tradition:</strong> ${evt.tradition_notes}</div>` : ''}
+
+      <!-- Multi-Horizon Planning Deadlines (Advance Procurement, Launch, Clearance) -->
+      <div class="fest-horizons-grid">
+        ${evt.advance_procurement_window ? `
+          <div class="horizon-pill">
+            <strong class="hz-procure">📦 T-14d Procurement:</strong>
+            <span>${evt.advance_procurement_window}</span>
+          </div>` : ''}
+        ${evt.promo_launch_window ? `
+          <div class="horizon-pill">
+            <strong class="hz-launch">🚀 T-7d Promo Launch:</strong>
+            <span>${evt.promo_launch_window}</span>
+          </div>` : ''}
+        ${evt.clearance_window ? `
+          <div class="horizon-pill">
+            <strong class="hz-clear">🧹 T+2d Clearance:</strong>
+            <span>${evt.clearance_window}</span>
+          </div>` : ''}
+      </div>
+
       <div class="key-skus-row">
         ${(evt.key_items || []).map(item => `<span class="sku-pill">🏷️ ${item}</span>`).join("")}
       </div>
 
       <div class="fest-action-btn">
-        <button class="btn btn-sm btn-secondary" onclick="preparePromoForFestival('${evt.name}')">
+        <button class="btn btn-sm btn-secondary" onclick="preparePromoForFestival('${evt.name}', '${evt.recommended_promo_type || 'COMBO_DISCOUNT'}')">
           <span>⚡</span> Create Festival Bundle
         </button>
       </div>
@@ -864,10 +1100,24 @@ function renderFestivalCards(events) {
   `).join("");
 }
 
-function preparePromoForFestival(festivalName) {
+function preparePromoForFestival(festivalName, recommendedType) {
   switchScreen("promos");
-  document.getElementById("promoEventSelect").value = "Diwali Maha Utsav (Big Billion Days Edition)";
-  document.getElementById("promoPromptInput").value = `Create an irresistible promotional offer tailored for ${festivalName} focusing on regional festival essentials.`;
+  const eventSelect = document.getElementById("promoEventSelect");
+  if (eventSelect) {
+    let found = false;
+    for (let opt of eventSelect.options) {
+      if (opt.value.toLowerCase().includes(festivalName.toLowerCase().split(" ")[0])) {
+        eventSelect.value = opt.value;
+        found = true;
+        break;
+      }
+    }
+  }
+  const offerTypeSelect = document.getElementById("promoOfferType");
+  if (offerTypeSelect && recommendedType) {
+    offerTypeSelect.value = recommendedType;
+  }
+  document.getElementById("promoPromptInput").value = `Create an irresistible regional festival promotion for ${festivalName} focusing on regional essentials with maximum margin preservation.`;
 }
 
 async function fetchActiveOffers() {
