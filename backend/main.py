@@ -532,15 +532,6 @@ if os.path.exists(frontend_dir):
     def serve_ui():
         return FileResponse(os.path.join(frontend_dir, "index.html"))
 
-    @app.get("/problem-statement")
-    def serve_problem_statement():
-        return FileResponse(os.path.join(frontend_dir, "problem_statement.html"))
-
-    @app.get("/deck")
-    @app.get("/presentation")
-    def serve_pitch_deck():
-        return FileResponse(os.path.join(frontend_dir, "presentation_deck.html"))
-
 if __name__ == "__main__":
     import uvicorn
     port = int(os.environ.get("PORT", 8080))
