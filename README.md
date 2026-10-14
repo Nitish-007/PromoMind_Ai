@@ -35,10 +35,15 @@
 - **WhatsApp Broadcast Engine**: Single-click sharing with auto-formatted emojis, store details, and offer expiry dates.
 - **In-Store Print Posters**: High-contrast, printable shelf signage with barcodes.
 
-### 5. ☁️ Enterprise Dual-Mode Google Cloud Firestore
-- **Live Cloud Sync**: Seamless synchronization across `stores/{id}/inventory`, `stores/{id}/offers`, and `stores/{id}/profile`.
-- **Zero-Downtime Fallback**: Instant offline persistence with local JSON when disconnected or before credentials are provided.
-- **Automated Verification Script**: `python backend/verify_gcp_creds.py` for diagnostic verification.
+### 5. 🔥 Direct Google Cloud Firestore Integration (Dual-Mode Hybrid Storage Adapter)
+- **Cloud Mode**: Directly reads & writes to Firestore collections under `stores/{store_id}/`:
+  - `stores/{store_id}/inventory`: Real-time stock levels, MRP, cost, and velocities.
+  - `stores/{store_id}/promotions`: Active/scheduled campaigns, pricing tiers, and conflict logs.
+  - `stores/{store_id}/calendar_events`: Regional festive event calendar.
+  - `stores/{store_id}/store_profile`: Store metadata, location, and customer list.
+  - `stores/{store_id}/knowledge_catalog`: Compiled Markdown catalog (`store_knowledge.md`).
+- **Offline / Local Fallback Mode**: Automatically falls back to local JSON + Markdown when running without internet or credentials, ensuring 100% zero downtime.
+- **Automated Verification**: Diagnostic credential verification and sync status.
 
 ### 6. 📊 Interactive Slide Presentation Deck & Demo Walkthrough
 - **Pitch Deck**: Accessible in-browser at [`/deck`](http://localhost:8080/deck) or [`frontend/presentation_deck.html`](frontend/presentation_deck.html).
@@ -71,11 +76,23 @@
                                          │
                                          ▼
 ┌─────────────────────────────────────────────────────────────────────────────────┐
-│                     Dual-Mode Data & Cloud Storage Layer                        │
-│   • Google Cloud Firestore: Live Cloud Sync (stores/{id}/inventory, offers)     │
-│   • Local JSON Storage: data/inventory_store.json, store_profile.json (Fallback)│
-│   • Grounded Catalog: data/store_knowledge.md (Synced for AI Agent Reasoning)   │
-└─────────────────────────────────────────────────────────────────────────────────┘
+│                 Dual-Mode Hybrid Storage Adapter (storage.py)                   │
+│   ┌─────────────────────────────────────┐ ┌───────────────────────────────────┐ │
+│   │   Cloud Mode (Firestore Live)       │ │   Offline / Local Fallback Mode   │ │
+│   │   stores/{store_id}/inventory       │ │   • data/inventory_store.json     │ │
+│   │   stores/{store_id}/promotions      │ │   • data/promotions_store.json    │ │
+│   │   stores/{store_id}/calendar_events │ │   • data/calendar_events.json     │ │
+│   │   stores/{store_id}/store_profile   │ │   • data/store_profile.json       │ │
+│   │   stores/{store_id}/knowledge_cat   │ │   • data/conflict_logs.json       │ │
+│   └──────────────────┬──────────────────┘ └─────────────────┬─────────────────┘ │
+└──────────────────────┼──────────────────────────────────────┼───────────────────┘
+                       │                                      │
+                       ▼                                      ▼
+               ┌──────────────────────────────────────────────────────┐
+               │         Instant AI Grounding Knowledge Base          │
+               │               data/store_knowledge.md                │
+               │   (Auto-recompiled on every inventory / cloud event) │
+               └──────────────────────────────────────────────────────┘
 ```
 
 ---
@@ -175,12 +192,16 @@ PromoMind AI operates in **Dual-Mode**: It runs out-of-the-box in local offline 
 | `GET` | `/deck` | Interactive slide presentation deck for investors & judges |
 | `GET` | `/problem-statement` | Problem statement, retail solution & impact whitepaper |
 | `GET` | `/api/health` | Service health status and active configuration |
+| `GET` | `/api/storage/status` | Hybrid storage adapter telemetry (Cloud vs Local, Firestore collections) |
 | `GET` | `/api/system/cloud-status` | Google Cloud Firestore connection status & credentials state |
 | `GET` | `/api/profile` | Retailer profile, working capital budget & regional settings |
 | `POST` | `/api/profile` | Update retailer profile and recompile `store_knowledge.md` |
+| `GET` | `/api/store/profile` | Retrieve store metadata, regional location, and customer list from storage |
+| `POST` | `/api/store/profile` | Update store identity, regional demographics, and customer list in storage |
 | `GET` | `/api/store/financial-roi` | Dukan Capital ROI metrics (turnover, net profit, dead capital risk) |
 | `POST` | `/api/store/simulate-roi` | "What-If" ROI simulation (adjust discount depth & volume lift) |
 | `GET` | `/api/inventory` | Retailer inventory, velocities, cost, MRP, and stock status |
+| `POST` | `/api/products` | Add new SKU, run Holt-Winters forecasts, and instant-sync AI Knowledge Base |
 | `GET` | `/api/inventory/{id}/brand-comparison` | Multi-brand sales curves (e.g., Amul vs Nandini vs Mother Dairy) |
 | `GET` | `/api/calendar/events` | Multi-horizon regional festival events (`?region=...`) |
 | `GET` | `/api/offers/active` | Currently scheduled and active in-store promotional offers |

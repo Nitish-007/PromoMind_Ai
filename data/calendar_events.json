@@ -1,0 +1,84 @@
+[
+  {
+    "date_window": "Oct 10 - Oct 13, 2026",
+    "demand_lift_pct": 60.0,
+    "icon": "🌾",
+    "key_items": [
+      "Puffed Rice (Pori)",
+      "Jaggery (Bella)",
+      "Sunflower Oil",
+      "Ash Gourd",
+      "Flowers & Lemon"
+    ],
+    "region": "Karnataka",
+    "status": "UPCOMING",
+    "description": "Massive corporate and vehicle puja demand. Bulk restocking of sweets and sunflower oil for frying.",
+    "name": "Ayudha Puja & Vijayadashami",
+    "id": "EVT_AYUDHA_PUJA_2026"
+  },
+  {
+    "date_window": "Oct 24 - Oct 29, 2026",
+    "demand_lift_pct": 85.0,
+    "icon": "🪔",
+    "key_items": [
+      "Clay Diyas & Deepas",
+      "Pure Cow Ghee",
+      "Gulab Jamun & Sweets",
+      "California Almonds",
+      "Puja Camphor & Wicks"
+    ],
+    "region": "Karnataka & South India",
+    "status": "UPCOMING",
+    "description": "Peak festive season in Bengaluru. Deepas and Cow Ghee require 3x normal stock. Non-festive days require only minimal puja stock.",
+    "name": "Diwali / Deepavali (Deepa & Lakshmi Puja)",
+    "id": "EVT_DIWALI_2026"
+  },
+  {
+    "date_window": "Nov 14 - Nov 20, 2026",
+    "demand_lift_pct": 45.0,
+    "icon": "🕯️",
+    "key_items": [
+      "Earthen Deepas (Clay Lamps)",
+      "Sesame Gingelly Oil",
+      "Cotton Wicks",
+      "Cow Ghee"
+    ],
+    "region": "Karnataka & Tamil Nadu",
+    "status": "UPCOMING",
+    "description": "Month of lights across temples and households. Heavy surge in clay deepas and lighting oils.",
+    "name": "Karthika Deepotsava",
+    "id": "EVT_KARTHIKA_DEEPAM_2026"
+  },
+  {
+    "date_window": "Jul 15 - Aug 30, 2026",
+    "demand_lift_pct": 35.0,
+    "icon": "🌧️",
+    "key_items": [
+      "Premium Tea",
+      "Biscuits",
+      "Garam Masala",
+      "Ginger",
+      "Snacks"
+    ],
+    "region": "Karnataka Urban",
+    "status": "COMPLETED",
+    "description": "Cool monsoon evenings trigger evening chai & biscuit combo demand.",
+    "name": "Monsoon Refresh Bonanza",
+    "id": "EVT_MONSOON_BONANZA_2026"
+  },
+  {
+    "id": "EVT_UGADI_2026",
+    "name": "Ugadi New Year",
+    "region": "Karnataka",
+    "date_window": "March 2026",
+    "demand_lift_pct": 50.0,
+    "key_items": [
+      "Jaggery",
+      "Neem",
+      "Raw Mango"
+    ],
+    "status": "UPCOMING",
+    "icon": "🪔",
+    "description": ""
+  }
+]

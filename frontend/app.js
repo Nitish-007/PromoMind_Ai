@@ -123,6 +123,7 @@ async function loadStoreProfile() {
     if (res.ok) {
       const prof = await res.json();
       applyProfileToUI(prof);
+      await fetchStorageStatus();
       return;
     }
   } catch (e) {
@@ -135,20 +136,31 @@ async function loadStoreProfile() {
     owner_name: localStorage.getItem("promomind_owner_name") || "Ramesh Sharma",
     state_region: localStorage.getItem("promomind_region") || "Karnataka & South India",
     city: localStorage.getItem("promomind_city") || "Bengaluru",
-    locality: "Koramangala 4th Block",
+    locality: localStorage.getItem("promomind_locality") || "Koramangala 4th Block",
     pincode: localStorage.getItem("promomind_pin") || "560034",
     phone: localStorage.getItem("promomind_phone") || "+91 98450 12345",
+    gstin: localStorage.getItem("promomind_gstin") || "29AAAAA0000A1Z5",
+    store_type: localStorage.getItem("promomind_store_type") || "Supermarket",
     audience_reach: parseInt(localStorage.getItem("promomind_audience") || "1420", 10),
     working_capital: parseFloat(localStorage.getItem("promomind_capital") || "500000"),
     min_gross_margin_target_pct: parseFloat(localStorage.getItem("promomind_margin") || "15.0")
   };
   applyProfileToUI(fallbackProf);
+  await fetchStorageStatus();
 }
 
 function applyProfileToUI(prof) {
   const storeName = prof.store_name || "Metro Supermarket & Retail Mart";
   const city = prof.city || "Bengaluru";
-  const region = prof.state_region || "Karnataka & South India";
+  const region = prof.state_region || prof.region || "Karnataka & South India";
+  const locality = prof.locality || "Koramangala 4th Block";
+  const pin = prof.pincode || prof.pin_code || "560034";
+  const phone = prof.phone || "+91 98450 12345";
+  const gstin = prof.gstin || "29AAAAA0000A1Z5";
+  const storeType = prof.store_type || "Supermarket";
+  const audience = prof.audience_reach || prof.audience_size || 1420;
+  const capital = prof.working_capital || prof.total_working_capital_inr || 500000;
+  const margin = prof.min_gross_margin_target_pct || prof.default_min_margin_pct || 15.0;
 
   // Apply to Header and Profile Screen
   const topStore = document.getElementById("topStoreName");
@@ -167,16 +179,22 @@ function applyProfileToUI(prof) {
   if (elRegion) elRegion.value = region;
   const elCity = document.getElementById("profCity");
   if (elCity) elCity.value = city;
+  const elLocality = document.getElementById("profLocality");
+  if (elLocality) elLocality.value = locality;
   const elPin = document.getElementById("profPin");
-  if (elPin) elPin.value = prof.pincode || "560034";
+  if (elPin) elPin.value = pin;
   const elPhone = document.getElementById("profPhone");
-  if (elPhone) elPhone.value = prof.phone || "+91 98450 12345";
+  if (elPhone) elPhone.value = phone;
+  const elGSTIN = document.getElementById("profGSTIN");
+  if (elGSTIN) elGSTIN.value = gstin;
+  const elStoreType = document.getElementById("profStoreType");
+  if (elStoreType) elStoreType.value = storeType;
   const elAudience = document.getElementById("profAudienceSize");
-  if (elAudience) elAudience.value = prof.audience_reach || 1420;
+  if (elAudience) elAudience.value = audience;
   const elCapital = document.getElementById("profWorkingCapital");
-  if (elCapital) elCapital.value = prof.working_capital || 500000;
+  if (elCapital) elCapital.value = capital;
   const elMargin = document.getElementById("profMinMargin");
-  if (elMargin) elMargin.value = prof.min_gross_margin_target_pct || 15.0;
+  if (elMargin) elMargin.value = margin;
 
   // Sync calendar region select
   const calRegion = document.getElementById("calendarRegionSelect");
@@ -187,31 +205,107 @@ function applyProfileToUI(prof) {
   if (copilotPill) copilotPill.innerText = `📍 ${city} (${region.split("&")[0].trim()}) • Active Copilot`;
 }
 
+async function fetchStorageStatus() {
+  try {
+    const res = await fetch("/api/storage/status");
+    if (!res.ok) return;
+    const data = await res.json();
+    const badgeEl = document.getElementById("storageStatusBadge");
+    const collsEl = document.getElementById("storageCollectionsBadge");
+    if (badgeEl) {
+      if (data.mode === "CLOUD" && data.firestore_connected) {
+        badgeEl.innerHTML = `🟢 <strong>Cloud Mode (Firestore Live)</strong>`;
+        badgeEl.style.color = "#15803d";
+      } else {
+        badgeEl.innerHTML = `🟡 <strong>Local Fallback Mode (Zero Downtime)</strong>`;
+        badgeEl.style.color = "#b45309";
+      }
+    }
+    if (collsEl && data.collections) {
+      collsEl.innerText = `stores/${data.store_id}/[inventory, promotions, calendar_events, store_profile, knowledge_catalog]`;
+    }
+  } catch (err) {
+    console.warn("Could not query /api/storage/status:", err);
+  }
+}
+
+async function fetchStoreProfile() {
+  try {
+    const res = await fetch("/api/store/profile");
+    if (!res.ok) return;
+    const profile = await res.json();
+    applyProfileToUI(profile);
+    if (profile.store_name) localStorage.setItem("promomind_store_name", profile.store_name);
+    if (profile.owner_name) localStorage.setItem("promomind_owner_name", profile.owner_name);
+    if (profile.phone) localStorage.setItem("promomind_phone", profile.phone);
+    if (profile.gstin) localStorage.setItem("promomind_gstin", profile.gstin);
+    if (profile.store_type) localStorage.setItem("promomind_store_type", profile.store_type);
+    if (profile.audience_size !== undefined && profile.audience_size !== null) {
+      localStorage.setItem("promomind_audience", String(profile.audience_size));
+    }
+    if (profile.region) localStorage.setItem("promomind_region", profile.region);
+    if (profile.city) localStorage.setItem("promomind_city", profile.city);
+    if (profile.locality) localStorage.setItem("promomind_locality", profile.locality);
+    if (profile.pin_code) localStorage.setItem("promomind_pin", profile.pin_code);
+    if (profile.total_working_capital_inr || profile.working_capital) {
+      localStorage.setItem("promomind_capital", String(profile.total_working_capital_inr || profile.working_capital));
+    }
+    if (profile.default_min_margin_pct || profile.min_gross_margin_target_pct) {
+      localStorage.setItem("promomind_margin", String(profile.default_min_margin_pct || profile.min_gross_margin_target_pct));
+    }
+  } catch (err) {
+    console.warn("Could not fetch remote store profile:", err);
+  }
+}
+
 async function saveStoreProfile() {
+  const storeName = (document.getElementById("profStoreName")?.value || "Metro Supermarket & Retail Mart").trim();
+  const owner = (document.getElementById("profOwnerName")?.value || "Ramesh Sharma").trim();
+  const phone = (document.getElementById("profPhone")?.value || "+91 98450 12345").trim();
+  const gstin = (document.getElementById("profGSTIN")?.value || "29AAAAA0000A1Z5").trim();
+  const storeType = document.getElementById("profStoreType")?.value || "Supermarket";
+  const audience = parseInt(document.getElementById("profAudienceSize")?.value?.trim() || "1420", 10) || 1420;
+  const region = document.getElementById("profStateRegion")?.value || "Karnataka & South India";
+  const city = (document.getElementById("profCity")?.value || "Bengaluru").trim();
+  const locality = (document.getElementById("profLocality")?.value || "Koramangala 4th Block").trim();
+  const pin = (document.getElementById("profPin")?.value || "560034").trim();
+  const capital = parseFloat(document.getElementById("profWorkingCapital")?.value || "500000") || 500000;
+  const margin = parseFloat(document.getElementById("profMinMargin")?.value || "15.0") || 15.0;
+
   const prof = {
-    store_name: document.getElementById("profStoreName").value.trim() || "Sharma Supermarket",
-    owner_name: document.getElementById("profOwnerName").value.trim() || "Ramesh Sharma",
-    phone: document.getElementById("profPhone").value.trim() || "+91 98450 12345",
-    store_type: (document.getElementById("profStoreType") && document.getElementById("profStoreType").value) || "Supermarket",
-    audience_reach: parseInt(document.getElementById("profAudienceSize").value || "1420", 10),
-    working_capital: parseFloat(document.getElementById("profWorkingCapital").value || "500000"),
-    min_gross_margin_target_pct: parseFloat(document.getElementById("profMinMargin").value || "15.0"),
-    state_region: document.getElementById("profStateRegion").value,
-    city: document.getElementById("profCity").value.trim() || "Bengaluru",
-    locality: (document.getElementById("profLocality") && document.getElementById("profLocality").value.trim()) || "Koramangala 4th Block",
-    pincode: document.getElementById("profPin").value.trim() || "560034"
+    store_name: storeName,
+    owner_name: owner,
+    phone: phone,
+    gstin: gstin,
+    store_type: storeType,
+    audience_reach: audience,
+    audience_size: audience,
+    working_capital: capital,
+    total_working_capital_inr: capital,
+    min_gross_margin_target_pct: margin,
+    default_min_margin_pct: margin,
+    state_region: region,
+    region: region,
+    city: city,
+    locality: locality,
+    pincode: pin,
+    pin_code: pin
   };
 
-  localStorage.setItem("promomind_store_name", prof.store_name);
-  localStorage.setItem("promomind_owner_name", prof.owner_name);
-  localStorage.setItem("promomind_region", prof.state_region);
-  localStorage.setItem("promomind_city", prof.city);
-  localStorage.setItem("promomind_pin", prof.pincode);
-  localStorage.setItem("promomind_phone", prof.phone);
-  localStorage.setItem("promomind_audience", prof.audience_reach);
-  localStorage.setItem("promomind_capital", prof.working_capital);
-  localStorage.setItem("promomind_margin", prof.min_gross_margin_target_pct);
+  localStorage.setItem("promomind_store_name", storeName);
+  localStorage.setItem("promomind_owner_name", owner);
+  localStorage.setItem("promomind_phone", phone);
+  localStorage.setItem("promomind_gstin", gstin);
+  localStorage.setItem("promomind_store_type", storeType);
+  localStorage.setItem("promomind_audience", String(audience));
+  localStorage.setItem("promomind_region", region);
+  localStorage.setItem("promomind_city", city);
+  localStorage.setItem("promomind_locality", locality);
+  localStorage.setItem("promomind_pin", pin);
+  localStorage.setItem("promomind_capital", String(capital));
+  localStorage.setItem("promomind_margin", String(margin));
 
+  // Sync with both endpoints
   try {
     await fetch("/api/profile", {
       method: "POST",
@@ -219,13 +313,37 @@ async function saveStoreProfile() {
       body: JSON.stringify(prof)
     });
   } catch (err) {
-    console.error("Error saving profile to server:", err);
+    console.error("Error saving profile to /api/profile:", err);
+  }
+
+  try {
+    await fetch("/api/store/profile", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        store_name: storeName,
+        owner_name: owner,
+        phone: phone,
+        gstin: gstin,
+        store_type: storeType,
+        audience_size: audience,
+        region: region,
+        city: city,
+        locality: locality,
+        pin_code: pin,
+        total_working_capital_inr: capital,
+        default_min_margin_pct: margin
+      })
+    });
+  } catch (err) {
+    console.warn("Could not push profile to /api/store/profile:", err);
   }
 
   applyProfileToUI(prof);
-  fetchKnowledgeMarkdown();
-  fetchStoreROI();
-  showToast("Store profile & regional preferences saved & synced to AI Knowledge Base!");
+  if (typeof fetchKnowledgeMarkdown === "function") fetchKnowledgeMarkdown();
+  if (typeof fetchStoreROI === "function") fetchStoreROI();
+  if (typeof fetchStorageStatus === "function") fetchStorageStatus();
+  showToast("Store profile & regional preferences saved & synced to AI Knowledge Base & Cloud Storage!");
 }
 
 function onProfileRegionChanged(region) {

@@ -72,11 +72,11 @@ class RegionalFestivalEvent(BaseModel):
     name: str
     region: str          # e.g. "Karnataka & South India", "Maharashtra & West India", etc.
     date_window: str     # e.g. "Oct 24 - Oct 29 (Peak Diwali)"
-    status: str          # "UPCOMING", "ACTIVE", "PAST"
+    status: Optional[str] = "UPCOMING"  # "UPCOMING", "ACTIVE", "PAST"
+    demand_lift_pct: Optional[float] = 80.0
     key_items: List[str] # e.g. ["Diyas / Deepas", "Pure Cow Ghee", "Gulab Jamun", "Almonds"]
-    demand_lift_pct: float
-    icon: str
-    description: str
+    icon: Optional[str] = "🪔"
+    description: Optional[str] = "Significant regional shopping demand spike for retail grocery."
     tradition_notes: Optional[str] = None               # Cultural and traditional rationale
     advance_procurement_window: Optional[str] = None    # When retailer should buy from distributor (T-14d)
     promo_launch_window: Optional[str] = None           # When to run early-bird offers (T-7d)
@@ -95,16 +95,18 @@ class FestivalDiscoveryRequest(BaseModel):
 
 class ScheduledOffer(BaseModel):
     id: str
-    combo_id: str
+    combo_id: Optional[str] = "COMBO_DEFAULT"
     title: str
     anchor_id: str
     attached_id: str
-    start_date: str
-    end_date: str
+    start_date: Optional[str] = "2026-10-15"
+    end_date: Optional[str] = "2026-10-25"
     discount_pct: float
     combo_price: float
-    event_theme: str
-    status: str  # "ACTIVE", "SCHEDULED", "COMPLETED"
+    event_theme: Optional[str] = "Active Campaign"
+    status: Optional[str] = "ACTIVE"  # "ACTIVE", "SCHEDULED", "COMPLETED"
+    type: Optional[str] = "promotion"
+    updated_at: Optional[str] = None
 
 class ConflictCheckRequest(BaseModel):
     anchor_id: str
@@ -235,4 +237,55 @@ class ChatResponse(BaseModel):
     ideas: Optional[List[Dict[str, Any]]] = None
     roi_summary: Optional[Dict[str, Any]] = None
 
+class CustomerInfo(BaseModel):
+    name: str
+    phone: str
+    segment: Optional[str] = "General"
+    preferred_channel: Optional[str] = "WhatsApp"
+
+class StoreProfile(BaseModel):
+    store_id: str = "store_bengaluru_01"
+    store_name: str = "Metro Supermarket & Retail Mart"
+    owner_name: str = "Ramesh Sharma"
+    phone: str = "+91 98450 12345"
+    gstin: Optional[str] = "29AAAAA0000A1Z5"
+    store_type: Optional[str] = "Supermarket"
+    store_format: Optional[str] = "Supermarket"
+    audience_size: Optional[int] = 1420
+    whatsapp_audience_size: Optional[int] = 1420
+    region: str = "Karnataka & South India"
+    city: str = "Bengaluru"
+    locality: Optional[str] = "Koramangala 4th Block"
+    pin_code: Optional[str] = "560034"
+    default_min_margin_pct: Optional[float] = 16.5
+    total_working_capital_inr: Optional[float] = 500000.0
+    customer_list: Optional[List[Dict[str, Any]]] = None
+    updated_at: Optional[str] = None
+
+class StoreProfileUpdate(BaseModel):
+    store_name: Optional[str] = None
+    owner_name: Optional[str] = None
+    phone: Optional[str] = None
+    gstin: Optional[str] = None
+    store_type: Optional[str] = None
+    store_format: Optional[str] = None
+    audience_size: Optional[int] = None
+    whatsapp_audience_size: Optional[int] = None
+    default_min_margin_pct: Optional[float] = None
+    total_working_capital_inr: Optional[float] = None
+    region: Optional[str] = None
+    city: Optional[str] = None
+    locality: Optional[str] = None
+    pin_code: Optional[str] = None
+    customer_list: Optional[List[Dict[str, Any]]] = None
+
+class StorageStatusResponse(BaseModel):
+    mode: str
+    firestore_connected: bool
+    store_id: str
+    collections: Dict[str, str]
+    instant_sync_active: bool
+    fallback_reason: Optional[str] = None
+    last_sync_timestamp: Optional[str] = None
+    local_cache_files: Dict[str, str]
 

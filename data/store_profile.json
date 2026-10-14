@@ -1,13 +1,50 @@
 {
-  "store_name": "Test Bangalore Mart",
-  "owner_name": "Suresh Kumar",
   "region": "Karnataka & South India",
-  "city": "Bengaluru",
-  "locality": "Indiranagar",
-  "pin_code": "560038",
-  "phone": "+91 99887 76655",
-  "store_format": "Supermarket",
-  "whatsapp_audience_size": 2500,
+  "gstin": "29AAAAA9999A1Z9",
+  "phone": "+91 98450 99999",
+  "store_name": "Sharma Supermarket Koramangala",
+  "audience_size": 1850,
+  "total_working_capital_inr": 650000.0,
+  "updated_at": "2026-10-14T14:46:12.945083+00:00",
   "default_min_margin_pct": 16.5,
-  "total_working_capital_inr": 650000.0
+  "pin_code": "560048",
+  "store_type": "Supermarket",
+  "locality": "Koramangala 4th Block",
+  "owner_name": "Ramesh Sharma",
+  "store_id": "sharma_supermarket_01",
+  "store_format": "Supermarket",
+  "customer_list": [
+    {
+      "name": "Ananya Rao",
+      "phone": "+91 98451 22334",
+      "segment": "Festive Gifting / High AOV",
+      "preferred_channel": "WhatsApp"
+    },
+    {
+      "name": "Vikram Patel",
+      "phone": "+91 98452 33445",
+      "segment": "Weekly Pantry Staples",
+      "preferred_channel": "WhatsApp"
+    },
+    {
+      "name": "Meera Iyer",
+      "phone": "+91 98453 44556",
+      "segment": "Dairy & Sweet Making",
+      "preferred_channel": "WhatsApp"
+    },
+    {
+      "name": "Karthik Reddy",
+      "phone": "+91 98454 55667",
+      "segment": "Evening Snacks & Tea",
+      "preferred_channel": "POS"
+    },
+    {
+      "name": "Sunita Jain",
+      "phone": "+91 98455 66778",
+      "segment": "Dry Fruits & Bulk Staples",
+      "preferred_channel": "WhatsApp"
+    }
+  ],
+  "whatsapp_audience_size": 2500,
+  "city": "Bengaluru"
 }

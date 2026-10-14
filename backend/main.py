@@ -8,6 +8,13 @@ from typing import List, Dict, Any, Optional
 
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.dirname(CURRENT_DIR)
+# Auto-load environment variables from backend/.env and project root .env
+try:
+    from dotenv import load_dotenv
+    load_dotenv(os.path.join(CURRENT_DIR, ".env"))
+    load_dotenv(os.path.join(PROJECT_ROOT, ".env"))
+except Exception:
+    pass
 if CURRENT_DIR not in sys.path:
     sys.path.insert(0, CURRENT_DIR)
 
@@ -32,16 +39,15 @@ from models import (
     BrandComparisonResponse, RegionalFestivalEvent, ScheduledOffer,
     ConflictCheckRequest, ConflictCheckResponse, StoreProfile,
     InvestmentROISimulation, ROIScenarioRequest, ChatQuery, ChatResponse,
-    FestivalDiscoveryRequest
+    FestivalDiscoveryRequest, StoreProfileUpdate, StorageStatusResponse
 )
 from mock_data import (
     DEMAND_FORECASTS, CATEGORY_BRAND_COMPARISONS, 
     REGIONAL_FESTIVAL_CALENDAR, SCHEDULED_OFFERS
 )
 from agents import PromoMindEngine, RetailCopilotAgent, DynamicFestivalEngine
-from storage import StoreDataManager
+from storage import StoreDataManager, DualModeStorageAdapter
 from forecasting import OpenSourceForecastingEngine, InvestmentROIEngine
-from firestore_service import FirestoreService
 
 app = FastAPI(
     title="PromoMind AI API",
@@ -63,33 +69,58 @@ StoreDataManager.load_products()
 
 @app.get("/api/health")
 def health_check():
+    status = StoreDataManager.get_storage_status()
     return {
         "status": "healthy",
         "service": "PromoMind AI",
         "version": "2.5.0",
         "region": "asia-south1 (Google Cloud)",
         "model": "Gemini 1.5 Flash / Open-Source Holt-Winters Forecaster",
+        "storage_mode": status["mode"],
+        "firestore_connected": status["firestore_connected"],
+        "store_id": status["store_id"],
         "active_theme": "Google Material 3 Responsive Multi-Screen"
     }
+
+@app.get("/api/storage/status", response_model=StorageStatusResponse)
+def get_storage_status():
+    """Retrieve Dual-Mode Hybrid Storage Adapter connection status and Firestore collections."""
+    return StoreDataManager.get_storage_status()
 
 @app.get("/api/system/cloud-status")
 def get_cloud_storage_status():
     """Returns Google Cloud Firestore live synchronization status and credentials state."""
-    return FirestoreService.get_status()
+    status = dict(StoreDataManager.get_storage_status())
+    status["is_connected"] = status.get("firestore_connected", False)
+    status["credentials_found"] = status.get("firestore_connected", False) or bool(os.getenv("GCP_SERVICE_ACCOUNT_KEY") or os.getenv("GOOGLE_APPLICATION_CREDENTIALS"))
+    return status
 
 # ==============================================================================
 # Store Profile, Regional Settings & Financial ROI Intelligence
 # ==============================================================================
 
 @app.get("/api/profile", response_model=StoreProfile)
-def get_store_profile():
+def get_profile_compat():
     """Retrieve retailer store profile, regional demographic settings, and working capital."""
     return StoreDataManager.load_profile()
 
 @app.post("/api/profile", response_model=StoreProfile)
-def update_store_profile(profile: StoreProfile):
+def update_profile_compat(profile: StoreProfile):
     """Update store profile, cultural region, and immediately recompile store_knowledge.md."""
     return StoreDataManager.save_profile(profile)
+
+@app.get("/api/store/profile", response_model=Dict[str, Any])
+def get_store_profile():
+    """Retrieve store metadata, regional location, and customer list from stores/{store_id}/store_profile."""
+    return StoreDataManager.get_store_profile()
+
+@app.post("/api/store/profile", response_model=Dict[str, Any])
+def update_store_profile(payload: StoreProfileUpdate):
+    """Update store metadata, regional location, and customer list in Firestore / local fallback."""
+    current = StoreDataManager.get_store_profile()
+    updates = payload.model_dump(exclude_unset=True)
+    current.update(updates)
+    return StoreDataManager.save_store_profile(current)
 
 @app.get("/api/store/financial-roi", response_model=InvestmentROISimulation)
 def get_store_financial_roi():
@@ -99,7 +130,8 @@ def get_store_financial_roi():
     """
     products = StoreDataManager.load_products()
     profile = StoreDataManager.load_profile()
-    roi = InvestmentROIEngine.compute_store_roi(products, store_capital_budget=profile.total_working_capital_inr)
+    budget = profile.total_working_capital_inr if hasattr(profile, "total_working_capital_inr") and profile.total_working_capital_inr else 500000.0
+    roi = InvestmentROIEngine.compute_store_roi(products, store_capital_budget=budget)
     return InvestmentROISimulation(**roi)
 
 @app.post("/api/store/simulate-roi")
@@ -110,7 +142,8 @@ def simulate_roi_scenario(payload: ROIScenarioRequest):
     """
     products = StoreDataManager.load_products()
     profile = StoreDataManager.load_profile()
-    roi_base = InvestmentROIEngine.compute_store_roi(products, store_capital_budget=profile.total_working_capital_inr)
+    budget = profile.total_working_capital_inr if hasattr(profile, "total_working_capital_inr") and profile.total_working_capital_inr else 500000.0
+    roi_base = InvestmentROIEngine.compute_store_roi(products, store_capital_budget=budget)
     
     sim = InvestmentROIEngine.simulate_scenario(
         base_invested=roi_base["total_inventory_invested_inr"],
@@ -121,7 +154,7 @@ def simulate_roi_scenario(payload: ROIScenarioRequest):
     return sim
 
 # ==============================================================================
-# Regional Festival Calendar & Conflict Tracker
+# Regional Festival Calendar & Conflict Tracker (stores/{store_id}/calendar_events)
 # ==============================================================================
 
 @app.get("/api/calendar/events", response_model=List[RegionalFestivalEvent])
@@ -161,30 +194,40 @@ def discover_regional_festivals(payload: FestivalDiscoveryRequest):
 @app.get("/api/offers/active", response_model=List[ScheduledOffer])
 def get_active_offers():
     """Retrieve currently active and scheduled offers across POS and WhatsApp channels."""
-    return SCHEDULED_OFFERS
+    return StoreDataManager.get_promotions()
 
 @app.post("/api/offers/check-conflict", response_model=ConflictCheckResponse)
 def check_offer_conflict(payload: ConflictCheckRequest):
     """
     Detect overlapping promotional offers for the same anchor or attached products
     to prevent margin cannibalization and retailer discount fatigue.
+    Logs conflict to stores/{store_id}/promotions when detected.
     """
+    offers = StoreDataManager.get_promotions()
     conflicts = []
-    for offer in SCHEDULED_OFFERS:
+    for offer in offers:
         if offer.get("status") in ["ACTIVE", "SCHEDULED"]:
-            if payload.anchor_id in [offer["anchor_id"], offer["attached_id"]]:
+            if payload.anchor_id in [offer.get("anchor_id"), offer.get("attached_id")]:
                 conflicts.append(offer)
-            elif payload.attached_id in [offer["anchor_id"], offer["attached_id"]]:
+            elif payload.attached_id in [offer.get("anchor_id"), offer.get("attached_id")]:
                 conflicts.append(offer)
 
     if conflicts:
         first = conflicts[0]
+        reason = (
+            f"Overlap detected with active offer '{first.get('title')}' (scheduled {first.get('start_date')} to {first.get('end_date')}). "
+            f"Discounting the same SKU across two campaigns creates price confusion and eats profit margin."
+        )
+        # Log detected conflict into Firestore collection stores/{store_id}/promotions
+        StoreDataManager.log_conflict({
+            "anchor_id": payload.anchor_id,
+            "attached_id": payload.attached_id,
+            "conflict_reason": reason,
+            "conflicting_offers": conflicts
+        })
         return ConflictCheckResponse(
             has_conflict=True,
-            conflict_reason=(
-                f"Overlap detected with active offer '{first['title']}' (scheduled {first['start_date']} to {first['end_date']}). "
-                f"Discounting the same SKU across two campaigns creates price confusion and eats profit margin."
-            ),
+            conflict_reason=reason,
             conflicting_offers=conflicts,
             recommended_action="Stagger campaign start date until existing promotion finishes or select an alternative attached SKU."
         )
@@ -195,6 +238,7 @@ def check_offer_conflict(payload: ConflictCheckRequest):
         conflicting_offers=[],
         recommended_action="Clear to schedule. No conflicting promotions active for selected SKUs."
     )
+
 
 # ==============================================================================
 # Inventory, Multi-Brand Curves & CSV Upload
@@ -454,9 +498,10 @@ def publish_offer(payload: Dict[str, Any]):
     disc = payload.get("discount_pct", 17.5)
     theme = payload.get("event_theme", "Active Campaign")
 
-    # Schedule into calendar
+    # Schedule into promotions collection (stores/{store_id}/promotions)
+    current_offers = StoreDataManager.get_promotions()
     new_offer = {
-        "id": f"OFFER_LIVE_{len(SCHEDULED_OFFERS) + 1:02d}",
+        "id": f"OFFER_LIVE_{len(current_offers) + 1:02d}",
         "combo_id": combo_id,
         "title": title,
         "anchor_id": anchor_id,
@@ -468,7 +513,7 @@ def publish_offer(payload: Dict[str, Any]):
         "event_theme": theme,
         "status": "ACTIVE"
     }
-    SCHEDULED_OFFERS.insert(0, new_offer)
+    StoreDataManager.save_promotion(new_offer)
 
     return {
         "status": "SUCCESS",

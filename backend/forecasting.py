@@ -233,7 +233,7 @@ class PriceElasticityOptimizer:
         net_margin_pct = round(((rounded_price - combined_cost) / max(1.0, rounded_price)) * 100.0, 1)
         if net_margin_pct < min_margin_pct:
             # Enforce margin floor if feasible under MRP
-            required_price = combined_cost / (1.0 - (min_margin_pct / 100.0))
+            required_price = combined_cost / max(0.05, (1.0 - (min_margin_pct / 100.0)))
             candidate_price = math.ceil(required_price / 10) * 10 + 9
             if candidate_price < combined_mrp:
                 rounded_price = candidate_price
@@ -242,8 +242,17 @@ class PriceElasticityOptimizer:
         if rounded_price >= combined_mrp:
             rounded_price = math.floor((combined_mrp - 2) / 10) * 10 + 9
             if rounded_price >= combined_mrp:
-                rounded_price = max(combined_cost, combined_mrp - 10.0)
+                rounded_price = max(combined_cost + 5.0, combined_mrp - 10.0)
             net_margin_pct = round(((rounded_price - combined_cost) / max(1.0, rounded_price)) * 100.0, 1)
+
+        # Absolute retail safeguard: never sell below cost
+        if rounded_price <= combined_cost:
+            candidate_safe = math.ceil((combined_cost * 1.05) / 10) * 10 + 9
+            if candidate_safe < combined_mrp:
+                rounded_price = candidate_safe
+            else:
+                rounded_price = max(combined_cost + 5.0, round(combined_mrp - 5.0, 1))
+        net_margin_pct = max(1.5, round(((rounded_price - combined_cost) / max(1.0, rounded_price)) * 100.0, 1))
 
         discount_amount = max(5.0, round(combined_mrp - rounded_price, 1))
         final_discount_pct = round((discount_amount / max(1.0, combined_mrp)) * 100.0, 1)

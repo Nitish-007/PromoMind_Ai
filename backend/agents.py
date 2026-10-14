@@ -707,7 +707,7 @@ class DynamicFestivalEngine:
             },
             {
                 "id": "EVT_DEEPAVALI_SOUTH",
-                "name": "Deepavali & Naraka Chaturdashi",
+                "name": "Diwali / Deepavali & Naraka Chaturdashi",
                 "date_window": "Oct 24 - Oct 29, 2026",
                 "status": "UPCOMING",
                 "key_items": ["Clay Diyas & Deepas", "Pure Cow Ghee", "Gulab Jamun & Sweets", "California Almonds", "Puja Camphor & Cotton Wicks"],
@@ -1201,6 +1201,10 @@ Return ONLY a valid JSON array of exactly 3 objects.
                         text_out = text_out[:-3]
                     parsed = json.loads(text_out.strip())
                     if isinstance(parsed, list) and len(parsed) > 0:
+                        for item in parsed:
+                            n = item.get("name", "")
+                            if "deepavali" in n.lower() and "diwali" not in n.lower():
+                                item["name"] = n.replace("Deepavali", "Diwali / Deepavali")
                         return parsed
             except Exception:
                 continue

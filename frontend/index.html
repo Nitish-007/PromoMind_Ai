@@ -1004,8 +1004,12 @@
 
           <div class="profile-metrics-list">
             <div class="p-metric-row">
-              <span class="p-metric-label">Store Database Status:</span>
-              <span class="p-metric-val">🟢 Online & Persistent (JSON + Markdown)</span>
+              <span class="p-metric-label">Dual-Mode Storage Adapter:</span>
+              <span class="p-metric-val" id="storageStatusBadge">🟢 Cloud / Local Hybrid Adapter</span>
+            </div>
+            <div class="p-metric-row">
+              <span class="p-metric-label">Firestore Collections:</span>
+              <span class="p-metric-val" id="storageCollectionsBadge" style="font-size:0.82rem;font-family:monospace;">stores/{store_id}/...</span>
             </div>
             <div class="p-metric-row">
               <span class="p-metric-label">Google Cloud Firestore:</span>
@@ -1020,8 +1024,8 @@
               <span class="p-metric-val">Apriori Market Basket Probability (Support/Lift)</span>
             </div>
             <div class="p-metric-row">
-              <span class="p-metric-label">AI Agent Reasoning Grounding:</span>
-              <span class="p-metric-val">Grounding via <code>store_knowledge.md</code></span>
+              <span class="p-metric-label">AI Knowledge Base Sync:</span>
+              <span class="p-metric-val" id="storageSyncBadge">⚡ Instant Re-compilation Grounded in <code>data/store_knowledge.md</code></span>
             </div>
           </div>
         </div>
