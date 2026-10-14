@@ -990,14 +990,64 @@ class DynamicFestivalEngine:
                 "suggested_combo_title": "Holi Gujiya Sweet & Thandai Duo"
             }
         ],
+        "california": [
+            {
+                "id": "EVT_CA_THANKSGIVING_2026",
+                "name": "Thanksgiving & Holiday Feasting",
+                "date_window": "Nov 19 - Nov 26, 2026",
+                "status": "UPCOMING",
+                "key_items": ["Whole Turkeys & Poultry", "Baking Mixes & Butter", "Cranberry Sauces & Jams", "Sweet Potatoes", "Sparkling Cider & Drinks", "California Almonds"],
+                "demand_lift_pct": 215.0,
+                "icon": "🦃",
+                "description": "Major family feasting holiday driving massive retail volume across center-store baking goods, fresh produce, and poultry in California supermarkets.",
+                "tradition_notes": "California consumers incorporate fresh local produce, sweet potatoes, and stuffing with high baking butter and turkey demand.",
+                "advance_procurement_window": "T-21 Days: Lock in poultry contracts, bulk butter, and roasting seasonings.",
+                "promo_launch_window": "T-10 Days: Launch 'Thanksgiving Family Feast Essentials' end-cap bundle.",
+                "clearance_window": "T+2 Days: Liquidate remaining fresh poultry and holiday bakery items.",
+                "recommended_promo_type": "FESTIVE_CELEBRATION_HAMPER",
+                "suggested_combo_title": "California Golden State Thanksgiving Feast Pack"
+            },
+            {
+                "id": "EVT_CA_CHRISTMAS_2026",
+                "name": "Christmas & Holiday Gifting Season",
+                "date_window": "Dec 18, 2026 - Jan 2, 2027",
+                "status": "UPCOMING",
+                "key_items": ["Chocolates & Cookies", "California Premium Almonds & Nuts", "Fruit Juices & Sparkling Cider", "Gifting Hampers", "Artisanal Cheese & Butter"],
+                "demand_lift_pct": 190.0,
+                "icon": "🎄",
+                "description": "High-volume corporate and family gifting, holiday party snacking, and celebratory entertaining across California retail stores.",
+                "tradition_notes": "Shoppers prepare holiday charcuterie boards, gift hampers of premium nuts and confectionery, and family holiday breakfasts.",
+                "advance_procurement_window": "T-18 Days: Stock holiday confection packaging, premium nuts, and festive beverages.",
+                "promo_launch_window": "T-10 Days: Launch 'Holiday Cheer Gifting Hamper' digital catalog.",
+                "clearance_window": "T+3 Days: Markdown post-Christmas seasonal gift sets at 30% off.",
+                "recommended_promo_type": "FESTIVE_CELEBRATION_HAMPER",
+                "suggested_combo_title": "California Holiday Cheer & Gifting Hamper"
+            },
+            {
+                "id": "EVT_CA_SUPERBOWL_2027",
+                "name": "Super Bowl & Game Day Weekend",
+                "date_window": "Feb 7 - Feb 14, 2027",
+                "status": "UPCOMING",
+                "key_items": ["Tortilla Chips & Snacks", "Dipping Sauces & Salsas", "Cold Beverages & Soda", "Pretzels & Mixed Nuts", "Party Packs"],
+                "demand_lift_pct": 175.0,
+                "icon": "🏈",
+                "description": "America's largest weekend snack and beverage shopping peak. High velocity on party-size snacks, chips, and refreshing beverages.",
+                "tradition_notes": "Game Day gatherings demand shareable finger foods, salty snacks, dipping platters, and convenient party bundles.",
+                "advance_procurement_window": "T-14 Days: Build bulk floor displays of chips, snacks, and beverage cases.",
+                "promo_launch_window": "T-7 Days: Launch 'Game Day Ultimate Snacking Pack' promotion.",
+                "clearance_window": "T+2 Days: Clear single-serve overflow snacks.",
+                "recommended_promo_type": "ANCHOR_MARGIN_BOOSTER",
+                "suggested_combo_title": "Touchdown Game Day Snacking Duo"
+            }
+        ],
         "global": [
             {
                 "id": "EVT_THANKSGIVING",
                 "name": "Thanksgiving & Holiday Feasting",
-                "date_window": "Nov 22 - Nov 28, 2026",
+                "date_window": "Nov 19 - Nov 26, 2026",
                 "status": "UPCOMING",
                 "key_items": ["Butter & Cream", "Roasting Seasonings", "Cranberry Sauces", "Bakery Mixes", "Beverages & Cider"],
-                "demand_lift_pct": 120.0,
+                "demand_lift_pct": 180.0,
                 "icon": "🦃",
                 "description": "Family feasting and holiday dinner preparations creating high basket value retail traffic.",
                 "tradition_notes": "Baking, roasting, and family dinner grocery purchases spike significantly.",
@@ -1013,7 +1063,7 @@ class DynamicFestivalEngine:
                 "date_window": "Dec 18, 2026 - Jan 2, 2027",
                 "status": "UPCOMING",
                 "key_items": ["Chocolates & Cookies", "Premium Snacks & Nuts", "Fruit Juices & Sparkling Cider", "Gifting Hampers"],
-                "demand_lift_pct": 135.0,
+                "demand_lift_pct": 195.0,
                 "icon": "🎄",
                 "description": "End-of-year gifting, party snacking, and holiday celebrations across retail grocers.",
                 "tradition_notes": "Confectionery, snacks, and holiday gift packs dominate checkout baskets.",
@@ -1022,9 +1072,73 @@ class DynamicFestivalEngine:
                 "clearance_window": "T+2 Days: Markdown seasonal gift items.",
                 "recommended_promo_type": "FESTIVE_CELEBRATION_HAMPER",
                 "suggested_combo_title": "Holiday Cheer Gifting Hamper"
+            },
+            {
+                "id": "EVT_SUPERBOWL_GLOBAL",
+                "name": "Super Bowl & Championship Game Day",
+                "date_window": "Feb 7 - Feb 14, 2027",
+                "status": "UPCOMING",
+                "key_items": ["Snack Packs & Chips", "Dipping Sauces", "Chilled Beverages", "Pretzels & Peanuts"],
+                "demand_lift_pct": 160.0,
+                "icon": "🏈",
+                "description": "Championship weekend snacking and viewing parties trigger immediate retail basket expansion.",
+                "tradition_notes": "Friends and families gather around the big game requiring abundant snack platters and beverages.",
+                "advance_procurement_window": "T-10 Days: Secure bulk snack chips and beverage cans.",
+                "promo_launch_window": "T-5 Days: 'Championship Snack Platter Bundle'.",
+                "clearance_window": "T+1 Day: Normal clearance on overflow beverages.",
+                "recommended_promo_type": "ANCHOR_MARGIN_BOOSTER",
+                "suggested_combo_title": "Championship Game Day Snack Platter"
             }
         ]
     }
+
+    @classmethod
+    def _normalize_region_and_country(cls, region: str, country: Optional[str] = None) -> Tuple[str, str]:
+        r = (region or "Karnataka").strip()
+        c = (country or "").strip()
+
+        if "," in r:
+            parts = r.split(",", 1)
+            r = parts[0].strip()
+            c = parts[1].strip()
+
+        r_lower = r.lower()
+        c_lower = c.lower()
+
+        us_states = [
+            "california", "texas", "florida", "new york", "illinois", "pennsylvania", "ohio",
+            "georgia", "north carolina", "michigan", "new jersey", "virginia", "washington",
+            "arizona", "massachusetts", "tennessee", "indiana", "missouri", "maryland", "wisconsin",
+            "colorado", "minnesota", "south carolina", "alabama", "louisiana", "kentucky", "oregon",
+            "oklahoma", "connecticut", "utah", "iowa", "nevada", "arkansas", "mississippi", "kansas",
+            "new mexico", "nebraska", "idaho", "west virginia", "hawaii", "new hampshire", "maine",
+            "montana", "rhode island", "delaware", "south dakota", "north dakota", "alaska", "vermont",
+            "wyoming", "usa", "us", "america", "united states", "los angeles", "san francisco", "bay area",
+            "san diego", "seattle", "chicago", "boston", "miami"
+        ]
+
+        clean_r = re.sub(r'\b(usa|us|united states|america)\b', '', r, flags=re.IGNORECASE).strip()
+        if clean_r:
+            r = clean_r
+
+        if any(w in r_lower for w in us_states) or c_lower in ["usa", "us", "america", "united states"]:
+            return r.title(), "United States"
+
+        if any(w in r_lower for w in ["uk", "united kingdom", "london", "england", "scotland"]) or c_lower in ["uk", "united kingdom", "great britain"]:
+            clean_uk = re.sub(r'\b(uk|united kingdom|england)\b', '', r, flags=re.IGNORECASE).strip()
+            return clean_uk.title() if clean_uk else r.title(), "United Kingdom"
+
+        if any(w in r_lower for w in ["canada", "toronto", "vancouver", "montreal", "ontario"]) or c_lower in ["canada"]:
+            clean_ca = re.sub(r'\b(canada)\b', '', r, flags=re.IGNORECASE).strip()
+            return clean_ca.title() if clean_ca else r.title(), "Canada"
+
+        if any(w in r_lower for w in ["australia", "sydney", "melbourne", "brisbane"]) or c_lower in ["australia"]:
+            return r.title(), "Australia"
+
+        if not c or c.lower() in ["india", "in", "bharat"]:
+            return r, "India"
+
+        return r, c
 
     @classmethod
     def discover_festivals(
@@ -1034,6 +1148,11 @@ class DynamicFestivalEngine:
         city: Optional[str] = None,
         force_refresh: bool = False
     ) -> List[RegionalFestivalEvent]:
+        # Normalize region and country intelligently
+        norm_region, norm_country = cls._normalize_region_and_country(region, country)
+        region = norm_region
+        country = norm_country
+
         cache_key = f"{region.lower().strip()}:{country.lower().strip()}"
         if not force_refresh and cache_key in cls._CACHE:
             return cls._CACHE[cache_key]
@@ -1055,12 +1174,12 @@ class DynamicFestivalEngine:
             
             category_synonyms = {
                 "sweet": "Sweets", "mithai": "Sweets", "modak": "Sweets", "ladoo": "Sweets", "holige": "Sweets", "obbattu": "Sweets",
-                "ghee": "Dairy", "milk": "Dairy", "butter": "Dairy",
+                "ghee": "Dairy", "milk": "Dairy", "butter": "Dairy", "cream": "Dairy",
                 "oil": "Oils", "sunflower": "Oils",
-                "almond": "Dry Fruits", "nut": "Dry Fruits", "kaju": "Dry Fruits",
-                "tea": "Beverages", "chai": "Beverages", "coffee": "Beverages",
-                "biscuit": "Bakery", "cookie": "Bakery", "snack": "Snacks",
-                "masala": "Spices", "spice": "Spices"
+                "almond": "Dry Fruits", "nut": "Dry Fruits", "kaju": "Dry Fruits", "pistachio": "Dry Fruits",
+                "tea": "Beverages", "chai": "Beverages", "coffee": "Beverages", "cider": "Beverages", "soda": "Beverages", "drink": "Beverages",
+                "biscuit": "Bakery", "cookie": "Bakery", "snack": "Snacks", "chip": "Snacks", "pretzel": "Snacks",
+                "masala": "Spices", "spice": "Spices", "seasoning": "Spices", "sauce": "Spices"
             }
 
             for item in key_items:
@@ -1087,7 +1206,7 @@ class DynamicFestivalEngine:
 
             # If no items directly matched, provide top 2 festive staples (Ghee/Sweets/Dry Fruits) from inventory
             if len(matched_prods) < 2:
-                festive_fallbacks = [p for p in products if p.category in ["Dairy & Oils", "Sweets & Confectionery", "Dry Fruits", "Beverages"]]
+                festive_fallbacks = [p for p in products if p.category in ["Dairy & Oils", "Sweets & Confectionery", "Dry Fruits", "Beverages", "Bakery & Snacks"]]
                 for p in festive_fallbacks:
                     if not any(m["product_id"] == p.id for m in matched_prods):
                         matched_prods.append({
@@ -1110,11 +1229,21 @@ class DynamicFestivalEngine:
             elif not suggested_title:
                 suggested_title = f"{d.get('name', 'Festive').split('(')[0].strip()} Special Saver Pack"
 
+            # Clean and strictly enforce upcoming dates with 2026/2027 years (Never 2024 or 2025)
+            date_win = str(d.get("date_window", "Upcoming Festive Season")).strip()
+            date_win = date_win.replace("2024", "2026").replace("2025", "2026")
+            if not any(yr in date_win for yr in ["2026", "2027"]):
+                early_months = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep"]
+                if any(m in date_win.lower() for m in early_months):
+                    date_win = f"{date_win}, 2027"
+                else:
+                    date_win = f"{date_win}, 2026"
+
             evt = RegionalFestivalEvent(
                 id=d.get("id", f"EVT_{abs(hash(d.get('name', 'fest')))}"),
                 name=d.get("name", "Regional Cultural Celebration"),
                 region=f"{region.strip().title()}, {country.strip().title()}",
-                date_window=d.get("date_window", "Upcoming Festive Season"),
+                date_window=date_win,
                 status=d.get("status", "UPCOMING"),
                 key_items=key_items,
                 demand_lift_pct=float(d.get("demand_lift_pct", 80.0)),
@@ -1147,19 +1276,21 @@ class DynamicFestivalEngine:
 CRITICAL TEMPORAL CONSTRAINT:
 - Today's date is in October 2026.
 - ALL festival dates MUST be strictly UPCOMING from October 2026 into calendar year 2027.
-- NEVER return past years (e.g. 2024 or 2025). Every date must have year 2026 (for late 2026) or 2027.
-- Return EXACTLY the top 3 upcoming regional cultural festivals, public celebrations, and FMCG grocery demand surges for:
+- NEVER return past years (e.g. 2024 or 2025). Every date_window MUST explicitly state the year 2026 or 2027 (e.g. 'Nov 19 - Nov 26, 2026', 'Dec 18 - Dec 26, 2026', 'Jan 22 - Feb 05, 2027', 'May 01 - May 06, 2027').
+- For US / North American regions (e.g. California, Texas, New York): focus on major retail FMCG grocery & holiday feasting surges including Thanksgiving Feasting (Nov 2026), Christmas & Holiday Season (Dec 2026), Super Bowl Party (Feb 2027), Cinco de Mayo (May 2027), or prominent local cultural celebrations like Lunar New Year (Jan/Feb 2027) or Diwali in California (Nov 2026).
+
+Return EXACTLY the top 3 upcoming regional cultural festivals, public celebrations, and FMCG grocery demand surges for:
 Region / State: {region}
 Country: {country}
 City / Locality: {city or "Major regional commercial centers"}
 
 For EACH of the 3 festivals, provide a JSON object with:
-- id: unique string e.g. "EVT_DASARA_2026"
-- name: authentic festival name (e.g. "Mysuru Dasara & Vijayadashami", "Deepavali & Naraka Chaturdashi", "Durga Puja & Bijoya", "Thai Pongal & Makar Sankranti", "Ganesh Utsav")
-- date_window: date or calendar season strictly in 2026 or 2027 (e.g. "Oct 12 - Oct 22, 2026", "Jan 13 - Jan 17, 2027", "Mar 28 - Apr 2, 2027")
+- id: unique string e.g. "EVT_CA_THANKSGIVING_2026"
+- name: authentic festival or celebration name (e.g. "Thanksgiving Feasting", "Christmas & Holiday Gifting", "Super Bowl Weekend", "Cinco de Mayo Fiesta", "Lunar New Year Spring Festival", "Mysuru Dasara", "Diwali")
+- date_window: date string strictly in 2026 or 2027 with explicit 4-digit year (e.g. "Nov 19 - Nov 26, 2026", "Dec 18, 2026 - Jan 02, 2027", "Feb 07 - Feb 14, 2027")
 - status: "UPCOMING"
-- key_items: array of 4-6 specific retail grocery items experiencing massive demand surges (e.g. ["Pure Cow Ghee", "Gulab Jamun & Sweets", "Mustard Oil", "California Almonds", "Puja Camphor"])
-- demand_lift_pct: integer or float percentage sales surge (e.g. 120.0)
+- key_items: array of 4-6 specific retail grocery items experiencing massive demand surges (e.g. ["Whole Turkeys", "Cranberries", "Sweet Potatoes", "Stuffing Mix", "Pies", "Butter"])
+- demand_lift_pct: integer or float percentage sales surge (e.g. 175.0)
 - icon: single emoji
 - description: 2-sentence explanation of the festive shopping rush and footfall surge
 - tradition_notes: cultural context explaining why these items are consumed or prepared
@@ -1171,14 +1302,14 @@ For EACH of the 3 festivals, provide a JSON object with:
 
 Return ONLY a valid JSON array of exactly 3 objects.
 """
-        target_model = os.environ.get("GEMINI_MODEL", "gemini-3.5-flash")
+        target_model = os.environ.get("GEMINI_MODEL", "gemini-3.5-flash-lite")
         candidate_models = list(dict.fromkeys([
             target_model,
-            "gemini-3.5-flash",
             "gemini-3.5-flash-lite",
-            "gemini-3-flash-preview",
             "gemini-2.5-flash",
-            "gemini-1.5-flash"
+            "gemini-2.0-flash",
+            "gemini-1.5-flash",
+            "gemini-1.5-pro"
         ]))
 
         for m in candidate_models:
@@ -1190,7 +1321,7 @@ Return ONLY a valid JSON array of exactly 3 objects.
                 }).encode("utf-8")
 
                 req = urllib.request.Request(url, data=payload, headers={"Content-Type": "application/json"})
-                with urllib.request.urlopen(req, timeout=6) as response:
+                with urllib.request.urlopen(req, timeout=10) as response:
                     res_data = json.loads(response.read().decode())
                     text_out = res_data["candidates"][0]["content"]["parts"][0]["text"].strip()
                     if text_out.startswith("```json"):
@@ -1203,8 +1334,20 @@ Return ONLY a valid JSON array of exactly 3 objects.
                     if isinstance(parsed, list) and len(parsed) > 0:
                         for item in parsed:
                             n = item.get("name", "")
-                            if "deepavali" in n.lower() and "diwali" not in n.lower():
-                                item["name"] = n.replace("Deepavali", "Diwali / Deepavali")
+                            if "diwali" in n.lower() and "deepavali" not in n.lower():
+                                item["name"] = n.replace("Diwali", "Deepavali / Diwali")
+                            elif "deepavali" in n.lower() and "diwali" not in n.lower():
+                                item["name"] = n.replace("Deepavali", "Deepavali / Diwali")
+                            # Sanitize dates inside Gemini response
+                            dw = str(item.get("date_window", "")).strip()
+                            dw = dw.replace("2024", "2026").replace("2025", "2026")
+                            if not any(yr in dw for yr in ["2026", "2027"]):
+                                early_months = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep"]
+                                if any(m in dw.lower() for m in early_months):
+                                    dw = f"{dw}, 2027"
+                                else:
+                                    dw = f"{dw}, 2026"
+                            item["date_window"] = dw
                         return parsed
             except Exception:
                 continue
@@ -1214,6 +1357,15 @@ Return ONLY a valid JSON array of exactly 3 objects.
     @classmethod
     def _get_builtin_festivals(cls, region: str, country: str) -> List[Dict[str, Any]]:
         reg = region.lower()
+        cntry = (country or "").lower()
+
+        if any(w in reg for w in ["california", "los angeles", "san francisco", "bay area"]):
+            return cls.BUILTIN_REGIONAL_FESTIVALS["california"]
+        elif cntry in ["united states", "usa", "us"] or any(w in reg for w in ["us", "usa", "texas", "new york", "america"]):
+            return cls.BUILTIN_REGIONAL_FESTIVALS["california"]
+        elif cntry in ["united kingdom", "uk", "canada", "australia"] or any(w in reg for w in ["uk", "london", "canada"]):
+            return cls.BUILTIN_REGIONAL_FESTIVALS["global"]
+
         for k, v in cls.BUILTIN_REGIONAL_FESTIVALS.items():
             if k in reg:
                 return v
@@ -1232,8 +1384,6 @@ Return ONLY a valid JSON array of exactly 3 objects.
             return cls.BUILTIN_REGIONAL_FESTIVALS["kerala"]
         elif any(w in reg for w in ["delhi", "noida", "gurugram", "up", "haryana", "punjab", "north"]):
             return cls.BUILTIN_REGIONAL_FESTIVALS["delhi"]
-        elif any(w in reg for w in ["us", "usa", "uk", "london", "canada"]):
-            return cls.BUILTIN_REGIONAL_FESTIVALS["global"]
 
         return cls.BUILTIN_REGIONAL_FESTIVALS["karnataka"]
 
@@ -1258,10 +1408,30 @@ class RetailCopilotAgent:
 
         msg_lower = message.lower()
 
+        # Check if user message explicitly specifies a region/state
+        potential_regions = [
+            "california", "texas", "florida", "new york", "washington", "illinois", "london", "uk", "canada", "australia",
+            "karnataka", "maharashtra", "west bengal", "tamil nadu", "gujarat", "kerala", "delhi", "bengaluru", "mumbai"
+        ]
+        for pr in potential_regions:
+            if re.search(rf'\b{pr}\b', msg_lower):
+                store_profile.region = pr.title()
+                break
+
+        norm_reg, norm_cntry = DynamicFestivalEngine._normalize_region_and_country(
+            store_profile.region,
+            getattr(store_profile, "country", None)
+        )
+        store_profile.region = norm_reg
+        store_profile.country = norm_cntry
+
         # Regional greeting & locality context
         reg_lower = (store_profile.region or "").lower()
         city_lower = (store_profile.city or "").lower()
-        if "karnataka" in reg_lower or "south" in reg_lower or "bengaluru" in city_lower or "bangalore" in city_lower:
+        if "california" in reg_lower or "usa" in reg_lower or "united states" in reg_lower or "us" in reg_lower:
+            greeting = "Hello & Welcome! 👋"
+            loc_label = f"{store_profile.locality or 'Bay Area'}, California"
+        elif "karnataka" in reg_lower or "south" in reg_lower or "bengaluru" in city_lower or "bangalore" in city_lower:
             greeting = "Namaskara! 🙏"
             loc_label = f"{store_profile.locality or 'Indiranagar'}, {store_profile.city or 'Bengaluru'}"
         elif "maharashtra" in reg_lower or "west" in reg_lower or "mumbai" in city_lower or "pune" in city_lower:
@@ -1270,6 +1440,9 @@ class RetailCopilotAgent:
         elif "bengal" in reg_lower or "east" in reg_lower or "kolkata" in city_lower:
             greeting = "Nomoshkar! 🙏"
             loc_label = f"{store_profile.locality or 'Gariahat'}, {store_profile.city or 'Kolkata'}"
+        elif any(w in reg_lower for w in ["uk", "london", "canada", "australia"]):
+            greeting = "Hello! 👋"
+            loc_label = f"{store_profile.locality or 'Central'}, {store_profile.city or 'Store'}"
         else:
             greeting = "Namaste! 🙏"
             loc_label = f"{store_profile.locality or 'Connaught Place'}, {store_profile.city or 'Delhi NCR'}"
@@ -1431,7 +1604,7 @@ class RetailCopilotAgent:
         if is_fest_query:
             events = DynamicFestivalEngine.discover_festivals(
                 region=store_profile.region,
-                country="India",
+                country=getattr(store_profile, "country", None),
                 city=store_profile.city
             )
             top_fest = events[0] if events else None
@@ -1463,8 +1636,9 @@ class RetailCopilotAgent:
             for ev in events[:3]:
                 fest_lines.append(f"• {ev.icon} **{ev.name}** ({ev.date_window})\n   Key Demand Surge: **{', '.join(ev.key_items[:3])}** (+{int(ev.demand_lift_pct)}% surge)")
 
+            reg_display = f"{store_profile.region}, {store_profile.country}" if getattr(store_profile, "country", None) else store_profile.region
             reply = (
-                f"{greeting} Here is the live cultural festival calendar and retail demand forecast for **{store_profile.region}** ({loc_label}):\n\n"
+                f"{greeting} Here is the live cultural festival calendar and retail demand forecast for **{reg_display}** ({loc_label}):\n\n"
                 + "\n\n".join(fest_lines) + "\n\n"
                 f"💡 **Recommended Action for {top_fest.name if top_fest else 'the upcoming festival'}:**\n"
                 f"{top_fest.tradition_notes if top_fest else 'High festival demand prep.'}\n\n"

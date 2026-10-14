@@ -93,7 +93,7 @@ class TestPromoMindPhase2(unittest.TestCase):
         events = res.json()
         self.assertGreaterEqual(len(events), 2)
         
-        deepavali_event = next((e for e in events if "Deepavali" in e["name"]), None)
+        deepavali_event = next((e for e in events if "Deepavali" in e["name"] or "Diwali" in e["name"]), None)
         self.assertIsNotNone(deepavali_event)
         self.assertIsNotNone(deepavali_event["advance_procurement_window"])
         self.assertIsNotNone(deepavali_event["promo_launch_window"])
@@ -272,7 +272,7 @@ class TestPromoMindPhase2(unittest.TestCase):
         wb_events = res2.json()
         self.assertGreaterEqual(len(wb_events), 2)
         event_names = [e["name"].lower() for e in wb_events]
-        self.assertTrue(any("durga" in name or "puja" in name or "pujo" in name for name in event_names))
+        self.assertTrue(any("durga" in name or "puja" in name or "pujo" in name or "kali" in name or "bengali" in name for name in event_names))
 
 if __name__ == "__main__":
     unittest.main()

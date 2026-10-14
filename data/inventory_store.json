@@ -594,6 +594,43 @@
     ]
   },
   {
+    "id": "PROD_CUSTOM_22",
+    "name": "Tata Salt Vacuum Evaporated (1kg)",
+    "category": "Staples",
+    "cost_price": 20.0,
+    "selling_price": 28.0,
+    "stock_quantity": 200,
+    "days_in_stock": 5,
+    "expiry_days": 300,
+    "velocity_status": "FAST_MOVING",
+    "weekly_sales_avg": 50,
+    "image_url": "product_default.png",
+    "past_sales_weeks": [
+      42,
+      45,
+      47,
+      50,
+      52,
+      50
+    ],
+    "forecast_sales_weeks": [
+      60,
+      66,
+      73,
+      80
+    ],
+    "sell_through_verdict": "STRONG_INVEST_BUY",
+    "verdict_badge": "🟢 Strong Buy / Restock Now",
+    "days_inventory_remaining": 28,
+    "sell_through_rate_pct": 100.0,
+    "reorder_recommendation": "High surge predicted. Restock aggressively to capitalize on event demand.",
+    "brand_comparison_insight": "Custom retailer SKU with expected growth of +46.3%.",
+    "alternative_brands": [
+      "Local Wholesaler Grade-A",
+      "National Market Alternative"
+    ]
+  },
+  {
     "id": "PROD_GHEE_01",
     "name": "Amul Pure Cow Ghee Tin (1 Litre)",
     "category": "Dairy & Oils",

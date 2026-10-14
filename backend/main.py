@@ -160,7 +160,7 @@ def simulate_roi_scenario(payload: ROIScenarioRequest):
 @app.get("/api/calendar/events", response_model=List[RegionalFestivalEvent])
 def get_festival_events(
     region: Optional[str] = None,
-    country: Optional[str] = "India",
+    country: Optional[str] = None,
     city: Optional[str] = None,
     refresh: bool = False
 ):
@@ -168,7 +168,7 @@ def get_festival_events(
     profile = StoreDataManager.load_profile()
     active_region = region or profile.region or "Karnataka & South India"
     active_city = city or profile.city or "Bengaluru"
-    active_country = country or "India"
+    active_country = country or getattr(profile, "country", None)
     
     events = DynamicFestivalEngine.discover_festivals(
         region=active_region,
@@ -185,7 +185,7 @@ def discover_regional_festivals(payload: FestivalDiscoveryRequest):
     active_city = payload.city or profile.city or "Bengaluru"
     events = DynamicFestivalEngine.discover_festivals(
         region=payload.region,
-        country=payload.country or "India",
+        country=payload.country or None,
         city=active_city,
         force_refresh=payload.force_refresh or False
     )
@@ -459,7 +459,7 @@ def copilot_chat(query: ChatQuery):
         response = RetailCopilotAgent.process_message(
             message=query.message,
             user_margin_pct=query.min_margin_pct,
-            region=query.store_region
+            region=query.region or query.store_region
         )
         return response
     except Exception as e:

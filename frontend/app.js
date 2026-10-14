@@ -1467,26 +1467,54 @@ async function activateCurrentOffer() {
 // Screen 3: Regional Festival Calendar & Conflict Management
 // ==============================================================================
 
+function inferCountryFromRegionName(rawRegion) {
+  if (!rawRegion) return "";
+  const low = rawRegion.toLowerCase();
+  const usStates = [
+    "california", "texas", "florida", "new york", "illinois", "pennsylvania", "ohio",
+    "georgia", "north carolina", "michigan", "new jersey", "virginia", "washington",
+    "arizona", "massachusetts", "tennessee", "indiana", "missouri", "maryland", "wisconsin",
+    "colorado", "minnesota", "south carolina", "alabama", "louisiana", "kentucky", "oregon",
+    "oklahoma", "connecticut", "utah", "iowa", "nevada", "arkansas", "mississippi", "kansas",
+    "new mexico", "nebraska", "idaho", "west virginia", "hawaii", "new hampshire", "maine",
+    "montana", "rhode island", "delaware", "south dakota", "north dakota", "alaska", "vermont",
+    "wyoming", "usa", "us", "america", "united states"
+  ];
+  if (usStates.some(s => low.includes(s))) return "United States";
+  if (low.includes("uk") || low.includes("london") || low.includes("england") || low.includes("scotland")) return "United Kingdom";
+  if (low.includes("canada") || low.includes("ontario") || low.includes("toronto")) return "Canada";
+  if (low.includes("australia") || low.includes("sydney")) return "Australia";
+  return "India";
+}
+
 async function fetchCalendarEvents(forcedRegion, forcedCountry, isRefresh = false) {
   try {
     const customInput = document.getElementById("calendarCustomRegionInput");
     
     const region = forcedRegion || (customInput && customInput.value.trim()) || localStorage.getItem("promomind_region") || "Karnataka";
-    const country = forcedCountry || "India";
+    const country = forcedCountry || inferCountryFromRegionName(region);
     
     if (customInput && !customInput.value.trim()) {
       customInput.value = region.split("&")[0].trim();
     }
 
     const badge = document.getElementById("calActiveRegionBadge");
-    if (badge) badge.innerText = `📍 Active State: ${region.split("&")[0].trim()}`;
+    if (badge) badge.innerText = `📍 Active Region: ${region.split("&")[0].trim()} (${country})`;
 
-    const url = `/api/calendar/events?region=${encodeURIComponent(region)}&country=${encodeURIComponent(country)}&refresh=${isRefresh}`;
+    let url = `/api/calendar/events?region=${encodeURIComponent(region)}&refresh=${isRefresh}`;
+    if (country) {
+      url += `&country=${encodeURIComponent(country)}`;
+    }
     const res = await fetch(url);
     if (!res.ok) throw new Error("Failed to load calendar events");
     regionalEvents = await res.json();
     renderFestivalCards(regionalEvents);
-    updateRegionalIntelCard(regionalEvents, region, country);
+
+    const displayRegion = (regionalEvents && regionalEvents.length > 0 && regionalEvents[0].region)
+      ? regionalEvents[0].region
+      : `${region.split("&")[0].trim()}, ${country}`;
+    updateRegionalIntelCard(regionalEvents, displayRegion, country);
+    if (badge) badge.innerText = `📍 Active Region: ${displayRegion}`;
   } catch (err) {
     console.error("Error fetching calendar:", err);
   }
@@ -1498,7 +1526,7 @@ async function discoverCustomRegionFestivals() {
   const listEl = document.getElementById("festivalCardsList");
 
   const region = (customInput && customInput.value.trim()) || "Karnataka";
-  const country = "India";
+  const country = inferCountryFromRegionName(region);
 
   if (btn) {
     btn.disabled = true;
@@ -1508,7 +1536,7 @@ async function discoverCustomRegionFestivals() {
     listEl.innerHTML = `
       <div style="padding:30px 20px;text-align:center;">
         <div class="loader-spinner" style="margin:0 auto 12px;"></div>
-        <p style="font-weight:600;color:var(--text-primary);margin-bottom:4px;">Gemini AI is discovering regional festivals & traditions for ${escapeHtml(region)}...</p>
+        <p style="font-weight:600;color:var(--text-primary);margin-bottom:4px;">Gemini AI is discovering regional festivals & traditions for ${escapeHtml(region)} (${country})...</p>
         <span style="font-size:12px;color:var(--text-secondary);">Identifying cultural demand spikes and scanning live store inventory for matching SKUs</span>
       </div>
     `;
@@ -2272,8 +2300,10 @@ async function sendMainChatMessage(prefilledText) {
   thread.appendChild(botThinkingEl);
   thread.scrollTop = thread.scrollHeight;
 
-  // Get current store region
-  const region = (document.getElementById("profStateRegion") && document.getElementById("profStateRegion").value) || "Karnataka & South India";
+  // Get current store region dynamically (from calendar input, localStorage, or profile)
+  const calCustomInput = document.getElementById("calendarCustomRegionInput");
+  const calVal = calCustomInput && calCustomInput.value.trim();
+  const region = calVal || localStorage.getItem("promomind_region") || (document.getElementById("profStateRegion") && document.getElementById("profStateRegion").value) || "Karnataka & South India";
 
   try {
     const res = await fetch("/api/chat", {

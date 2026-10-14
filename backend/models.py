@@ -59,6 +59,7 @@ class StoreProfile(BaseModel):
     owner_name: str = "Ramesh Sharma"
     region: str = "Karnataka & South India"
     city: str = "Bengaluru"
+    country: Optional[str] = "India"
     locality: str = "Koramangala 4th Block"
     pin_code: str = "560034"
     phone: str = "+91 98450 12345"
@@ -227,6 +228,7 @@ class ChatQuery(BaseModel):
     message: str
     min_margin_pct: Optional[float] = None
     store_region: Optional[str] = None
+    region: Optional[str] = None
     history: Optional[List[Dict[str, str]]] = []
 
 class ChatResponse(BaseModel):
@@ -255,6 +257,7 @@ class StoreProfile(BaseModel):
     whatsapp_audience_size: Optional[int] = 1420
     region: str = "Karnataka & South India"
     city: str = "Bengaluru"
+    country: Optional[str] = "India"
     locality: Optional[str] = "Koramangala 4th Block"
     pin_code: Optional[str] = "560034"
     default_min_margin_pct: Optional[float] = 16.5
@@ -275,6 +278,7 @@ class StoreProfileUpdate(BaseModel):
     total_working_capital_inr: Optional[float] = None
     region: Optional[str] = None
     city: Optional[str] = None
+    country: Optional[str] = None
     locality: Optional[str] = None
     pin_code: Optional[str] = None
     customer_list: Optional[List[Dict[str, Any]]] = None

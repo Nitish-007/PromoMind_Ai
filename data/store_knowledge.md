@@ -1,17 +1,17 @@
 # 🏪 PromoMind AI — Retail Store Knowledge & Catalog Base
-> *Store Name*: **Sharma Supermarket Koramangala** | *Owner*: **Ramesh Sharma**
-> *Cultural Region*: **Karnataka & South India** (Bengaluru, 560048)
+> *Store Name*: **Test Bangalore Mart** | *Owner*: **Suresh Kumar**
+> *Cultural Region*: **Karnataka & South India** (Bengaluru, 560038)
 > *Store Format*: **Supermarket** | *WhatsApp Broadcast Reach*: **2500 Families**
-> *Working Capital Invested*: **₹367,520** | *Target Net Margin*: **16.5%**
-> *Storage Mode: **CLOUD** | Synchronized: 2026-10-14 14:48:17 UTC*
+> *Working Capital Invested*: **₹371,520** | *Target Net Margin*: **16.5%**
+> *Storage Mode: **CLOUD** | Synchronized: 2026-10-14 15:25:02 UTC*
 > *Auto-generated from retail inventory data & open-source demand forecasting engine.*
 
 ---
 ## 💰 1. Working Capital Investment & Return on Capital (ROI) Intelligence
 
-- **Total Inventory Capital Invested**: ₹367,520
-- **Projected 30-Day Sales Turnover**: ₹884,086
-- **Projected Net Dukan Profit**: ₹222,675 (**60.6% Net Return on Capital**)
+- **Total Inventory Capital Invested**: ₹371,520
+- **Projected 30-Day Sales Turnover**: ₹891,898
+- **Projected Net Dukan Profit**: ₹224,907 (**60.5% Net Return on Capital**)
 - **Dead Working Capital Trapped in Slow Movers**: ₹124,170 (7 at-risk SKUs)
 - **Capital Unlocked via Smart Promo Bundles**: **₹80,710** cash freed within 12 days (+₹17,756 net promo profit)
 - **Cash Turnover Velocity**: Every **17 days**
@@ -38,6 +38,7 @@
 | `PROD_CUSTOM_19` | Tata Salt Vacuum Evaporated (1kg) | Staples | 200 | ₹20.0 | ₹28.0 | 28.6% | FAST_MOVING | 28d | 🟢 Strong Buy / Restock Now |
 | `PROD_CUSTOM_20` | Tata Salt Vacuum Evaporated (1kg) | Staples | 200 | ₹20.0 | ₹28.0 | 28.6% | FAST_MOVING | 28d | 🟢 Strong Buy / Restock Now |
 | `PROD_CUSTOM_21` | Tata Salt Vacuum Evaporated (1kg) | Staples | 200 | ₹20.0 | ₹28.0 | 28.6% | FAST_MOVING | 28d | 🟢 Strong Buy / Restock Now |
+| `PROD_CUSTOM_22` | Tata Salt Vacuum Evaporated (1kg) | Staples | 200 | ₹20.0 | ₹28.0 | 28.6% | FAST_MOVING | 28d | 🟢 Strong Buy / Restock Now |
 | `PROD_GHEE_01` | Amul Pure Cow Ghee Tin (1 Litre) | Dairy & Oils | 85 | ₹530.0 | ₹640.0 | 17.2% | FAST_MOVING | 14d | 🟢 Strong Buy / Festive Stockout Risk |
 | `PROD_MASALA_01` | Everest Shahi Garam Masala (100g) | Spices | 90 | ₹58.0 | ₹88.0 | 34.1% | SLOW_MOVING | 52d | 🟡 Caution / Compare With MDH |
 | `PROD_OIL_01` | Fortune Sunlite Refined Sunflower Oil (1 Litre) | Staples & Oils | 220 | ₹125.0 | ₹148.0 | 15.5% | FAST_MOVING | 16d | 🟢 Strong Buy / Core Fast Mover |
@@ -175,6 +176,14 @@
 - **Brand Intelligence**: Custom retailer SKU with expected growth of +46.3%.
 - **Market Alternatives**: Local Wholesaler Grade-A; National Market Alternative
 
+### Tata Salt Vacuum Evaporated (1kg) (`PROD_CUSTOM_22`)
+- **Past 6-Week Sales Units**: `[42, 45, 47, 50, 52, 50]` (Weekly Avg: **47.7**)
+- **Forecast 4-Week Demand**: `[60, 66, 73, 80]` (Weekly Projected: **69.8**)
+- **Growth Momentum**: 📈 **+46.3% expected demand shift**
+- **Procurement Advice**: High surge predicted. Restock aggressively to capitalize on event demand.
+- **Brand Intelligence**: Custom retailer SKU with expected growth of +46.3%.
+- **Market Alternatives**: Local Wholesaler Grade-A; National Market Alternative
+
 ### Amul Pure Cow Ghee Tin (1 Litre) (`PROD_GHEE_01`)
 - **Past 6-Week Sales Units**: `[30, 32, 35, 36, 38, 42]` (Weekly Avg: **35.5**)
 - **Forecast 4-Week Demand**: `[52, 65, 74, 82]` (Weekly Projected: **68.2**)
@@ -252,7 +261,7 @@
 
 ---
 ## 🤖 5. Grounding Rules for AI Promotion & Offer Generation
-1. **Store Identity Grounding**: Personalize campaign titles and WhatsApp copy with store name 'Sharma Supermarket Koramangala' and locality 'Koramangala 4th Block, Bengaluru'.
+1. **Store Identity Grounding**: Personalize campaign titles and WhatsApp copy with store name 'Test Bangalore Mart' and locality 'Indiranagar, Bengaluru'.
 2. **Cultural Tradition Respect**: Acknowledge local regional customs for Karnataka & South India (e.g. Diyas and Cow Ghee for Deepavali; Bevu-Bella for Ugadi; Modak for Ganesh Chaturthi).
 3. **Margin Safeguard**: Never breach the store's minimum net margin of 16.5%.
 4. **Archetype Alignment**: Align bundle structure with the target goal (Anchor Booster, Expiry Rescue, Festive Hamper, or Volume Slab).
