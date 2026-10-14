@@ -52,12 +52,22 @@ def test_api_store_profile_get_and_post():
     payload = {
         "store_name": "Sharma Supermarket Koramangala",
         "owner_name": "Ramesh Sharma",
+        "locality": "Koramangala 4th Block",
+        "pin_code": "560048",
+        "gstin": "29AAAAA9999A1Z9",
+        "store_type": "Supermarket",
+        "phone": "+91 98450 99999",
         "audience_size": 1850
     }
     update_res = client.post("/api/store/profile", json=payload)
     assert update_res.status_code == 200
     updated = update_res.json()
     assert updated["store_name"] == "Sharma Supermarket Koramangala"
+    assert updated["locality"] == "Koramangala 4th Block"
+    assert updated["pin_code"] == "560048"
+    assert updated["gstin"] == "29AAAAA9999A1Z9"
+    assert updated["store_type"] == "Supermarket"
+    assert updated["phone"] == "+91 98450 99999"
     assert updated["audience_size"] == 1850
 
 

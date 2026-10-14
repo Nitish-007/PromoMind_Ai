@@ -1,5 +1,45 @@
 [
   {
+    "anchor_id": "PROD_GHEE_01",
+    "attached_id": "PROD_SWEET_01",
+    "conflict_reason": "Overlap detected with active offer 'Diwali Pure Ghee & Almonds Festive Pack' (scheduled 2026-10-23 to 2026-10-30). Discounting the same SKU across two campaigns creates price confusion and eats profit margin.",
+    "conflicting_offers": [
+      {
+        "type": "promotion",
+        "start_date": "2026-10-23",
+        "discount_pct": 18.0,
+        "end_date": "2026-10-30",
+        "updated_at": "2026-10-14T12:08:11.264261+00:00",
+        "combo_price": 1059.0,
+        "event_theme": "Diwali Maha Utsav",
+        "id": "OFFER_ACTIVE_02",
+        "combo_id": "COMBO_1059",
+        "status": "SCHEDULED",
+        "title": "Diwali Pure Ghee & Almonds Festive Pack",
+        "attached_id": "PROD_ALMOND_01",
+        "anchor_id": "PROD_GHEE_01"
+      },
+      {
+        "type": "promotion",
+        "start_date": "2026-10-15",
+        "updated_at": "2026-10-14T12:51:38.728281+00:00",
+        "end_date": "2026-10-25",
+        "discount_pct": 20.0,
+        "combo_price": 899.0,
+        "attached_id": "PROD_SWEET_01",
+        "id": "OFFER_LIVE_03",
+        "combo_id": "COMBO_DIWALI_999",
+        "status": "ACTIVE",
+        "title": "Diwali Ghee & Jamun Mega Saver",
+        "event_theme": "Diwali Maha Utsav",
+        "anchor_id": "PROD_GHEE_01"
+      }
+    ],
+    "id": "CONFLICT_1791982300474",
+    "type": "conflict_log",
+    "timestamp": "2026-10-14T12:51:40.474368+00:00"
+  },
+  {
     "anchor_id": "PROD_TEA_01",
     "attached_id": "PROD_BISCUIT_01",
     "conflict_reason": "Overlap with active test offer",

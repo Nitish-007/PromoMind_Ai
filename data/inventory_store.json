@@ -1,40 +1,40 @@
 [
   {
-    "id": "PROD_TEA_01",
-    "name": "Taj Mahal Premium Gold Tea (500g)",
-    "category": "Beverages",
-    "cost_price": 240.0,
-    "selling_price": 310.0,
-    "stock_quantity": 140,
-    "days_in_stock": 12,
-    "expiry_days": 360,
-    "velocity_status": "FAST_MOVING",
-    "weekly_sales_avg": 52,
-    "image_url": "tea.png",
+    "id": "PROD_ALMOND_01",
+    "name": "Nutraj California Premium Almonds (500g)",
+    "category": "Dry Fruits",
+    "cost_price": 330.0,
+    "selling_price": 470.0,
+    "stock_quantity": 110,
+    "days_in_stock": 62,
+    "expiry_days": 180,
+    "velocity_status": "SLOW_MOVING",
+    "weekly_sales_avg": 11,
+    "image_url": "almonds.png",
     "past_sales_weeks": [
-      42,
-      45,
-      48,
-      50,
-      52,
-      55
+      14,
+      13,
+      12,
+      11,
+      11,
+      10
     ],
     "forecast_sales_weeks": [
-      58,
-      64,
-      72,
-      78
+      12,
+      16,
+      22,
+      28
     ],
-    "sell_through_verdict": "STRONG_INVEST_BUY",
-    "verdict_badge": "🟢 Strong Buy / Restock Now",
-    "days_inventory_remaining": 18,
-    "sell_through_rate_pct": 89.2,
-    "reorder_recommendation": "High Velocity Anchor (+35% monsoon/weekend surge): Current stock of 140 units will exhaust in ~18 days. Invest in a 50kg wholesale replenishment immediately to secure dealer discount.",
-    "brand_comparison_insight": "Taj Mahal dominates local chai consumption (74% brand retention in Indiranagar). While Brooke Bond Red Label offers ~2% higher retailer margins, Taj Mahal sells 35% faster. Do not switch away; retain as prime anchor.",
+    "sell_through_verdict": "CAUTION_CHECK_BRANDS",
+    "verdict_badge": "🟡 Caution / Check Unbranded APMC",
+    "days_inventory_remaining": 70,
+    "sell_through_rate_pct": 30.0,
+    "reorder_recommendation": "Hold off on Nutraj branded reorders: 110 units will cover the next 70 days. Let the Diwali surge clear existing packs in bundles before restocking.",
+    "brand_comparison_insight": "Nutraj branded MRP of ₹470 meets consumer price resistance. Local APMC loose/pouch almonds sell for ₹390 with a 38% retailer margin vs Nutraj's 29.8%. Switching to local grade-A pouches yields higher net cash.",
     "alternative_brands": [
-      "Tata Tea Gold (500g) — 26% margin, +15% pull",
-      "Brooke Bond Red Label (500g) — 24% margin, steady volume",
-      "Wagh Bakri Premium (500g) — 28% margin, regional favorite"
+      "APMC Mandi Loose Grade-A Almonds (500g pouch) — 38% margin, ₹390 price",
+      "Happilo California Almonds (500g) — 31% margin, attractive tin pack",
+      "Tata Sampann California Almonds (500g) — 27% margin, high trust"
     ]
   },
   {
@@ -76,6 +76,413 @@
     ]
   },
   {
+    "id": "PROD_CSV_08",
+    "name": "Nandini Pure Cow Ghee Pouch (500ml)",
+    "category": "Dairy & Oils",
+    "cost_price": 260.0,
+    "selling_price": 315.0,
+    "stock_quantity": 95,
+    "days_in_stock": 5,
+    "expiry_days": 180,
+    "velocity_status": "FAST_MOVING",
+    "weekly_sales_avg": 40,
+    "image_url": "product_default.png",
+    "past_sales_weeks": [
+      34,
+      36,
+      38,
+      40,
+      42,
+      40
+    ],
+    "forecast_sales_weeks": [
+      48,
+      54,
+      59,
+      65
+    ],
+    "sell_through_verdict": "STRONG_INVEST_BUY",
+    "verdict_badge": "🟢 Strong Buy / Restock Now",
+    "days_inventory_remaining": 16,
+    "sell_through_rate_pct": 100.0,
+    "reorder_recommendation": "High surge predicted. Restock aggressively to capitalize on event demand.",
+    "brand_comparison_insight": "Fast-moving regional staple with 17.5% retailer margin.",
+    "alternative_brands": [
+      "Local Wholesaler Grade-A",
+      "National Market Alternative"
+    ]
+  },
+  {
+    "id": "PROD_CSV_09",
+    "name": "Tata Sampann Premium Cashews W320 (500g)",
+    "category": "Dry Fruits",
+    "cost_price": 390.0,
+    "selling_price": 520.0,
+    "stock_quantity": 65,
+    "days_in_stock": 5,
+    "expiry_days": 240,
+    "velocity_status": "SLOW_MOVING",
+    "weekly_sales_avg": 15,
+    "image_url": "product_default.png",
+    "past_sales_weeks": [
+      12,
+      13,
+      14,
+      15,
+      15,
+      15
+    ],
+    "forecast_sales_weeks": [
+      18,
+      20,
+      23,
+      25
+    ],
+    "sell_through_verdict": "STRONG_INVEST_BUY",
+    "verdict_badge": "🟢 Strong Buy / Restock Now",
+    "days_inventory_remaining": 30,
+    "sell_through_rate_pct": 92.3,
+    "reorder_recommendation": "High surge predicted. Restock aggressively to capitalize on event demand.",
+    "brand_comparison_insight": "High festival gifting demand; great attachment with festive sweets.",
+    "alternative_brands": [
+      "Local Wholesaler Grade-A",
+      "National Market Alternative"
+    ]
+  },
+  {
+    "id": "PROD_CSV_10",
+    "name": "Kalyan Clay Diya Gift Box (Set of 24)",
+    "category": "Puja & Festive",
+    "cost_price": 70.0,
+    "selling_price": 149.0,
+    "stock_quantity": 180,
+    "days_in_stock": 5,
+    "expiry_days": 365,
+    "velocity_status": "FAST_MOVING",
+    "weekly_sales_avg": 55,
+    "image_url": "product_default.png",
+    "past_sales_weeks": [
+      46,
+      49,
+      52,
+      55,
+      57,
+      55
+    ],
+    "forecast_sales_weeks": [
+      67,
+      74,
+      82,
+      91
+    ],
+    "sell_through_verdict": "STRONG_INVEST_BUY",
+    "verdict_badge": "🟢 Strong Buy / Restock Now",
+    "days_inventory_remaining": 22,
+    "sell_through_rate_pct": 100.0,
+    "reorder_recommendation": "High surge predicted. Restock aggressively to capitalize on event demand.",
+    "brand_comparison_insight": "Diwali seasonal surge item with 53% margin; pairs with pure ghee.",
+    "alternative_brands": [
+      "Local Wholesaler Grade-A",
+      "National Market Alternative"
+    ]
+  },
+  {
+    "id": "PROD_CSV_11",
+    "name": "Sunfeast Dark Fantasy Choco Fills (Pack of 4)",
+    "category": "Bakery & Snacks",
+    "cost_price": 85.0,
+    "selling_price": 120.0,
+    "stock_quantity": 140,
+    "days_in_stock": 5,
+    "expiry_days": 45,
+    "velocity_status": "MODERATE",
+    "weekly_sales_avg": 28,
+    "image_url": "product_default.png",
+    "past_sales_weeks": [
+      23,
+      25,
+      26,
+      28,
+      29,
+      28
+    ],
+    "forecast_sales_weeks": [
+      34,
+      39,
+      43,
+      48
+    ],
+    "sell_through_verdict": "STRONG_INVEST_BUY",
+    "verdict_badge": "🟢 Strong Buy / Restock Now",
+    "days_inventory_remaining": 35,
+    "sell_through_rate_pct": 80.0,
+    "reorder_recommendation": "High surge predicted. Restock aggressively to capitalize on event demand.",
+    "brand_comparison_insight": "Near-expiry stock; ideal bundle driver with premium evening tea.",
+    "alternative_brands": [
+      "Local Wholesaler Grade-A",
+      "National Market Alternative"
+    ]
+  },
+  {
+    "id": "PROD_CSV_12",
+    "name": "Aashirvaad Shahi Garam Masala Box (200g)",
+    "category": "Spices",
+    "cost_price": 105.0,
+    "selling_price": 155.0,
+    "stock_quantity": 50,
+    "days_in_stock": 5,
+    "expiry_days": 120,
+    "velocity_status": "SLOW_MOVING",
+    "weekly_sales_avg": 12,
+    "image_url": "product_default.png",
+    "past_sales_weeks": [
+      10,
+      10,
+      11,
+      12,
+      12,
+      12
+    ],
+    "forecast_sales_weeks": [
+      14,
+      15,
+      16,
+      18
+    ],
+    "sell_through_verdict": "STRONG_INVEST_BUY",
+    "verdict_badge": "🟢 Strong Buy / Restock Now",
+    "days_inventory_remaining": 29,
+    "sell_through_rate_pct": 96.0,
+    "reorder_recommendation": "High surge predicted. Restock aggressively to capitalize on event demand.",
+    "brand_comparison_insight": "Slow-moving spice box; bundle with sunflower oil to clear shelf space.",
+    "alternative_brands": [
+      "Local Wholesaler Grade-A",
+      "National Market Alternative"
+    ]
+  },
+  {
+    "id": "PROD_CSV_13",
+    "name": "Nandini Pure Cow Ghee Pouch (500ml)",
+    "category": "Dairy & Oils",
+    "cost_price": 260.0,
+    "selling_price": 315.0,
+    "stock_quantity": 95,
+    "days_in_stock": 5,
+    "expiry_days": 180,
+    "velocity_status": "FAST_MOVING",
+    "weekly_sales_avg": 40,
+    "image_url": "product_default.png",
+    "past_sales_weeks": [
+      34,
+      36,
+      38,
+      40,
+      42,
+      40
+    ],
+    "forecast_sales_weeks": [
+      48,
+      54,
+      59,
+      65
+    ],
+    "sell_through_verdict": "STRONG_INVEST_BUY",
+    "verdict_badge": "🟢 Strong Buy / Restock Now",
+    "days_inventory_remaining": 16,
+    "sell_through_rate_pct": 100.0,
+    "reorder_recommendation": "High surge predicted. Restock aggressively to capitalize on event demand.",
+    "brand_comparison_insight": "Fast-moving regional staple with 17.5% retailer margin.",
+    "alternative_brands": [
+      "Local Wholesaler Grade-A",
+      "National Market Alternative"
+    ]
+  },
+  {
+    "id": "PROD_CSV_14",
+    "name": "Tata Sampann Premium Cashews W320 (500g)",
+    "category": "Dry Fruits",
+    "cost_price": 390.0,
+    "selling_price": 520.0,
+    "stock_quantity": 65,
+    "days_in_stock": 5,
+    "expiry_days": 240,
+    "velocity_status": "SLOW_MOVING",
+    "weekly_sales_avg": 15,
+    "image_url": "product_default.png",
+    "past_sales_weeks": [
+      12,
+      13,
+      14,
+      15,
+      15,
+      15
+    ],
+    "forecast_sales_weeks": [
+      18,
+      20,
+      23,
+      25
+    ],
+    "sell_through_verdict": "STRONG_INVEST_BUY",
+    "verdict_badge": "🟢 Strong Buy / Restock Now",
+    "days_inventory_remaining": 30,
+    "sell_through_rate_pct": 92.3,
+    "reorder_recommendation": "High surge predicted. Restock aggressively to capitalize on event demand.",
+    "brand_comparison_insight": "High festival gifting demand; great attachment with festive sweets.",
+    "alternative_brands": [
+      "Local Wholesaler Grade-A",
+      "National Market Alternative"
+    ]
+  },
+  {
+    "id": "PROD_CSV_15",
+    "name": "Kalyan Clay Diya Gift Box (Set of 24)",
+    "category": "Puja & Festive",
+    "cost_price": 70.0,
+    "selling_price": 149.0,
+    "stock_quantity": 180,
+    "days_in_stock": 5,
+    "expiry_days": 365,
+    "velocity_status": "FAST_MOVING",
+    "weekly_sales_avg": 55,
+    "image_url": "product_default.png",
+    "past_sales_weeks": [
+      46,
+      49,
+      52,
+      55,
+      57,
+      55
+    ],
+    "forecast_sales_weeks": [
+      67,
+      74,
+      82,
+      91
+    ],
+    "sell_through_verdict": "STRONG_INVEST_BUY",
+    "verdict_badge": "🟢 Strong Buy / Restock Now",
+    "days_inventory_remaining": 22,
+    "sell_through_rate_pct": 100.0,
+    "reorder_recommendation": "High surge predicted. Restock aggressively to capitalize on event demand.",
+    "brand_comparison_insight": "Diwali seasonal surge item with 53% margin; pairs with pure ghee.",
+    "alternative_brands": [
+      "Local Wholesaler Grade-A",
+      "National Market Alternative"
+    ]
+  },
+  {
+    "id": "PROD_CSV_16",
+    "name": "Sunfeast Dark Fantasy Choco Fills (Pack of 4)",
+    "category": "Bakery & Snacks",
+    "cost_price": 85.0,
+    "selling_price": 120.0,
+    "stock_quantity": 140,
+    "days_in_stock": 5,
+    "expiry_days": 45,
+    "velocity_status": "MODERATE",
+    "weekly_sales_avg": 28,
+    "image_url": "product_default.png",
+    "past_sales_weeks": [
+      23,
+      25,
+      26,
+      28,
+      29,
+      28
+    ],
+    "forecast_sales_weeks": [
+      34,
+      39,
+      43,
+      48
+    ],
+    "sell_through_verdict": "STRONG_INVEST_BUY",
+    "verdict_badge": "🟢 Strong Buy / Restock Now",
+    "days_inventory_remaining": 35,
+    "sell_through_rate_pct": 80.0,
+    "reorder_recommendation": "High surge predicted. Restock aggressively to capitalize on event demand.",
+    "brand_comparison_insight": "Near-expiry stock; ideal bundle driver with premium evening tea.",
+    "alternative_brands": [
+      "Local Wholesaler Grade-A",
+      "National Market Alternative"
+    ]
+  },
+  {
+    "id": "PROD_CSV_17",
+    "name": "Aashirvaad Shahi Garam Masala Box (200g)",
+    "category": "Spices",
+    "cost_price": 105.0,
+    "selling_price": 155.0,
+    "stock_quantity": 50,
+    "days_in_stock": 5,
+    "expiry_days": 120,
+    "velocity_status": "SLOW_MOVING",
+    "weekly_sales_avg": 12,
+    "image_url": "product_default.png",
+    "past_sales_weeks": [
+      10,
+      10,
+      11,
+      12,
+      12,
+      12
+    ],
+    "forecast_sales_weeks": [
+      14,
+      15,
+      16,
+      18
+    ],
+    "sell_through_verdict": "STRONG_INVEST_BUY",
+    "verdict_badge": "🟢 Strong Buy / Restock Now",
+    "days_inventory_remaining": 29,
+    "sell_through_rate_pct": 96.0,
+    "reorder_recommendation": "High surge predicted. Restock aggressively to capitalize on event demand.",
+    "brand_comparison_insight": "Slow-moving spice box; bundle with sunflower oil to clear shelf space.",
+    "alternative_brands": [
+      "Local Wholesaler Grade-A",
+      "National Market Alternative"
+    ]
+  },
+  {
+    "id": "PROD_CUSTOM_18",
+    "name": "Tata Salt Vacuum Evaporated (1kg)",
+    "category": "Staples",
+    "cost_price": 20.0,
+    "selling_price": 28.0,
+    "stock_quantity": 200,
+    "days_in_stock": 5,
+    "expiry_days": 300,
+    "velocity_status": "FAST_MOVING",
+    "weekly_sales_avg": 50,
+    "image_url": "product_default.png",
+    "past_sales_weeks": [
+      42,
+      45,
+      47,
+      50,
+      52,
+      50
+    ],
+    "forecast_sales_weeks": [
+      60,
+      66,
+      73,
+      80
+    ],
+    "sell_through_verdict": "STRONG_INVEST_BUY",
+    "verdict_badge": "🟢 Strong Buy / Restock Now",
+    "days_inventory_remaining": 28,
+    "sell_through_rate_pct": 100.0,
+    "reorder_recommendation": "High surge predicted. Restock aggressively to capitalize on event demand.",
+    "brand_comparison_insight": "Custom retailer SKU with expected growth of +46.3%.",
+    "alternative_brands": [
+      "Local Wholesaler Grade-A",
+      "National Market Alternative"
+    ]
+  },
+  {
     "id": "PROD_GHEE_01",
     "name": "Amul Pure Cow Ghee Tin (1 Litre)",
     "category": "Dairy & Oils",
@@ -111,82 +518,6 @@
       "Nandini Pure Cow Ghee (1L) — 19% margin, ₹20 cheaper",
       "Mother Dairy Cow Ghee (1L) — 17.5% margin, stable demand",
       "Aashirvaad Svasti Ghee (1L) — 21% margin, higher brand push"
-    ]
-  },
-  {
-    "id": "PROD_ALMOND_01",
-    "name": "Nutraj California Premium Almonds (500g)",
-    "category": "Dry Fruits",
-    "cost_price": 330.0,
-    "selling_price": 470.0,
-    "stock_quantity": 110,
-    "days_in_stock": 62,
-    "expiry_days": 180,
-    "velocity_status": "SLOW_MOVING",
-    "weekly_sales_avg": 11,
-    "image_url": "almonds.png",
-    "past_sales_weeks": [
-      14,
-      13,
-      12,
-      11,
-      11,
-      10
-    ],
-    "forecast_sales_weeks": [
-      12,
-      16,
-      22,
-      28
-    ],
-    "sell_through_verdict": "CAUTION_CHECK_BRANDS",
-    "verdict_badge": "🟡 Caution / Check Unbranded APMC",
-    "days_inventory_remaining": 70,
-    "sell_through_rate_pct": 30.0,
-    "reorder_recommendation": "Hold off on Nutraj branded reorders: 110 units will cover the next 70 days. Let the Diwali surge clear existing packs in bundles before restocking.",
-    "brand_comparison_insight": "Nutraj branded MRP of ₹470 meets consumer price resistance. Local APMC loose/pouch almonds sell for ₹390 with a 38% retailer margin vs Nutraj's 29.8%. Switching to local grade-A pouches yields higher net cash.",
-    "alternative_brands": [
-      "APMC Mandi Loose Grade-A Almonds (500g pouch) — 38% margin, ₹390 price",
-      "Happilo California Almonds (500g) — 31% margin, attractive tin pack",
-      "Tata Sampann California Almonds (500g) — 27% margin, high trust"
-    ]
-  },
-  {
-    "id": "PROD_OIL_01",
-    "name": "Fortune Sunlite Refined Sunflower Oil (1 Litre)",
-    "category": "Staples & Oils",
-    "cost_price": 125.0,
-    "selling_price": 148.0,
-    "stock_quantity": 220,
-    "days_in_stock": 8,
-    "expiry_days": 300,
-    "velocity_status": "FAST_MOVING",
-    "weekly_sales_avg": 95,
-    "image_url": "oil.png",
-    "past_sales_weeks": [
-      88,
-      90,
-      92,
-      94,
-      95,
-      98
-    ],
-    "forecast_sales_weeks": [
-      105,
-      115,
-      125,
-      130
-    ],
-    "sell_through_verdict": "STRONG_INVEST_BUY",
-    "verdict_badge": "🟢 Strong Buy / Core Fast Mover",
-    "days_inventory_remaining": 16,
-    "sell_through_rate_pct": 96.5,
-    "reorder_recommendation": "High Velocity Anchor: Sells 95+ pouches weekly. Capital turns over every 16 days. Restock 15 cartons to capture festive bulk frying demand.",
-    "brand_comparison_insight": "Fortune is the #1 household staple. However, Gemini and Sunpure are currently running a 'Buy 10 cartons get 1 free' trade scheme. Check with your local wholesaler to negotiate a matching rebate on Fortune.",
-    "alternative_brands": [
-      "Gemini Refined Sunflower Oil (1L) — 18% margin, trade scheme active",
-      "Sunpure Refined Sunflower Oil (1L) — 17.5% margin, popular in South India",
-      "Dhara Refined Sunflower Oil (1L) — 15% margin, standard"
     ]
   },
   {
@@ -228,6 +559,44 @@
     ]
   },
   {
+    "id": "PROD_OIL_01",
+    "name": "Fortune Sunlite Refined Sunflower Oil (1 Litre)",
+    "category": "Staples & Oils",
+    "cost_price": 125.0,
+    "selling_price": 148.0,
+    "stock_quantity": 220,
+    "days_in_stock": 8,
+    "expiry_days": 300,
+    "velocity_status": "FAST_MOVING",
+    "weekly_sales_avg": 95,
+    "image_url": "oil.png",
+    "past_sales_weeks": [
+      88,
+      90,
+      92,
+      94,
+      95,
+      98
+    ],
+    "forecast_sales_weeks": [
+      105,
+      115,
+      125,
+      130
+    ],
+    "sell_through_verdict": "STRONG_INVEST_BUY",
+    "verdict_badge": "🟢 Strong Buy / Core Fast Mover",
+    "days_inventory_remaining": 16,
+    "sell_through_rate_pct": 96.5,
+    "reorder_recommendation": "High Velocity Anchor: Sells 95+ pouches weekly. Capital turns over every 16 days. Restock 15 cartons to capture festive bulk frying demand.",
+    "brand_comparison_insight": "Fortune is the #1 household staple. However, Gemini and Sunpure are currently running a 'Buy 10 cartons get 1 free' trade scheme. Check with your local wholesaler to negotiate a matching rebate on Fortune.",
+    "alternative_brands": [
+      "Gemini Refined Sunflower Oil (1L) — 18% margin, trade scheme active",
+      "Sunpure Refined Sunflower Oil (1L) — 17.5% margin, popular in South India",
+      "Dhara Refined Sunflower Oil (1L) — 15% margin, standard"
+    ]
+  },
+  {
     "id": "PROD_SWEET_01",
     "name": "Haldiram's Gulab Jamun Traditional Tin (1kg)",
     "category": "Sweets & Confectionery",
@@ -263,6 +632,44 @@
       "Bikaji Traditional Gulab Jamun (1kg) — 31% margin, ₹30 lower MRP",
       "Bikanervala Tin Sweets (1kg) — 28% margin, comparable brand",
       "Gits Instant Gulab Jamun Mix (500g) — 35% margin, DIY segment"
+    ]
+  },
+  {
+    "id": "PROD_TEA_01",
+    "name": "Taj Mahal Premium Gold Tea (500g)",
+    "category": "Beverages",
+    "cost_price": 240.0,
+    "selling_price": 310.0,
+    "stock_quantity": 140,
+    "days_in_stock": 12,
+    "expiry_days": 360,
+    "velocity_status": "FAST_MOVING",
+    "weekly_sales_avg": 52,
+    "image_url": "tea.png",
+    "past_sales_weeks": [
+      42,
+      45,
+      48,
+      50,
+      52,
+      55
+    ],
+    "forecast_sales_weeks": [
+      58,
+      64,
+      72,
+      78
+    ],
+    "sell_through_verdict": "STRONG_INVEST_BUY",
+    "verdict_badge": "🟢 Strong Buy / Restock Now",
+    "days_inventory_remaining": 18,
+    "sell_through_rate_pct": 89.2,
+    "reorder_recommendation": "High Velocity Anchor (+35% monsoon/weekend surge): Current stock of 140 units will exhaust in ~18 days. Invest in a 50kg wholesale replenishment immediately to secure dealer discount.",
+    "brand_comparison_insight": "Taj Mahal dominates local chai consumption (74% brand retention in Indiranagar). While Brooke Bond Red Label offers ~2% higher retailer margins, Taj Mahal sells 35% faster. Do not switch away; retain as prime anchor.",
+    "alternative_brands": [
+      "Tata Tea Gold (500g) — 26% margin, +15% pull",
+      "Brooke Bond Red Label (500g) — 24% margin, steady volume",
+      "Wagh Bakri Premium (500g) — 28% margin, regional favorite"
     ]
   }
 ]

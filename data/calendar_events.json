@@ -1,26 +1,10 @@
 [
   {
-    "id": "EVT_DIWALI_2026",
-    "name": "Diwali / Deepavali (Deepa & Lakshmi Puja)",
-    "region": "Karnataka & South India",
-    "date_window": "Oct 24 - Oct 29, 2026",
-    "status": "UPCOMING",
-    "key_items": [
-      "Clay Diyas & Deepas",
-      "Pure Cow Ghee",
-      "Gulab Jamun & Sweets",
-      "California Almonds",
-      "Puja Camphor & Wicks"
-    ],
-    "demand_lift_pct": 85.0,
-    "icon": "🪔",
-    "description": "Peak festive season in Bengaluru. Deepas and Cow Ghee require 3x normal stock. Non-festive days require only minimal puja stock."
-  },
-  {
-    "id": "EVT_AYUDHA_PUJA_2026",
-    "name": "Ayudha Puja & Vijayadashami",
-    "region": "Karnataka",
     "date_window": "Oct 10 - Oct 13, 2026",
+    "region": "Karnataka",
+    "name": "Ayudha Puja & Vijayadashami",
+    "demand_lift_pct": 60.0,
+    "id": "EVT_AYUDHA_PUJA_2026",
     "status": "UPCOMING",
     "key_items": [
       "Puffed Rice (Pori)",
@@ -29,15 +13,32 @@
       "Ash Gourd",
       "Flowers & Lemon"
     ],
-    "demand_lift_pct": 60.0,
-    "icon": "🌾",
-    "description": "Massive corporate and vehicle puja demand. Bulk restocking of sweets and sunflower oil for frying."
+    "description": "Massive corporate and vehicle puja demand. Bulk restocking of sweets and sunflower oil for frying.",
+    "icon": "🌾"
   },
   {
-    "id": "EVT_KARTHIKA_DEEPAM_2026",
-    "name": "Karthika Deepotsava",
-    "region": "Karnataka & Tamil Nadu",
+    "date_window": "Oct 24 - Oct 29, 2026",
+    "region": "Karnataka & South India",
+    "name": "Diwali / Deepavali (Deepa & Lakshmi Puja)",
+    "demand_lift_pct": 85.0,
+    "id": "EVT_DIWALI_2026",
+    "status": "UPCOMING",
+    "key_items": [
+      "Clay Diyas & Deepas",
+      "Pure Cow Ghee",
+      "Gulab Jamun & Sweets",
+      "California Almonds",
+      "Puja Camphor & Wicks"
+    ],
+    "description": "Peak festive season in Bengaluru. Deepas and Cow Ghee require 3x normal stock. Non-festive days require only minimal puja stock.",
+    "icon": "🪔"
+  },
+  {
     "date_window": "Nov 14 - Nov 20, 2026",
+    "region": "Karnataka & Tamil Nadu",
+    "name": "Karthika Deepotsava",
+    "demand_lift_pct": 45.0,
+    "id": "EVT_KARTHIKA_DEEPAM_2026",
     "status": "UPCOMING",
     "key_items": [
       "Earthen Deepas (Clay Lamps)",
@@ -45,15 +46,15 @@
       "Cotton Wicks",
       "Cow Ghee"
     ],
-    "demand_lift_pct": 45.0,
-    "icon": "🕯️",
-    "description": "Month of lights across temples and households. Heavy surge in clay deepas and lighting oils."
+    "description": "Month of lights across temples and households. Heavy surge in clay deepas and lighting oils.",
+    "icon": "🕯️"
   },
   {
-    "id": "EVT_MONSOON_BONANZA_2026",
-    "name": "Monsoon Refresh Bonanza",
-    "region": "Karnataka Urban",
     "date_window": "Jul 15 - Aug 30, 2026",
+    "region": "Karnataka Urban",
+    "name": "Monsoon Refresh Bonanza",
+    "demand_lift_pct": 35.0,
+    "id": "EVT_MONSOON_BONANZA_2026",
     "status": "COMPLETED",
     "key_items": [
       "Premium Tea",
@@ -62,23 +63,7 @@
       "Ginger",
       "Snacks"
     ],
-    "demand_lift_pct": 35.0,
-    "icon": "🌧️",
-    "description": "Cool monsoon evenings trigger evening chai & biscuit combo demand."
-  },
-  {
-    "id": "EVT_UGADI_2026",
-    "name": "Ugadi New Year",
-    "region": "Karnataka",
-    "date_window": "March 2026",
-    "demand_lift_pct": 50.0,
-    "key_items": [
-      "Jaggery",
-      "Neem",
-      "Raw Mango"
-    ],
-    "status": "UPCOMING",
-    "icon": "🪔",
-    "description": ""
+    "description": "Cool monsoon evenings trigger evening chai & biscuit combo demand.",
+    "icon": "🌧️"
   }
 ]

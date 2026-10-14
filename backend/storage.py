@@ -213,23 +213,9 @@ class DualModeStorageAdapter:
             return
 
         try:
-            # 1. Check for Inline Service Account JSON across common environment variables
-            inline_candidates = [
-                os.environ.get("FIRESTORE_SA_JSON"),
-                os.environ.get("GCP_SA_KEY"),
-                os.environ.get("FIRESTORE_CREDENTIALS_JSON"),
-                os.environ.get("GCP_SERVICE_ACCOUNT_JSON"),
-                os.environ.get("GOOGLE_APPLICATION_CREDENTIALS_JSON"),
-                os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")  # In case user pasted raw JSON directly here
-            ]
-
-            parsed_sa = None
-            for candidate in inline_candidates:
-                if candidate and (candidate.strip().startswith("{") or "client_email" in candidate):
-                    parsed_sa = self.parse_inline_service_account(candidate)
-                    if parsed_sa:
-                        break
-
+            
+            sa_json = os.environ.get("FIRESTORE_SA_JSON")
+            parsed_sa = self.parse_inline_service_account(sa_json) 
             if parsed_sa:
                 # Auto-extract and prioritize project_id from inline SA JSON
                 sa_proj = parsed_sa.get("project_id")
@@ -240,11 +226,6 @@ class DualModeStorageAdapter:
                 creds = service_account.Credentials.from_service_account_info(parsed_sa)
                 self.client = firestore.Client(project=self.project_id or creds.project_id, credentials=creds)
                 logger.info("Initialized Firestore client using inline Service Account JSON.")
-
-            elif os.environ.get("GOOGLE_APPLICATION_CREDENTIALS") and os.path.exists(os.environ["GOOGLE_APPLICATION_CREDENTIALS"]):
-                creds_file = os.environ["GOOGLE_APPLICATION_CREDENTIALS"]
-                self.client = firestore.Client.from_service_account_json(creds_file, project=self.project_id)
-                logger.info(f"Initialized Firestore client using credentials file: {creds_file}")
 
             else:
                 # Attempt Application Default Credentials (ADC) or Emulator
@@ -259,8 +240,8 @@ class DualModeStorageAdapter:
                         "Set FIRESTORE_SA_JSON (inline JSON) or FIRESTORE_PROJECT_ID."
                     )
 
-            # Test connection probe with a shallow read
-            _ = self.client.collection("stores").document(self.store_id).get()
+            # Test connection probe with a shallow read with a short timeout to prevent blocking
+            _ = self.client.collection("stores").document(self.store_id).get(timeout=3.0)
             self.mode = "CLOUD"
             self.fallback_reason = None
             logger.info(f"Storage Adapter successfully connected to Google Cloud Firestore in CLOUD mode (store: {self.store_id}).")

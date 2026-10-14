@@ -1,46 +1,46 @@
 {
-  "store_id": "sharma_kirana_cloud",
-  "store_name": "Sharma Supermarket & Kirana",
-  "owner_name": "Ramesh Sharma",
-  "phone": "+91 98450 12345",
-  "gstin": "29AAAAA0000A1Z5",
-  "store_type": "Supermarket",
-  "audience_size": 1420,
-  "region": "Karnataka & South India",
-  "city": "Bengaluru",
+  "region": "Maharashtra & West India",
+  "updated_at": "2026-10-14T12:51:35.243125+00:00",
+  "store_id": "sharma_supermarket_01",
+  "audience_size": 1850,
   "locality": "Koramangala 4th Block",
-  "pin_code": "560034",
+  "gstin": "29AAAAA9999A1Z9",
+  "store_name": "Sharma Supermarket Koramangala",
   "customer_list": [
     {
-      "name": "Ananya Rao",
-      "phone": "+91 98451 22334",
       "segment": "Festive Gifting / High AOV",
+      "phone": "+91 98451 22334",
+      "name": "Ananya Rao",
       "preferred_channel": "WhatsApp"
     },
     {
-      "name": "Vikram Patel",
-      "phone": "+91 98452 33445",
       "segment": "Weekly Pantry Staples",
+      "phone": "+91 98452 33445",
+      "name": "Vikram Patel",
       "preferred_channel": "WhatsApp"
     },
     {
-      "name": "Meera Iyer",
-      "phone": "+91 98453 44556",
       "segment": "Dairy & Sweet Making",
+      "phone": "+91 98453 44556",
+      "name": "Meera Iyer",
       "preferred_channel": "WhatsApp"
     },
     {
-      "name": "Karthik Reddy",
-      "phone": "+91 98454 55667",
       "segment": "Evening Snacks & Tea",
+      "phone": "+91 98454 55667",
+      "name": "Karthik Reddy",
       "preferred_channel": "POS"
     },
     {
-      "name": "Sunita Jain",
-      "phone": "+91 98455 66778",
       "segment": "Dry Fruits & Bulk Staples",
+      "phone": "+91 98455 66778",
+      "name": "Sunita Jain",
       "preferred_channel": "WhatsApp"
     }
   ],
-  "updated_at": "2026-10-14T11:46:25.597750+00:00"
+  "store_type": "Supermarket",
+  "phone": "+91 98450 99999",
+  "pin_code": "560048",
+  "owner_name": "Ramesh Sharma",
+  "city": "Bengaluru"
 }

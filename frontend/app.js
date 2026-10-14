@@ -92,8 +92,11 @@ function loadStoreProfile() {
   const savedOwner = localStorage.getItem("promomind_owner_name") || "Ramesh Sharma";
   const savedRegion = localStorage.getItem("promomind_region") || "Karnataka & South India";
   const savedCity = localStorage.getItem("promomind_city") || "Bengaluru";
+  const savedLocality = localStorage.getItem("promomind_locality") || "Koramangala 4th Block";
   const savedPin = localStorage.getItem("promomind_pin") || "560034";
   const savedPhone = localStorage.getItem("promomind_phone") || "+91 98450 12345";
+  const savedGSTIN = localStorage.getItem("promomind_gstin") || "29AAAAA0000A1Z5";
+  const savedStoreType = localStorage.getItem("promomind_store_type") || "Supermarket";
   const savedAudience = localStorage.getItem("promomind_audience") || "1420";
 
   // Apply to Header and Profile Screen
@@ -110,10 +113,16 @@ function loadStoreProfile() {
   if (elRegion) elRegion.value = savedRegion;
   const elCity = document.getElementById("profCity");
   if (elCity) elCity.value = savedCity;
+  const elLocality = document.getElementById("profLocality");
+  if (elLocality) elLocality.value = savedLocality;
   const elPin = document.getElementById("profPin");
   if (elPin) elPin.value = savedPin;
   const elPhone = document.getElementById("profPhone");
   if (elPhone) elPhone.value = savedPhone;
+  const elGSTIN = document.getElementById("profGSTIN");
+  if (elGSTIN) elGSTIN.value = savedGSTIN;
+  const elStoreType = document.getElementById("profStoreType");
+  if (elStoreType) elStoreType.value = savedStoreType;
   const elAudience = document.getElementById("profAudienceSize");
   if (elAudience) elAudience.value = savedAudience;
 
@@ -159,10 +168,55 @@ async function fetchStoreProfile() {
       document.getElementById("topStoreName").innerText = profile.store_name;
       const elStore = document.getElementById("profStoreName");
       if (elStore) elStore.value = profile.store_name;
+      localStorage.setItem("promomind_store_name", profile.store_name);
     }
     if (profile.owner_name) {
       const elOwner = document.getElementById("profOwnerName");
       if (elOwner) elOwner.value = profile.owner_name;
+      localStorage.setItem("promomind_owner_name", profile.owner_name);
+    }
+    if (profile.phone) {
+      const elPhone = document.getElementById("profPhone");
+      if (elPhone) elPhone.value = profile.phone;
+      localStorage.setItem("promomind_phone", profile.phone);
+    }
+    if (profile.gstin) {
+      const elGSTIN = document.getElementById("profGSTIN");
+      if (elGSTIN) elGSTIN.value = profile.gstin;
+      localStorage.setItem("promomind_gstin", profile.gstin);
+    }
+    if (profile.store_type) {
+      const elStoreType = document.getElementById("profStoreType");
+      if (elStoreType) elStoreType.value = profile.store_type;
+      localStorage.setItem("promomind_store_type", profile.store_type);
+    }
+    if (profile.audience_size !== undefined && profile.audience_size !== null) {
+      const elAudience = document.getElementById("profAudienceSize");
+      if (elAudience) elAudience.value = profile.audience_size;
+      localStorage.setItem("promomind_audience", String(profile.audience_size));
+    }
+    if (profile.region) {
+      const elRegion = document.getElementById("profStateRegion");
+      if (elRegion) elRegion.value = profile.region;
+      const calRegion = document.getElementById("calendarRegionSelect");
+      if (calRegion) calRegion.value = profile.region;
+      document.getElementById("intelRegionName").innerText = profile.region;
+      localStorage.setItem("promomind_region", profile.region);
+    }
+    if (profile.city) {
+      const elCity = document.getElementById("profCity");
+      if (elCity) elCity.value = profile.city;
+      localStorage.setItem("promomind_city", profile.city);
+    }
+    if (profile.locality) {
+      const elLocality = document.getElementById("profLocality");
+      if (elLocality) elLocality.value = profile.locality;
+      localStorage.setItem("promomind_locality", profile.locality);
+    }
+    if (profile.pin_code) {
+      const elPin = document.getElementById("profPin");
+      if (elPin) elPin.value = profile.pin_code;
+      localStorage.setItem("promomind_pin", profile.pin_code);
     }
     if (profile.city && profile.region) {
       document.getElementById("topStoreLocation").innerText = `${profile.city} • ${profile.region.split("&")[0].trim()}`;
@@ -175,19 +229,25 @@ async function fetchStoreProfile() {
 async function saveStoreProfile() {
   const storeName = document.getElementById("profStoreName").value.trim() || "Sharma Supermarket";
   const owner = document.getElementById("profOwnerName").value.trim();
+  const phone = document.getElementById("profPhone").value.trim();
+  const gstin = document.getElementById("profGSTIN").value.trim();
+  const storeType = document.getElementById("profStoreType").value;
+  const audience = parseInt(document.getElementById("profAudienceSize").value.trim()) || 1420;
   const region = document.getElementById("profStateRegion").value;
   const city = document.getElementById("profCity").value.trim();
+  const locality = document.getElementById("profLocality").value.trim();
   const pin = document.getElementById("profPin").value.trim();
-  const phone = document.getElementById("profPhone").value.trim();
-  const audience = parseInt(document.getElementById("profAudienceSize").value.trim()) || 1420;
 
   localStorage.setItem("promomind_store_name", storeName);
   localStorage.setItem("promomind_owner_name", owner);
+  localStorage.setItem("promomind_phone", phone);
+  localStorage.setItem("promomind_gstin", gstin);
+  localStorage.setItem("promomind_store_type", storeType);
+  localStorage.setItem("promomind_audience", String(audience));
   localStorage.setItem("promomind_region", region);
   localStorage.setItem("promomind_city", city);
+  localStorage.setItem("promomind_locality", locality);
   localStorage.setItem("promomind_pin", pin);
-  localStorage.setItem("promomind_phone", phone);
-  localStorage.setItem("promomind_audience", String(audience));
 
   // Update header and calendar
   document.getElementById("topStoreName").innerText = storeName;
@@ -203,11 +263,14 @@ async function saveStoreProfile() {
       body: JSON.stringify({
         store_name: storeName,
         owner_name: owner,
+        phone: phone,
+        gstin: gstin,
+        store_type: storeType,
+        audience_size: audience,
         region: region,
         city: city,
-        pin_code: pin,
-        phone: phone,
-        audience_size: audience
+        locality: locality,
+        pin_code: pin
       })
     });
   } catch (err) {
