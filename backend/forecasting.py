@@ -204,9 +204,12 @@ class PriceElasticityOptimizer:
         # Base archetype pricing logic
         if archetype == "EXPIRY_RESCUE_CLEARANCE":
             # Anchor at full MRP, attached item discounted steeply (35-50% off attached)
-            attached_discounted = attached_mrp * max(0.50, (0.65 - urgency_discount_bonus))
+            attached_discounted = attached_mrp * max(0.40, (0.55 - urgency_discount_bonus))
             tentative_price = anchor_mrp + attached_discounted
             effective_discount_pct = ((combined_mrp - tentative_price) / combined_mrp) * 100.0
+            if effective_discount_pct < 16.0:
+                tentative_price = combined_mrp * 0.82
+                effective_discount_pct = 18.0
         elif archetype == "FESTIVE_CELEBRATION_HAMPER":
             # Festive rush pricing: 18% to 24% off combined bundle
             target_disc = 0.18 + (min(0.06, event_surge_pct / 500.0))
@@ -229,12 +232,20 @@ class PriceElasticityOptimizer:
         # Net Margin Safeguard Floor Check
         net_margin_pct = round(((rounded_price - combined_cost) / max(1.0, rounded_price)) * 100.0, 1)
         if net_margin_pct < min_margin_pct:
-            # Enforce margin floor
+            # Enforce margin floor if feasible under MRP
             required_price = combined_cost / (1.0 - (min_margin_pct / 100.0))
-            rounded_price = math.ceil(required_price / 10) * 10 + 9
+            candidate_price = math.ceil(required_price / 10) * 10 + 9
+            if candidate_price < combined_mrp:
+                rounded_price = candidate_price
+                net_margin_pct = round(((rounded_price - combined_cost) / max(1.0, rounded_price)) * 100.0, 1)
+
+        if rounded_price >= combined_mrp:
+            rounded_price = math.floor((combined_mrp - 2) / 10) * 10 + 9
+            if rounded_price >= combined_mrp:
+                rounded_price = max(combined_cost, combined_mrp - 10.0)
             net_margin_pct = round(((rounded_price - combined_cost) / max(1.0, rounded_price)) * 100.0, 1)
 
-        discount_amount = round(combined_mrp - rounded_price, 1)
+        discount_amount = max(5.0, round(combined_mrp - rounded_price, 1))
         final_discount_pct = round((discount_amount / max(1.0, combined_mrp)) * 100.0, 1)
 
         # Dynamic Volume Lift Projection via Constant Elasticity Equation:
@@ -269,6 +280,177 @@ class PriceElasticityOptimizer:
             "dead_stock_cleared_pct": dead_stock_cleared_pct,
             "archetype_applied": archetype
         }
+
+    @classmethod
+    def generate_all_varieties(
+        cls,
+        anchor_mrp: float,
+        anchor_cost: float,
+        anchor_category: str,
+        attached_mrp: float,
+        attached_cost: float,
+        attached_category: str,
+        attached_expiry_days: Optional[int] = None,
+        attached_stock: int = 50,
+        min_margin_pct: float = 18.0,
+        event_surge_pct: float = 0.0,
+        chosen_archetype: str = "ANCHOR_MARGIN_BOOSTER"
+    ) -> List[Dict[str, Any]]:
+        """
+        Generates 5 dynamic, non-static promotional varieties side-by-side.
+        Each variety has distinct discount depth, profit margin, volume lift,
+        and customer psychological targeting.
+        """
+        combined_mrp = anchor_mrp + attached_mrp
+        combined_cost = anchor_cost + attached_cost
+
+        # 1. Balanced Margin Booster (Protects high gross margin)
+        p_margin = cls.optimize_bundle_pricing(
+            anchor_mrp, anchor_cost, anchor_category,
+            attached_mrp, attached_cost, attached_category,
+            attached_expiry_days, attached_stock,
+            min_margin_pct=max(min_margin_pct, 18.0),
+            archetype="ANCHOR_MARGIN_BOOSTER",
+            event_surge_pct=event_surge_pct
+        )
+
+        # 2. Expiry Rescue Clearance (Steep markdown to recover dead capital)
+        p_clearance = cls.optimize_bundle_pricing(
+            anchor_mrp, anchor_cost, anchor_category,
+            attached_mrp, attached_cost, attached_category,
+            attached_expiry_days=min(attached_expiry_days or 25, 20),
+            attached_stock=attached_stock,
+            min_margin_pct=max(10.0, min_margin_pct - 6.0),
+            archetype="EXPIRY_RESCUE_CLEARANCE",
+            event_surge_pct=event_surge_pct
+        )
+
+        # 3. Volume Tier Slab (Buy 2+ multi-pack incentives)
+        p_volume = cls.optimize_bundle_pricing(
+            anchor_mrp, anchor_cost, anchor_category,
+            attached_mrp, attached_cost, attached_category,
+            attached_expiry_days, attached_stock,
+            min_margin_pct=min_margin_pct,
+            archetype="VOLUME_TIER_SLAB",
+            event_surge_pct=event_surge_pct
+        )
+
+        # 4. Festive Celebration Hamper Box (Festive impulse gifting)
+        p_festive = cls.optimize_bundle_pricing(
+            anchor_mrp, anchor_cost, anchor_category,
+            attached_mrp, attached_cost, attached_category,
+            attached_expiry_days, attached_stock,
+            min_margin_pct=min_margin_pct,
+            archetype="FESTIVE_CELEBRATION_HAMPER",
+            event_surge_pct=max(40.0, event_surge_pct)
+        )
+
+        # 5. Bill-Buster Minimum Spend Ladder (Spend threshold deal)
+        bill_ladder_price = math.floor((combined_mrp * 0.76) / 10) * 10 + 9
+        if bill_ladder_price < combined_cost * 1.15:
+            bill_ladder_price = math.ceil((combined_cost * 1.15) / 10) * 10 + 9
+        bill_disc_amt = round(combined_mrp - bill_ladder_price, 1)
+        bill_disc_pct = round((bill_disc_amt / combined_mrp) * 100.0, 1)
+        bill_net_margin = round(((bill_ladder_price - combined_cost) / bill_ladder_price) * 100.0, 1)
+
+        varieties = [
+            {
+                "id": "VAR_MARGIN_BOOSTER",
+                "variety_type": "MARGIN_BOOSTER",
+                "title": "Balanced Margin Booster",
+                "tagline": "Safe 20%+ retail margin with steady everyday volume lift",
+                "badge": "Safe Margin",
+                "badge_class": "badge-safe",
+                "icon": "⚖️",
+                "combo_price": p_margin["bundle_price"],
+                "original_mrp": combined_mrp,
+                "discount_amount": p_margin["discount_amount"],
+                "discount_pct": p_margin["discount_pct"],
+                "net_margin_pct": p_margin["net_margin_pct"],
+                "projected_volume_lift_pct": p_margin["volume_lift_pct"],
+                "capital_turnover_days": 18,
+                "customer_target": "Everyday value seekers & regular weekly household grocery shoppers",
+                "is_recommended": chosen_archetype == "ANCHOR_MARGIN_BOOSTER"
+            },
+            {
+                "id": "VAR_EXPIRY_CLEARANCE",
+                "variety_type": "EXPIRY_CLEARANCE",
+                "title": "Deep Clearance Flash Deal",
+                "tagline": "Maximum discount velocity to liquidate trapped stock before expiry deadline",
+                "badge": "Fast Liquidation",
+                "badge_class": "badge-warning",
+                "icon": "⚡",
+                "combo_price": p_clearance["bundle_price"],
+                "original_mrp": combined_mrp,
+                "discount_amount": p_clearance["discount_amount"],
+                "discount_pct": p_clearance["discount_pct"],
+                "net_margin_pct": p_clearance["net_margin_pct"],
+                "projected_volume_lift_pct": p_clearance["volume_lift_pct"],
+                "capital_turnover_days": 8,
+                "customer_target": "Bargain hunters, budget students & fast-decision counter impulse buyers",
+                "is_recommended": chosen_archetype == "EXPIRY_RESCUE_CLEARANCE"
+            },
+            {
+                "id": "VAR_VOLUME_SLAB",
+                "variety_type": "VOLUME_SLAB",
+                "title": "Buy 2+ Tier / Volume Slab",
+                "tagline": "Multi-pack savings that expand total basket size and counter ticket size",
+                "badge": "Max Basket Size",
+                "badge_class": "badge-safe",
+                "icon": "📦",
+                "combo_price": p_volume["bundle_price"],
+                "original_mrp": combined_mrp,
+                "discount_amount": p_volume["discount_amount"],
+                "discount_pct": p_volume["discount_pct"],
+                "net_margin_pct": p_volume["net_margin_pct"],
+                "projected_volume_lift_pct": p_volume["volume_lift_pct"],
+                "capital_turnover_days": 12,
+                "customer_target": "Joint families, large households, and bulk monthly grocery planners",
+                "is_recommended": chosen_archetype == "VOLUME_TIER_SLAB"
+            },
+            {
+                "id": "VAR_FESTIVE_HAMPER",
+                "variety_type": "FESTIVE_HAMPER",
+                "title": "Festive Celebration Gift Box",
+                "tagline": "Curated premium packaging capturing celebratory willingness-to-pay",
+                "badge": "Festive Gifting",
+                "badge_class": "badge-safe",
+                "icon": "🎁",
+                "combo_price": p_festive["bundle_price"],
+                "original_mrp": combined_mrp,
+                "discount_amount": p_festive["discount_amount"],
+                "discount_pct": p_festive["discount_pct"],
+                "net_margin_pct": p_festive["net_margin_pct"],
+                "projected_volume_lift_pct": p_festive["volume_lift_pct"],
+                "capital_turnover_days": 10,
+                "customer_target": "Family celebration gift exchanges, festive sweets gifting & puja shoppers",
+                "is_recommended": chosen_archetype == "FESTIVE_CELEBRATION_HAMPER"
+            },
+            {
+                "id": "VAR_BILL_BUSTER",
+                "variety_type": "BILL_BUSTER",
+                "title": "Spend ₹799+ Unlock Deal",
+                "tagline": "Unlocks this steep bundle discount only when store bill crosses ₹799",
+                "badge": "Cart Ladder",
+                "badge_class": "badge-safe",
+                "icon": "🛒",
+                "combo_price": bill_ladder_price,
+                "original_mrp": combined_mrp,
+                "discount_amount": bill_disc_amt,
+                "discount_pct": bill_disc_pct,
+                "net_margin_pct": bill_net_margin,
+                "projected_volume_lift_pct": 48.0,
+                "capital_turnover_days": 14,
+                "customer_target": "Shoppers currently holding ₹500-₹700 bills, pushing them over the ₹799 milestone",
+                "is_recommended": False
+            }
+        ]
+
+        # Ensure at least one is recommended if none matched
+        if not any(v["is_recommended"] for v in varieties):
+            varieties[0]["is_recommended"] = True
+
+        return varieties
 
 
 class InvestmentROIEngine:

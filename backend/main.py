@@ -7,20 +7,38 @@ from fastapi.responses import FileResponse
 from typing import List, Dict, Any, Optional
 
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.dirname(CURRENT_DIR)
 if CURRENT_DIR not in sys.path:
     sys.path.insert(0, CURRENT_DIR)
+
+# Auto-load environment variables from .env if present
+dotenv_file = os.path.join(PROJECT_ROOT, ".env")
+if os.path.exists(dotenv_file):
+    try:
+        with open(dotenv_file, "r", encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith("#") and "=" in line:
+                    k, v = line.split("=", 1)
+                    k = k.strip()
+                    v = v.strip().strip('"').strip("'")
+                    if k and k not in os.environ:
+                        os.environ[k] = v
+    except Exception:
+        pass
 
 from models import (
     Product, ProductCreate, DemandForecast, ComboQuery, ComboPlan,
     BrandComparisonResponse, RegionalFestivalEvent, ScheduledOffer,
     ConflictCheckRequest, ConflictCheckResponse, StoreProfile,
-    InvestmentROISimulation, ROIScenarioRequest
+    InvestmentROISimulation, ROIScenarioRequest, ChatQuery, ChatResponse,
+    FestivalDiscoveryRequest
 )
 from mock_data import (
     DEMAND_FORECASTS, CATEGORY_BRAND_COMPARISONS, 
     REGIONAL_FESTIVAL_CALENDAR, SCHEDULED_OFFERS
 )
-from agents import PromoMindEngine
+from agents import PromoMindEngine, RetailCopilotAgent, DynamicFestivalEngine
 from storage import StoreDataManager
 from forecasting import OpenSourceForecastingEngine, InvestmentROIEngine
 from firestore_service import FirestoreService
@@ -107,13 +125,38 @@ def simulate_roi_scenario(payload: ROIScenarioRequest):
 # ==============================================================================
 
 @app.get("/api/calendar/events", response_model=List[RegionalFestivalEvent])
-def get_festival_events(region: Optional[str] = None):
-    """Retrieve regional festival calendar with specific regional demand surge items (e.g. Deepas/Diyas for Diwali)."""
-    if region:
-        filtered = [e for e in REGIONAL_FESTIVAL_CALENDAR if region.lower() in e["region"].lower()]
-        if filtered:
-            return filtered
-    return REGIONAL_FESTIVAL_CALENDAR
+def get_festival_events(
+    region: Optional[str] = None,
+    country: Optional[str] = "India",
+    city: Optional[str] = None,
+    refresh: bool = False
+):
+    """Retrieve dynamic regional festival calendar with live AI discovery and matched store inventory."""
+    profile = StoreDataManager.load_profile()
+    active_region = region or profile.region or "Karnataka & South India"
+    active_city = city or profile.city or "Bengaluru"
+    active_country = country or "India"
+    
+    events = DynamicFestivalEngine.discover_festivals(
+        region=active_region,
+        country=active_country,
+        city=active_city,
+        force_refresh=refresh
+    )
+    return events
+
+@app.post("/api/calendar/discover", response_model=List[RegionalFestivalEvent])
+def discover_regional_festivals(payload: FestivalDiscoveryRequest):
+    """Trigger AI search and discovery of regional festivals for any custom state, place, or country."""
+    profile = StoreDataManager.load_profile()
+    active_city = payload.city or profile.city or "Bengaluru"
+    events = DynamicFestivalEngine.discover_festivals(
+        region=payload.region,
+        country=payload.country or "India",
+        city=active_city,
+        force_refresh=payload.force_refresh or False
+    )
+    return events
 
 @app.get("/api/offers/active", response_model=List[ScheduledOffer])
 def get_active_offers():
@@ -345,6 +388,39 @@ def get_demand_forecasts():
 # Offer Generation & Channel Dispatch
 # ==============================================================================
 
+@app.get("/api/weekly-offer-ideas")
+def get_weekly_offer_ideas(region: Optional[str] = None):
+    """
+    Returns autonomous weekly offer recommendations across multiple products in the store.
+    No product selection is needed by the merchant.
+    """
+    try:
+        ideas = PromoMindEngine.generate_weekly_recommendations(region=region)
+        return {
+            "status": "SUCCESS",
+            "count": len(ideas),
+            "ideas": ideas
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/chat", response_model=ChatResponse)
+def copilot_chat(query: ChatQuery):
+    """
+    Conversational AI Copilot for Retailers.
+    Processes natural language commands, extracts requested profit margin %,
+    and runs backend econometric, pricing, and collateral tools silently.
+    """
+    try:
+        response = RetailCopilotAgent.process_message(
+            message=query.message,
+            user_margin_pct=query.min_margin_pct,
+            region=query.store_region
+        )
+        return response
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 @app.post("/api/generate-combo", response_model=ComboPlan)
 def generate_combo(query: ComboQuery):
     """
@@ -357,6 +433,8 @@ def generate_combo(query: ComboQuery):
             min_margin_pct=query.min_margin_pct or 18.0,
             event_theme=query.event_theme or "Diwali Maha Utsav",
             offer_type=query.offer_type or "COMBO_DISCOUNT",
+            primary_product_id=query.primary_product_id,
+            secondary_product_id=query.secondary_product_id,
             region=query.region,
             archetype=query.archetype or "ANCHOR_MARGIN_BOOSTER"
         )

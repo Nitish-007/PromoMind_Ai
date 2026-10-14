@@ -82,6 +82,16 @@ class RegionalFestivalEvent(BaseModel):
     promo_launch_window: Optional[str] = None           # When to run early-bird offers (T-7d)
     clearance_window: Optional[str] = None              # Post-festival clearance window (T+2d)
     recommended_promo_type: Optional[str] = None        # e.g. "Festive Gifting Hamper", "Advance Booking Combo"
+    matched_inventory_items: Optional[List[Dict[str, Any]]] = None # Matched products from current store inventory
+    suggested_combo_title: Optional[str] = None        # e.g. "Mysuru Dasara Ghee & Sweets Pack"
+    country: Optional[str] = "India"
+    city: Optional[str] = None
+
+class FestivalDiscoveryRequest(BaseModel):
+    region: str
+    country: Optional[str] = "India"
+    city: Optional[str] = None
+    force_refresh: Optional[bool] = False
 
 class ScheduledOffer(BaseModel):
     id: str
@@ -124,6 +134,8 @@ class ComboQuery(BaseModel):
     offer_type: Optional[str] = "COMBO_DISCOUNT"
     region: Optional[str] = "Karnataka & South India"
     archetype: Optional[str] = "ANCHOR_MARGIN_BOOSTER"
+    primary_product_id: Optional[str] = None
+    secondary_product_id: Optional[str] = None
 
 class CreativeAssets(BaseModel):
     poster_headline: str
@@ -159,6 +171,28 @@ class ROIScenarioRequest(BaseModel):
     proposed_discount_depth_pct: float = 16.0
     expected_volume_lift_pct: float = 35.0
 
+class PromotionVariety(BaseModel):
+    id: str
+    variety_type: str
+    title: str
+    tagline: str
+    badge: str
+    badge_class: str
+    icon: str
+    combo_price: float
+    original_mrp: float
+    discount_amount: float
+    discount_pct: float
+    net_margin_pct: float
+    projected_volume_lift_pct: float
+    capital_turnover_days: int
+    customer_target: str
+    cashier_counter_pitch: str
+    whatsapp_copy: str
+    poster_headline: str
+    poster_savings: str
+    is_recommended: bool = False
+
 class ComboPlan(BaseModel):
     combo_id: str
     title: str
@@ -169,6 +203,8 @@ class ComboPlan(BaseModel):
     demand_driver: str
     original_combined_mrp: float
     recommended_combo_price: float
+    combo_price: Optional[float] = None
+    original_total_mrp: Optional[float] = None
     discount_amount: float
     discount_pct: float
     net_margin_pct: float
@@ -182,3 +218,21 @@ class ComboPlan(BaseModel):
     region: Optional[str] = "Karnataka & South India"
     co_purchase_probability: Optional[Dict[str, Any]] = None
     forecasting_summary: Optional[Dict[str, Any]] = None
+    varieties: Optional[List[PromotionVariety]] = None
+    hybrid_architecture: Optional[Dict[str, Any]] = None
+
+class ChatQuery(BaseModel):
+    message: str
+    min_margin_pct: Optional[float] = None
+    store_region: Optional[str] = None
+    history: Optional[List[Dict[str, str]]] = []
+
+class ChatResponse(BaseModel):
+    reply: str
+    intent: str  # "PROMOTION_GENERATED", "WEEKLY_IDEAS", "ROI_INSIGHT", "GENERAL_ASSISTANCE"
+    detected_margin_pct: float
+    plan: Optional[ComboPlan] = None
+    ideas: Optional[List[Dict[str, Any]]] = None
+    roi_summary: Optional[Dict[str, Any]] = None
+
+
