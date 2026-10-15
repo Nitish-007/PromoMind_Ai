@@ -8,14 +8,15 @@ import { InventoryScreen } from "@/components/inventory/InventoryScreen";
 import { CopilotScreen } from "@/components/copilot/CopilotScreen";
 import { BrandComparisonModal } from "@/components/modals/BrandComparisonModal";
 import { AddProductModal } from "@/components/modals/AddProductModal";
-import { 
-  fetchInventory, 
-  fetchFinancialRoi, 
-  simulateRoi, 
-  fetchBrandComparison, 
+import { LoginStoreModal } from "@/components/modals/LoginStoreModal";
+import {
+  fetchInventory,
+  fetchFinancialRoi,
+  simulateRoi,
+  fetchBrandComparison,
   addProduct,
   fetchStoreProfile,
-  fetchStorageStatus
+  fetchStorageStatus,
 } from "@/lib/api";
 
 import { CalendarScreen } from "@/components/calendar/CalendarScreen";
@@ -26,14 +27,17 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState("inventory");
   const [theme, setTheme] = useState("light");
   const [copilotPrompt, setCopilotPrompt] = useState("");
-  
+
   // Store Profile & Storage
   const [storeProfile, setStoreProfile] = useState({
-    store_name: "Metro Supermarket & Retail Mart",
+    store_id: "sharma_supermarket_01",
+    store_name: "Sharma Supermarket & Kirana",
     owner_name: "Ramesh Sharma",
     city: "Bengaluru",
     region: "Karnataka & South India",
     phone: "+91 98450 12345",
+    audience_size: 1420,
+    whatsapp_audience_size: 1420,
   });
   const [storageStatus, setStorageStatus] = useState(null);
 
@@ -44,12 +48,11 @@ export default function Home() {
 
   // Modals state
   const [isAddSkuOpen, setIsAddSkuOpen] = useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [brandModalProduct, setBrandModalProduct] = useState(null);
   const [brandComparisonData, setBrandComparisonData] = useState(null);
 
-  // Initial load
   useEffect(() => {
-    // Check saved theme
     const savedTheme = localStorage.getItem("promomind_theme") || "light";
     setTheme(savedTheme);
     if (savedTheme === "dark") {
@@ -58,16 +61,25 @@ export default function Home() {
       document.documentElement.classList.remove("dark");
     }
 
-    // Read cached store profile from localStorage after client hydration
+    // Check if user has logged in once; if not, open the one-time Login & Region Setup modal
+    const hasLoggedIn = localStorage.getItem("promomind_logged_in");
+    if (!hasLoggedIn) {
+      setIsLoginModalOpen(true);
+    }
+
     const cachedStoreName = localStorage.getItem("promomind_store_name");
     if (cachedStoreName) {
+      const cachedAud = parseInt(localStorage.getItem("promomind_audience") || "1420", 10);
       setStoreProfile((prev) => ({
         ...prev,
+        store_id: localStorage.getItem("promomind_store_id") || prev.store_id,
         store_name: cachedStoreName,
         owner_name: localStorage.getItem("promomind_owner_name") || prev.owner_name,
         city: localStorage.getItem("promomind_city") || prev.city,
         region: localStorage.getItem("promomind_region") || prev.region,
         phone: localStorage.getItem("promomind_phone") || prev.phone,
+        audience_size: cachedAud,
+        whatsapp_audience_size: cachedAud,
       }));
     }
 
@@ -88,7 +100,6 @@ export default function Home() {
   const loadInitialData = async () => {
     setIsLoadingInventory(true);
     try {
-      // 1. Fetch store profile
       try {
         const prof = await fetchStoreProfile();
         if (prof) setStoreProfile((prev) => ({ ...prev, ...prof }));
@@ -96,7 +107,6 @@ export default function Home() {
         console.warn("Could not load store profile:", e);
       }
 
-      // 2. Fetch inventory
       try {
         const prods = await fetchInventory();
         if (Array.isArray(prods)) setProducts(prods);
@@ -104,7 +114,6 @@ export default function Home() {
         console.warn("Could not load inventory:", e);
       }
 
-      // 3. Fetch financial ROI
       try {
         const roi = await fetchFinancialRoi();
         if (roi) setRoiData(roi);
@@ -112,7 +121,6 @@ export default function Home() {
         console.warn("Could not load ROI data:", e);
       }
 
-      // 4. Storage status
       try {
         const status = await fetchStorageStatus();
         if (status) setStorageStatus(status);
@@ -172,10 +180,13 @@ export default function Home() {
   };
 
   const handleProfileUpdated = (updatedProf) => {
-    setStoreProfile((prev) => ({
-      ...prev,
-      ...updatedProf,
-    }));
+    if (updatedProf) {
+      setStoreProfile((prev) => ({
+        ...prev,
+        ...updatedProf,
+      }));
+    }
+    loadInitialData();
   };
 
   return (
@@ -186,6 +197,7 @@ export default function Home() {
         theme={theme}
         onToggleTheme={toggleTheme}
         onOpenProfile={() => setActiveTab("profile")}
+        onOpenLoginModal={() => setIsLoginModalOpen(true)}
       />
 
       {/* 2. Festive Alert Strip */}
@@ -223,24 +235,27 @@ export default function Home() {
           />
         )}
 
-        {/* Feature 3: Regional Festival Calendar & Conflict Tracker */}
+        {/* Feature 3: Regional Festival Calendar & Store Offers Manager */}
         {activeTab === "calendar" && (
           <CalendarScreen
+            storeProfile={storeProfile}
             onLaunchPromo={handleLaunchPromoForFestival}
           />
         )}
 
-        {/* Feature 4: CSV Intake & AI Markdown Sync */}
+        {/* Feature 4: Smart CSV Structurizer & Deduplicating Firestore Sync */}
         {activeTab === "upload" && (
           <UploadScreen
-            onInventoryUpdated={loadInitialData}
+            storeProfile={storeProfile}
+            onInventoryUpdated={handleProfileUpdated}
           />
         )}
 
-        {/* Feature 5: Store Profile & Settings */}
+        {/* Feature 5: Store Profile & Multi-Store Management */}
         {activeTab === "profile" && (
           <ProfileScreen
             onProfileUpdated={handleProfileUpdated}
+            onOpenLoginModal={() => setIsLoginModalOpen(true)}
           />
         )}
       </main>
@@ -259,6 +274,14 @@ export default function Home() {
         isOpen={isAddSkuOpen}
         onClose={() => setIsAddSkuOpen(false)}
         onAddProduct={handleAddSku}
+      />
+
+      {/* One-Time Retailer Login & Regional Setup Modal */}
+      <LoginStoreModal
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
+        currentProfile={storeProfile}
+        onStoreAuthenticated={handleProfileUpdated}
       />
     </div>
   );

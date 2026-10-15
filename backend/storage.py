@@ -1,4 +1,5 @@
 import os
+import re
 import sys
 import json
 import time
@@ -9,7 +10,6 @@ from typing import List, Dict, Any, Optional, Tuple
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.dirname(CURRENT_DIR)
 
-# Auto-load environment variables from backend/.env and project root .env
 try:
     from dotenv import load_dotenv
     load_dotenv(os.path.join(CURRENT_DIR, ".env"))
@@ -24,14 +24,13 @@ if CURRENT_DIR not in sys.path:
 
 from models import Product, RegionalFestivalEvent, ScheduledOffer, StoreProfile
 from mock_data import (
-    INVENTORY_DATA, DEMAND_FORECASTS, 
+    INVENTORY_DATA, DEMAND_FORECASTS,
     REGIONAL_FESTIVAL_CALENDAR, SCHEDULED_OFFERS
 )
 from forecasting import OpenSourceForecastingEngine, InvestmentROIEngine
 
 logger = logging.getLogger("PromoMind.Storage")
 
-# Firestore Optional Import & Driver Handling
 try:
     from google.cloud import firestore
     from google.oauth2 import service_account
@@ -40,11 +39,11 @@ try:
     FIRESTORE_AVAILABLE = True
 except Exception as e:
     firestore = None
+    service_account = None
     FIRESTORE_AVAILABLE = False
     logger.info(f"Google Cloud Firestore driver not active: {e}")
 
 
-# Default Kirana / Supermarket Customer List
 DEFAULT_CUSTOMER_LIST: List[Dict[str, Any]] = [
     {"name": "Ananya Rao", "phone": "+91 98451 22334", "segment": "Festive Gifting / High AOV", "preferred_channel": "WhatsApp"},
     {"name": "Vikram Patel", "phone": "+91 98452 33445", "segment": "Weekly Pantry Staples", "preferred_channel": "WhatsApp"},
@@ -53,43 +52,130 @@ DEFAULT_CUSTOMER_LIST: List[Dict[str, Any]] = [
     {"name": "Sunita Jain", "phone": "+91 98455 66778", "segment": "Dry Fruits & Bulk Staples", "preferred_channel": "WhatsApp"}
 ]
 
-# Baseline Store Profile for Sharma Supermarket
 DEFAULT_STORE_PROFILE: Dict[str, Any] = {
     "store_id": "sharma_supermarket_01",
     "store_name": "Sharma Supermarket & Kirana",
     "owner_name": "Ramesh Sharma",
+    "email": "ramesh@sharmamart.in",
     "phone": "+91 98450 12345",
     "gstin": "29AAAAA0000A1Z5",
     "store_type": "Supermarket",
+    "store_format": "Supermarket",
     "audience_size": 1420,
+    "whatsapp_audience_size": 1420,
     "region": "Karnataka & South India",
     "city": "Bengaluru",
+    "country": "India",
     "locality": "Koramangala 4th Block",
     "pin_code": "560034",
+    "default_min_margin_pct": 18.0,
+    "total_working_capital_inr": 500000.0,
     "customer_list": DEFAULT_CUSTOMER_LIST,
-    "updated_at": "2026-10-14T10:00:00Z"
+    "updated_at": "2026-10-15T10:00:00Z"
 }
+
+PRESET_STORES_REGISTRY: Dict[str, Dict[str, Any]] = {
+    "sharma_supermarket_01": dict(DEFAULT_STORE_PROFILE),
+    "patel_fresh_mart_02": {
+        "store_id": "patel_fresh_mart_02",
+        "store_name": "Patel Fresh Mart & Provision Store",
+        "owner_name": "Kiran Patel",
+        "email": "kiran@patelfresh.in",
+        "phone": "+91 98201 55667",
+        "gstin": "27BBBBB1111B1Z2",
+        "store_type": "Supermarket",
+        "store_format": "Supermarket",
+        "audience_size": 2150,
+        "whatsapp_audience_size": 2150,
+        "region": "Maharashtra & West India",
+        "city": "Mumbai",
+        "country": "India",
+        "locality": "Dadar West",
+        "pin_code": "400028",
+        "default_min_margin_pct": 17.5,
+        "total_working_capital_inr": 750000.0,
+        "customer_list": DEFAULT_CUSTOMER_LIST,
+        "updated_at": "2026-10-15T10:00:00Z"
+    },
+    "sen_bazar_03": {
+        "store_id": "sen_bazar_03",
+        "store_name": "Sen Family Department Store",
+        "owner_name": "Subrata Sen",
+        "email": "subrata@senbazar.in",
+        "phone": "+91 98300 77889",
+        "gstin": "19CCCCC2222C1Z8",
+        "store_type": "Departmental",
+        "store_format": "Departmental",
+        "audience_size": 1680,
+        "whatsapp_audience_size": 1680,
+        "region": "West Bengal & East India",
+        "city": "Kolkata",
+        "country": "India",
+        "locality": "Gariahat",
+        "pin_code": "700019",
+        "default_min_margin_pct": 16.5,
+        "total_working_capital_inr": 600000.0,
+        "customer_list": DEFAULT_CUSTOMER_LIST,
+        "updated_at": "2026-10-15T10:00:00Z"
+    }
+}
+
+
+def _dump_model(obj: Any) -> Dict[str, Any]:
+    if hasattr(obj, "model_dump"):
+        return obj.model_dump()
+    if hasattr(obj, "dict"):
+        return obj.dict()
+    return dict(obj)
+
+
+def _normalize_product_key(name: str) -> str:
+    """Create canonical key for deduplicating SKUs across re-uploads."""
+    if not name:
+        return ""
+    return re.sub(r"[^a-z0-9]+", "", name.strip().lower())
+
+
+def _infer_category_from_name(name: str) -> str:
+    low = (name or "").lower()
+    if any(w in low for w in ["ghee", "milk", "butter", "paneer", "curd", "cheese", "dairy"]):
+        return "Dairy"
+    if any(w in low for w in ["tea", "chai", "coffee", "juice", "drink", "soda", "beverage", "cider"]):
+        return "Beverages"
+    if any(w in low for w in ["almond", "cashew", "kaju", "pistachio", "pista", "raisin", "walnut", "dry fruit", "nut"]):
+        return "Dry Fruits"
+    if any(w in low for w in ["biscuit", "cookie", "chip", "namkeen", "bhujia", "snack", "noodle", "chocolate"]):
+        return "Snacks"
+    if any(w in low for w in ["sweet", "jamun", "rasgulla", "ladoo", "barfi", "mithai", "soan", "payasam"]):
+        return "Sweets & Confectionery"
+    if any(w in low for w in ["masala", "spice", "turmeric", "chilli", "cumin", "pepper", "cardamom"]):
+        return "Spices"
+    if any(w in low for w in ["diya", "deepa", "camphor", "agarbatti", "wick", "puja", "pooja", "dhoop"]):
+        return "Puja & Festive"
+    return "Staples & Oils"
+
+
+def _pick_col(row_lower: Dict[str, str], candidates: List[str], default: Any = None) -> Any:
+    for c in candidates:
+        if c in row_lower and row_lower[c] is not None and str(row_lower[c]).strip() != "":
+            return str(row_lower[c]).strip()
+    return default
+
+
+def _parse_number(val: Any, default: float = 0.0) -> float:
+    if val is None:
+        return default
+    cleaned = re.sub(r"[^\d.-]", "", str(val))
+    try:
+        return float(cleaned) if cleaned else default
+    except Exception:
+        return default
 
 
 class DualModeStorageAdapter:
     """
-    Dual-Mode Hybrid Storage Adapter:
-    
-    1. Cloud Mode:
-       When Google Cloud credentials are provided, reads and writes directly to Firestore collections:
-         - stores/{store_id}/inventory: Real-time stock levels, MRP, cost, and velocities.
-         - stores/{store_id}/promotions: Active/scheduled campaigns, pricing tiers, and conflict logs.
-         - stores/{store_id}/calendar_events: Regional festive event calendar.
-         - stores/{store_id}/store_profile: Store metadata, location, and customer list.
-         - stores/{store_id}/knowledge_catalog: Compiled Markdown catalog (store_knowledge.md).
-    
-    2. Offline / Local Fallback Mode:
-       Automatically falls back to local JSON + Markdown when running without internet or credentials,
-       ensuring 100% zero downtime.
-       
-    3. Instant Sync with AI Knowledge Base:
-       Any update to Firestore triggers an automatic re-compilation of data/store_knowledge.md
-       for AI agent grounding, and writes the snapshot to stores/{store_id}/knowledge_catalog.
+    Firestore-First Storage Adapter with Multi-Store Isolation, Smart CSV Normalization,
+    Strict De-Duplication, and Login-Driven Regional Festival Persistence.
     """
 
     def __init__(
@@ -109,6 +195,14 @@ class DualModeStorageAdapter:
         self.instant_sync_active: bool = True
         self._listener_unsubscribe = None
 
+        # Per-store memory state
+        self._memory_inventory: Dict[str, List[Product]] = {}
+        self._memory_promotions: Dict[str, List[Dict[str, Any]]] = {}
+        self._memory_calendar: Dict[str, List[Dict[str, Any]]] = {}
+        self._memory_profiles: Dict[str, Dict[str, Any]] = {
+            k: dict(v) for k, v in PRESET_STORES_REGISTRY.items()
+        }
+
         self.data_dir = data_dir or os.environ.get("PROMOMIND_DATA_DIR") or DATA_DIR
         self.store_json_file = os.path.join(self.data_dir, "inventory_store.json")
         self.knowledge_md_file = os.path.join(self.data_dir, "store_knowledge.md")
@@ -123,34 +217,8 @@ class DualModeStorageAdapter:
     def _ensure_local_data_dir(self):
         os.makedirs(self.data_dir, exist_ok=True)
 
-    def _init_connection(self, force_mode: Optional[str] = None):
-        """Attempt to establish Cloud Mode via Firestore client or fall back cleanly."""
-        requested_mode = (force_mode or os.environ.get("STORAGE_MODE", "AUTO")).upper()
-        if requested_mode == "LOCAL":
-            self.mode = "LOCAL_FALLBACK"
-            self.fallback_reason = "Manually forced to LOCAL_FALLBACK via STORAGE_MODE configuration."
-            logger.info("Storage Adapter initialized in LOCAL_FALLBACK mode (forced).")
-            return
-
-        if self.client is not None:
-            self.mode = "CLOUD"
-            self.fallback_reason = None
-            logger.info(f"Storage Adapter initialized in CLOUD mode with provided Firestore client for store: {self.store_id}")
-            self._start_realtime_sync_listener()
-            return
-
-        if not FIRESTORE_AVAILABLE:
-            self.mode = "LOCAL_FALLBACK"
-            self.fallback_reason = "google-cloud-firestore library is not installed in the current environment."
-            logger.warning("google-cloud-firestore not available. Operating in LOCAL_FALLBACK mode.")
-            return
-
     @staticmethod
     def parse_inline_service_account(raw_val: Optional[str]) -> Optional[Dict[str, Any]]:
-        """
-        Parse raw inline service account string (JSON, single-quoted JSON, or base64 encoded JSON).
-        Returns parsed dict containing service account keys, or None if invalid.
-        """
         if not raw_val or not isinstance(raw_val, str):
             return None
 
@@ -158,11 +226,9 @@ class DualModeStorageAdapter:
         if not cleaned:
             return None
 
-        # Strip outer quotes if enclosed in single or double quotes
         if (cleaned.startswith("'") and cleaned.endswith("'")) or (cleaned.startswith('"') and cleaned.endswith('"')):
             cleaned = cleaned[1:-1].strip()
 
-        # 1. Direct JSON parse
         try:
             data = json.loads(cleaned)
             if isinstance(data, dict) and ("type" in data or "client_email" in data or "private_key" in data):
@@ -170,7 +236,6 @@ class DualModeStorageAdapter:
         except Exception:
             pass
 
-        # 2. Try base64 decoding (useful for single-line base64 env vars)
         try:
             import base64
             decoded = base64.b64decode(cleaned).decode("utf-8")
@@ -180,7 +245,6 @@ class DualModeStorageAdapter:
         except Exception:
             pass
 
-        # 3. Clean escaped newlines/characters if unescaped in .env or multiline paste
         try:
             normalized = cleaned.replace("\\n", "\n").replace('\\"', '"').replace("\\'", "'")
             data = json.loads(normalized)
@@ -192,67 +256,77 @@ class DualModeStorageAdapter:
         return None
 
     def _init_connection(self, force_mode: Optional[str] = None):
-        """Attempt to establish Cloud Mode via Firestore client or fall back cleanly."""
         requested_mode = (force_mode or os.environ.get("STORAGE_MODE", "AUTO")).upper()
         if requested_mode == "LOCAL":
             self.mode = "LOCAL_FALLBACK"
             self.fallback_reason = "Manually forced to LOCAL_FALLBACK via STORAGE_MODE configuration."
-            logger.info("Storage Adapter initialized in LOCAL_FALLBACK mode (forced).")
             return
 
         if self.client is not None:
             self.mode = "CLOUD"
             self.fallback_reason = None
-            logger.info(f"Storage Adapter initialized in CLOUD mode with provided Firestore client for store: {self.store_id}")
             self._start_realtime_sync_listener()
             return
 
         if not FIRESTORE_AVAILABLE:
             self.mode = "LOCAL_FALLBACK"
             self.fallback_reason = "google-cloud-firestore library is not installed in the current environment."
-            logger.warning("google-cloud-firestore not available. Operating in LOCAL_FALLBACK mode.")
             return
 
         try:
-            
             sa_json = os.environ.get("FIRESTORE_SA_JSON")
-            parsed_sa = self.parse_inline_service_account(sa_json) 
-            if parsed_sa:
-                # Auto-extract and prioritize project_id from inline SA JSON
+            parsed_sa = self.parse_inline_service_account(sa_json)
+            if parsed_sa and service_account is not None:
                 sa_proj = parsed_sa.get("project_id")
                 if sa_proj:
                     self.project_id = sa_proj
-                    logger.info(f"Using project_id '{self.project_id}' from inline Service Account JSON.")
-
                 creds = service_account.Credentials.from_service_account_info(parsed_sa)
                 self.client = firestore.Client(project=self.project_id or creds.project_id, credentials=creds)
-                logger.info("Initialized Firestore client using inline Service Account JSON.")
-
             else:
-                # Attempt Application Default Credentials (ADC) or Emulator
                 emulator_host = os.environ.get("FIRESTORE_EMULATOR_HOST")
                 if emulator_host:
                     self.client = firestore.Client(project=self.project_id or "demo-promomind")
                 elif self.project_id:
                     self.client = firestore.Client(project=self.project_id)
                 else:
-                    raise ValueError(
-                        "No Google Cloud credentials or project configured. "
-                        "Set FIRESTORE_SA_JSON (inline JSON) or FIRESTORE_PROJECT_ID."
-                    )
+                    raise ValueError("No Google Cloud credentials or project configured.")
 
-            # Test connection probe with a shallow read with a short timeout to prevent blocking
             _ = self.client.collection("stores").document(self.store_id).get(timeout=3.0)
             self.mode = "CLOUD"
             self.fallback_reason = None
-            logger.info(f"Storage Adapter successfully connected to Google Cloud Firestore in CLOUD mode (store: {self.store_id}).")
             self._start_realtime_sync_listener()
-
         except Exception as e:
             self.mode = "LOCAL_FALLBACK"
             self.client = None
             self.fallback_reason = f"Cloud connection unavailable: {str(e)}"
-            logger.info(f"Storage Adapter operating in LOCAL_FALLBACK mode: {self.fallback_reason}")
+
+    # ==========================================================================
+    # Multi-Store Management
+    # ==========================================================================
+
+    def switch_store(self, store_id: str) -> Dict[str, Any]:
+        clean_id = (store_id or "sharma_supermarket_01").strip().lower().replace(" ", "_")
+        self.store_id = clean_id
+        return self.get_store_profile()
+
+    def list_stores(self) -> List[Dict[str, Any]]:
+        stores_map: Dict[str, Dict[str, Any]] = {
+            k: dict(v) for k, v in self._memory_profiles.items()
+        }
+        if self.mode == "CLOUD" and self.client:
+            try:
+                for doc in self.client.collection("stores").stream():
+                    prof_doc = doc.reference.collection("store_profile").document("profile").get()
+                    if prof_doc.exists:
+                        p_data = prof_doc.to_dict()
+                        p_data["store_id"] = doc.id
+                        stores_map[doc.id] = p_data
+            except Exception as e:
+                logger.warning(f"Failed listing stores from Firestore: {e}")
+
+        curr = self.get_store_profile()
+        stores_map[self.store_id] = curr
+        return list(stores_map.values())
 
     # ==========================================================================
     # Firestore Collection References (stores/{store_id}/...)
@@ -279,11 +353,10 @@ class DualModeStorageAdapter:
         return self._store_doc_ref().collection("knowledge_catalog")
 
     # ==========================================================================
-    # 1. Inventory Collection: stores/{store_id}/inventory
+    # 1. Inventory Collection & Smart Deduplicating CSV Ingestion
     # ==========================================================================
 
     def load_products(self) -> List[Product]:
-        """Load inventory from Firestore collection stores/{store_id}/inventory, with local fallback."""
         if self.mode == "CLOUD" and self.client:
             try:
                 docs = list(self._inventory_coll().stream())
@@ -294,49 +367,59 @@ class DualModeStorageAdapter:
                         if "id" not in data:
                             data["id"] = doc.id
                         products.append(Product(**data))
-                    # Sync local cache
+                    self._memory_inventory[self.store_id] = products
                     self._save_local_products_cache(products)
                     return products
                 else:
-                    # Seed cloud collection with baseline inventory
-                    logger.info("Firestore inventory empty. Seeding baseline products...")
-                    self.save_products(INVENTORY_DATA)
-                    return INVENTORY_DATA
+                    self.save_products(list(INVENTORY_DATA))
+                    return list(INVENTORY_DATA)
             except Exception as e:
-                logger.warning(f"Failed to read from Firestore inventory, falling back to local: {e}")
+                logger.warning(f"Failed to read from Firestore inventory, falling back: {e}")
 
-        # Local Fallback
+        if self.store_id in self._memory_inventory and self._memory_inventory[self.store_id]:
+            return list(self._memory_inventory[self.store_id])
+
         return self._load_local_products()
 
     def save_products(self, products: List[Product]):
-        """Persist inventory to stores/{store_id}/inventory and trigger instant sync."""
+        self._memory_inventory[self.store_id] = list(products)
         if self.mode == "CLOUD" and self.client:
             try:
                 batch = self.client.batch()
                 coll = self._inventory_coll()
                 for p in products:
                     doc_ref = coll.document(p.id)
-                    batch.set(doc_ref, p.model_dump())
+                    batch.set(doc_ref, _dump_model(p))
                 batch.commit()
             except Exception as e:
                 logger.warning(f"Error persisting products to Firestore: {e}")
 
-        # Local persistence & Instant Sync
         self._save_local_products_cache(products)
         self.rebuild_knowledge_markdown(products)
 
     def add_or_update_product(self, product: Product) -> List[Product]:
-        """Add or update an individual product SKU, sync to Firestore and AI Knowledge Base."""
+        """Add or update an individual product SKU with automatic name/ID deduplication."""
         products = self.load_products()
-        idx = next((i for i, p in enumerate(products) if p.id == product.id), None)
+        incoming_key = _normalize_product_key(product.name)
+        idx = next(
+            (
+                i for i, p in enumerate(products)
+                if p.id.lower() == product.id.lower() or (incoming_key and _normalize_product_key(p.name) == incoming_key)
+            ),
+            None
+        )
         if idx is not None:
+            # Preserve existing canonical ID when updating by name match
+            product.id = products[idx].id
             products[idx] = product
         else:
             products.append(product)
 
+        self._memory_inventory[self.store_id] = list(products)
+
         if self.mode == "CLOUD" and self.client:
             try:
-                self._inventory_coll().document(product.id).set(product.model_dump())
+                self._inventory_coll().document(product.id).set(_dump_model(product))
             except Exception as e:
                 logger.warning(f"Error writing product {product.id} to Firestore: {e}")
 
@@ -344,38 +427,159 @@ class DualModeStorageAdapter:
         self.rebuild_knowledge_markdown(products)
         return products
 
-    def import_csv_data(self, csv_content: str) -> Tuple[int, str]:
-        """Parse CSV rows, compute Holt-Winters curves, persist to Firestore, and sync AI Knowledge Base."""
+    def import_csv_data_with_stats(self, csv_content: str, replace_existing: bool = False) -> Dict[str, Any]:
+        """
+        Smart Multi-Format CSV Structurizer & De-Duplicating Ingestion Engine:
+        1. Auto-maps arbitrary distributor/POS column headers into canonical PromoMind schema.
+        2. Deduplicates by both SKU ID and normalized Product Name (re-uploading the same CSV updates in-place with zero duplicates).
+        3. Extracts & deduplicates customer broadcast contacts / WhatsApp audience numbers if present in CSV.
+        4. Runs Holt-Winters demand forecasting and syncs directly to Firestore (`stores/{store_id}/inventory`).
+        """
         import csv
         import io
 
-        reader = csv.DictReader(io.StringIO(csv_content.strip()))
-        imported = 0
-        products = self.load_products()
+        cleaned_csv = (csv_content or "").strip()
+        if not cleaned_csv:
+            return {
+                "imported_count": 0,
+                "new_skus_added": 0,
+                "existing_skus_updated": 0,
+                "duplicates_prevented": 0,
+                "broadcast_contacts_synced": 0,
+                "columns_mapped": [],
+                "markdown": self.get_knowledge_markdown()
+            }
 
-        for row in reader:
-            name = row.get("name") or row.get("product_name") or row.get("Product")
+        reader = csv.DictReader(io.StringIO(cleaned_csv))
+        raw_headers = reader.fieldnames or []
+        products = [] if replace_existing else self.load_products()
+
+        new_added = 0
+        existing_updated = 0
+        duplicates_prevented = 0
+        imported = 0
+
+        # Track customer broadcast contacts if CSV includes customer/WhatsApp columns
+        profile = self.get_store_profile()
+        customer_list = list(profile.get("customer_list") or DEFAULT_CUSTOMER_LIST)
+        existing_phones = {re.sub(r"[^\d+]", "", c.get("phone", "")) for c in customer_list if c.get("phone")}
+        broadcast_contacts_added = 0
+        explicit_audience_reach = None
+
+        for raw_row in reader:
+            if not raw_row:
+                continue
+            row_lower = {str(k).strip().lower().replace(" ", "_"): v for k, v in raw_row.items() if k is not None}
+
+            # Check if row has customer / broadcast contact fields
+            cust_phone = _pick_col(row_lower, ["customer_phone", "whatsapp", "whatsapp_number", "mobile", "phone", "contact_phone"])
+            cust_name = _pick_col(row_lower, ["customer_name", "buyer_name", "client_name", "member_name"])
+            cust_seg = _pick_col(row_lower, ["customer_segment", "segment", "buyer_tier"], "Store Broadcast List")
+            aud_col = _pick_col(row_lower, ["audience_size", "whatsapp_audience_size", "broadcast_reach", "subscribers"])
+            if aud_col:
+                parsed_aud = int(_parse_number(aud_col, 0))
+                if parsed_aud > 0:
+                    explicit_audience_reach = parsed_aud
+
+            if cust_phone:
+                norm_phone = re.sub(r"[^\d+]", "", cust_phone)
+                if len(norm_phone) >= 8 and norm_phone not in existing_phones:
+                    existing_phones.add(norm_phone)
+                    customer_list.append({
+                        "name": cust_name or f"Customer {len(customer_list) + 1}",
+                        "phone": cust_phone,
+                        "segment": cust_seg,
+                        "preferred_channel": "WhatsApp"
+                    })
+                    broadcast_contacts_added += 1
+
+            # Extract Product SKU fields using flexible multi-header aliases
+            name = _pick_col(row_lower, [
+                "name", "product_name", "product", "item_name", "item", "title",
+                "sku_name", "description", "particulars", "brand_item"
+            ])
             if not name:
                 continue
-            cat = row.get("category") or row.get("Category") or "General Staples"
-            cost = float(row.get("cost_price") or row.get("cost") or row.get("Cost") or 100.0)
-            mrp = float(row.get("selling_price") or row.get("mrp") or row.get("MRP") or cost * 1.25)
-            stock = int(row.get("stock_quantity") or row.get("stock") or row.get("Stock") or 50)
-            weekly_avg = int(row.get("weekly_sales_avg") or row.get("sales_avg") or row.get("Velocity") or 20)
-            expiry = int(row.get("expiry_days") or row.get("expiry") or row.get("Expiry") or 300)
-            brand_notes = row.get("brand_comparison_insight") or row.get("brand_notes") or f"Imported SKU for {cat}."
 
-            sku_id = f"PROD_CSV_{len(products) + 1:02d}"
-            base_sales = [
-                int(weekly_avg * 0.85), int(weekly_avg * 0.90),
-                int(weekly_avg * 0.95), int(weekly_avg * 1.00),
-                int(weekly_avg * 1.05), weekly_avg
-            ]
+            brand_col = _pick_col(row_lower, ["brand", "brand_name", "manufacturer", "company"])
+            if brand_col and brand_col.lower() not in name.lower():
+                name = f"{brand_col} {name}".strip()
+
+            cat = _pick_col(row_lower, ["category", "cat", "department", "group", "product_category", "section"])
+            if not cat:
+                cat = _infer_category_from_name(name)
+
+            raw_cost = _pick_col(row_lower, ["cost_price", "cost", "buy_price", "purchase_price", "wholesale_price", "cp", "rate", "unit_cost"])
+            raw_mrp = _pick_col(row_lower, ["selling_price", "mrp", "price", "retail_price", "sp", "sale_price", "unit_price"])
+
+            cost = _parse_number(raw_cost, 0.0)
+            mrp = _parse_number(raw_mrp, 0.0)
+            if cost <= 0 and mrp > 0:
+                cost = round(mrp * 0.78, 1)
+            elif mrp <= 0 and cost > 0:
+                mrp = round(cost * 1.28, 1)
+            elif cost <= 0 and mrp <= 0:
+                cost, mrp = 100.0, 130.0
+
+            if mrp <= cost:
+                mrp = round(cost * 1.22, 1)
+
+            raw_stock = _pick_col(row_lower, ["stock_quantity", "stock", "qty", "quantity", "closing_stock", "inventory", "units", "available_stock"], "50")
+            stock = max(0, int(_parse_number(raw_stock, 50)))
+
+            raw_weekly = _pick_col(row_lower, ["weekly_sales_avg", "sales_avg", "velocity", "weekly_sales", "units_sold", "sales_per_week"])
+            raw_monthly = _pick_col(row_lower, ["monthly_sales", "monthly_units", "sales_30d"])
+            if raw_weekly is not None:
+                weekly_avg = max(1, int(_parse_number(raw_weekly, 20)))
+            elif raw_monthly is not None:
+                weekly_avg = max(1, int(_parse_number(raw_monthly, 80) / 4.0))
+            else:
+                weekly_avg = 22
+
+            raw_expiry = _pick_col(row_lower, ["expiry_days", "expiry", "shelf_life", "days_to_expiry", "best_before_days"], "180")
+            expiry = max(1, int(_parse_number(raw_expiry, 180)))
+
+            raw_past = _pick_col(row_lower, ["past_sales_weeks", "past_sales", "history"])
+            base_sales = None
+            if raw_past:
+                nums = [int(float(x)) for x in re.findall(r"\d+(?:\.\d+)?", str(raw_past))]
+                if len(nums) >= 3:
+                    base_sales = nums[:6]
+            if not base_sales:
+                base_sales = [
+                    max(1, int(weekly_avg * 0.85)), max(1, int(weekly_avg * 0.90)),
+                    max(1, int(weekly_avg * 0.95)), max(1, int(weekly_avg * 1.00)),
+                    max(1, int(weekly_avg * 1.05)), max(1, weekly_avg)
+                ]
+
+            incoming_id = _pick_col(row_lower, ["product_id", "id", "sku_id", "sku", "barcode", "item_code", "code"])
+            norm_name_key = _normalize_product_key(name)
+
+            # Strict De-Duplication Lookup (match by ID OR by normalized product name)
+            existing_idx = next(
+                (
+                    i for i, ep in enumerate(products)
+                    if (incoming_id and ep.id.strip().lower() == incoming_id.strip().lower())
+                    or (norm_name_key and _normalize_product_key(ep.name) == norm_name_key)
+                ),
+                None
+            )
+
+            if existing_idx is not None:
+                sku_id = products[existing_idx].id
+            else:
+                if incoming_id:
+                    sku_id = incoming_id.strip().upper().replace(" ", "_")
+                else:
+                    slug = re.sub(r"[^A-Z0-9]+", "_", name.upper()).strip("_")[:14]
+                    sku_id = f"SKU_{slug}_{len(products) + 1:02d}"
+
             forecast = OpenSourceForecastingEngine.predict_demand_surge(base_sales, event_surge_pct=35.0)
             velocity = "FAST_MOVING" if weekly_avg >= 35 else ("SLOW_MOVING" if weekly_avg <= 15 else "MODERATE")
             days_rem = int((stock / max(1, weekly_avg)) * 7)
             verdict = "STRONG_INVEST_BUY" if forecast["expected_growth_pct"] >= 25 else ("DO_NOT_REORDER" if days_rem >= 70 else "CAUTION_CHECK_BRANDS")
-            badge = "🟢 Strong Buy / Restock Now" if verdict == "STRONG_INVEST_BUY" else ("🛑 Do Not Reorder" if verdict == "DO_NOT_REORDER" else "🟡 Check Brands")
+            badge = "Strong Buy / Restock Now" if verdict == "STRONG_INVEST_BUY" else ("Do Not Reorder" if verdict == "DO_NOT_REORDER" else "Check Brands")
+            brand_notes = _pick_col(row_lower, ["brand_comparison_insight", "brand_notes", "notes"], f"Structured & forecasted SKU in {cat}.")
 
             p = Product(
                 id=sku_id,
@@ -399,36 +603,70 @@ class DualModeStorageAdapter:
                 brand_comparison_insight=brand_notes,
                 alternative_brands=["Local Wholesaler Grade-A", "National Market Alternative"]
             )
-            products.append(p)
+
+            if existing_idx is not None:
+                products[existing_idx] = p
+                existing_updated += 1
+                duplicates_prevented += 1
+            else:
+                products.append(p)
+                new_added += 1
             imported += 1
 
+        # Update broadcast customer list / audience reach if discovered in CSV
+        if broadcast_contacts_added > 0 or explicit_audience_reach:
+            profile["customer_list"] = customer_list
+            if explicit_audience_reach:
+                profile["audience_size"] = explicit_audience_reach
+                profile["whatsapp_audience_size"] = explicit_audience_reach
+            else:
+                base_aud = int(profile.get("whatsapp_audience_size") or profile.get("audience_size") or 1420)
+                profile["audience_size"] = base_aud + broadcast_contacts_added
+                profile["whatsapp_audience_size"] = base_aud + broadcast_contacts_added
+            self.save_store_profile(profile)
+
         self.save_products(products)
-        return imported, self.get_knowledge_markdown()
+        return {
+            "imported_count": imported,
+            "new_skus_added": new_added,
+            "existing_skus_updated": existing_updated,
+            "duplicates_prevented": duplicates_prevented,
+            "broadcast_contacts_synced": broadcast_contacts_added,
+            "active_broadcast_reach": profile.get("whatsapp_audience_size") or profile.get("audience_size") or 1420,
+            "columns_mapped": raw_headers,
+            "markdown": self.get_knowledge_markdown()
+        }
+
+    def import_csv_data(self, csv_content: str, replace_existing: bool = False) -> Tuple[int, str]:
+        stats = self.import_csv_data_with_stats(csv_content, replace_existing=replace_existing)
+        return stats["imported_count"], stats["markdown"]
 
     def _load_local_products(self) -> List[Product]:
         if not os.path.exists(self.store_json_file):
             self._save_local_products_cache(INVENTORY_DATA)
-            return INVENTORY_DATA
+            self._memory_inventory[self.store_id] = list(INVENTORY_DATA)
+            return list(INVENTORY_DATA)
         try:
             with open(self.store_json_file, "r", encoding="utf-8") as f:
                 data = json.load(f)
-                return [Product(**item) for item in data]
+                prods = [Product(**item) for item in data]
+                self._memory_inventory[self.store_id] = prods
+                return prods
         except Exception as e:
-            logger.warning(f"Could not parse local JSON inventory: {e}. Returning INVENTORY_DATA.")
-            return INVENTORY_DATA
+            logger.warning(f"Could not parse local inventory: {e}. Returning INVENTORY_DATA.")
+            return list(INVENTORY_DATA)
 
     def _save_local_products_cache(self, products: List[Product]):
         self._ensure_local_data_dir()
-        data = [p.model_dump() for p in products]
+        data = [_dump_model(p) for p in products]
         with open(self.store_json_file, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=2, ensure_ascii=False)
 
     # ==========================================================================
-    # 2. Promotions Collection: stores/{store_id}/promotions
+    # 2. Promotions Collection: stores/{store_id}/promotions (Active & Scheduled)
     # ==========================================================================
 
     def get_promotions(self) -> List[Dict[str, Any]]:
-        """Retrieve active and scheduled campaigns from stores/{store_id}/promotions."""
         if self.mode == "CLOUD" and self.client:
             try:
                 docs = list(self._promotions_coll().stream())
@@ -437,21 +675,24 @@ class DualModeStorageAdapter:
                     if d.to_dict().get("type") != "conflict_log"
                 ]
                 if promos:
+                    self._memory_promotions[self.store_id] = promos
                     self._save_local_promotions_cache(promos)
                     return promos
                 else:
-                    # Seed with default SCHEDULED_OFFERS
                     for offer in SCHEDULED_OFFERS:
                         self.save_promotion(offer)
-                    return SCHEDULED_OFFERS
+                    return list(SCHEDULED_OFFERS)
             except Exception as e:
-                logger.warning(f"Firestore promotions query failed: {e}. Falling back to local.")
+                logger.warning(f"Firestore promotions query failed: {e}. Falling back.")
+
+        if self.store_id in self._memory_promotions and self._memory_promotions[self.store_id]:
+            return list(self._memory_promotions[self.store_id])
 
         return self._load_local_promotions()
 
     def save_promotion(self, offer: Dict[str, Any]) -> Dict[str, Any]:
-        """Save a promotional offer to stores/{store_id}/promotions."""
-        offer_id = offer.get("id") or f"OFFER_LIVE_{int(time.time())}"
+        """Save or upsert a promotional offer into stores/{store_id}/promotions."""
+        offer_id = offer.get("id") or f"OFFER_LIVE_{int(time.time() * 1000) % 100000}"
         offer_data = dict(offer)
         offer_data["id"] = offer_id
         offer_data["type"] = "promotion"
@@ -460,6 +701,7 @@ class DualModeStorageAdapter:
         offer_data.setdefault("end_date", "2026-10-25")
         offer_data.setdefault("event_theme", "Active Campaign")
         offer_data.setdefault("status", "ACTIVE")
+        offer_data.setdefault("channels", ["WhatsApp Broadcast", "POS Barcode", "In-Store Poster"])
         offer_data["updated_at"] = datetime.now(timezone.utc).isoformat()
 
         if self.mode == "CLOUD" and self.client:
@@ -468,18 +710,65 @@ class DualModeStorageAdapter:
             except Exception as e:
                 logger.warning(f"Failed to write promotion {offer_id} to Firestore: {e}")
 
-        # Update local cache
-        current = self._load_local_promotions()
-        existing_idx = next((i for i, o in enumerate(current) if o.get("id") == offer_id), None)
+        current = self.get_promotions()
+        existing_idx = next(
+            (
+                i for i, o in enumerate(current)
+                if o.get("id") == offer_id or (o.get("title") == offer_data.get("title") and o.get("start_date") == offer_data.get("start_date"))
+            ),
+            None
+        )
         if existing_idx is not None:
+            offer_data["id"] = current[existing_idx].get("id", offer_id)
             current[existing_idx] = offer_data
         else:
             current.insert(0, offer_data)
+        self._memory_promotions[self.store_id] = current
         self._save_local_promotions_cache(current)
         return offer_data
 
+    def update_promotion(self, offer_id: str, updates: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        """Update status, dates, or pricing of an existing offer in stores/{store_id}/promotions."""
+        current = self.get_promotions()
+        idx = next((i for i, o in enumerate(current) if o.get("id") == offer_id), None)
+        if idx is None:
+            return None
+
+        updated = dict(current[idx])
+        for k, v in updates.items():
+            if v is not None:
+                updated[k] = v
+        updated["updated_at"] = datetime.now(timezone.utc).isoformat()
+        current[idx] = updated
+
+        if self.mode == "CLOUD" and self.client:
+            try:
+                self._promotions_coll().document(offer_id).set(updated)
+            except Exception as e:
+                logger.warning(f"Failed to update promotion {offer_id} in Firestore: {e}")
+
+        self._memory_promotions[self.store_id] = current
+        self._save_local_promotions_cache(current)
+        return updated
+
+    def delete_promotion(self, offer_id: str) -> bool:
+        """Delete an offer from stores/{store_id}/promotions."""
+        current = self.get_promotions()
+        new_list = [o for o in current if o.get("id") != offer_id]
+        if len(new_list) == len(current):
+            return False
+
+        if self.mode == "CLOUD" and self.client:
+            try:
+                self._promotions_coll().document(offer_id).delete()
+            except Exception as e:
+                logger.warning(f"Failed to delete promotion {offer_id} from Firestore: {e}")
+
+        self._memory_promotions[self.store_id] = new_list
+        self._save_local_promotions_cache(new_list)
+        return True
+
     def log_conflict(self, conflict_data: Dict[str, Any]) -> Dict[str, Any]:
-        """Log detected promotion conflict to stores/{store_id}/promotions."""
         log_id = f"CONFLICT_{int(time.time() * 1000)}"
         entry = dict(conflict_data)
         entry["id"] = log_id
@@ -492,7 +781,6 @@ class DualModeStorageAdapter:
             except Exception as e:
                 logger.warning(f"Failed to log conflict to Firestore: {e}")
 
-        # Update local conflict log
         self._ensure_local_data_dir()
         logs = []
         if os.path.exists(self.conflict_logs_file):
@@ -507,7 +795,6 @@ class DualModeStorageAdapter:
         return entry
 
     def get_conflict_logs(self) -> List[Dict[str, Any]]:
-        """Retrieve recent conflict detection logs."""
         if self.mode == "CLOUD" and self.client:
             try:
                 docs = list(self._promotions_coll().where("type", "==", "conflict_log").stream())
@@ -527,12 +814,12 @@ class DualModeStorageAdapter:
     def _load_local_promotions(self) -> List[Dict[str, Any]]:
         if not os.path.exists(self.promotions_json_file):
             self._save_local_promotions_cache(SCHEDULED_OFFERS)
-            return SCHEDULED_OFFERS
+            return list(SCHEDULED_OFFERS)
         try:
             with open(self.promotions_json_file, "r", encoding="utf-8") as f:
                 return json.load(f)
         except Exception:
-            return SCHEDULED_OFFERS
+            return list(SCHEDULED_OFFERS)
 
     def _save_local_promotions_cache(self, promos: List[Dict[str, Any]]):
         self._ensure_local_data_dir()
@@ -544,33 +831,59 @@ class DualModeStorageAdapter:
     # ==========================================================================
 
     def get_calendar_events(self, region: Optional[str] = None) -> List[Dict[str, Any]]:
-        """Retrieve regional festive event calendar from stores/{store_id}/calendar_events."""
         events = []
         if self.mode == "CLOUD" and self.client:
             try:
                 docs = list(self._calendar_coll().stream())
                 if docs:
                     events = [d.to_dict() for d in docs]
-                    self._save_local_calendar_cache(events)
+                    self._memory_calendar[self.store_id] = events
                 else:
-                    # Seed with default events
                     for ev in REGIONAL_FESTIVAL_CALENDAR:
                         self.save_calendar_event(ev)
-                    events = REGIONAL_FESTIVAL_CALENDAR
+                    events = list(REGIONAL_FESTIVAL_CALENDAR)
             except Exception as e:
                 logger.warning(f"Error fetching calendar from Firestore: {e}")
+
+        if not events and self.store_id in self._memory_calendar:
+            events = list(self._memory_calendar[self.store_id])
 
         if not events:
             events = self._load_local_calendar()
 
         if region:
-            filtered = [e for e in events if region.lower() in e.get("region", "").lower()]
+            reg_key = region.lower().split("&")[0].split(",")[0].strip()
+            filtered = [e for e in events if reg_key in e.get("region", "").lower()]
             if filtered:
                 return filtered
         return events
 
+    def save_calendar_events_batch(self, events_list: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """Persist a full batch of regional festivals for the current store into stores/{store_id}/calendar_events."""
+        now_iso = datetime.now(timezone.utc).isoformat()
+        cleaned_list = []
+        for ev in events_list:
+            d = _dump_model(ev) if not isinstance(ev, dict) else dict(ev)
+            d["id"] = d.get("id") or f"EVT_{int(time.time() * 1000)}"
+            d["synced_at"] = d.get("synced_at") or now_iso
+            cleaned_list.append(d)
+
+        self._memory_calendar[self.store_id] = cleaned_list
+
+        if self.mode == "CLOUD" and self.client:
+            try:
+                batch = self.client.batch()
+                coll = self._calendar_coll()
+                for d in cleaned_list:
+                    batch.set(coll.document(d["id"]), d)
+                batch.commit()
+            except Exception as e:
+                logger.warning(f"Error writing festival batch to Firestore: {e}")
+
+        self._save_local_calendar_cache(cleaned_list)
+        return cleaned_list
+
     def save_calendar_event(self, event_data: Dict[str, Any]) -> Dict[str, Any]:
-        """Save festival event into stores/{store_id}/calendar_events."""
         event_id = event_data.get("id") or f"EVT_{int(time.time())}"
         data = dict(event_data)
         data["id"] = event_id
@@ -578,8 +891,9 @@ class DualModeStorageAdapter:
         data.setdefault("status", "UPCOMING")
         data.setdefault("key_items", [])
         data.setdefault("demand_lift_pct", 30.0)
-        data.setdefault("icon", "🪔")
+        data.setdefault("icon", "")
         data.setdefault("description", "")
+        data["synced_at"] = datetime.now(timezone.utc).isoformat()
 
         if self.mode == "CLOUD" and self.client:
             try:
@@ -587,24 +901,25 @@ class DualModeStorageAdapter:
             except Exception as e:
                 logger.warning(f"Error writing calendar event to Firestore: {e}")
 
-        current = self._load_local_calendar()
+        current = self._memory_calendar.get(self.store_id) or self._load_local_calendar()
         idx = next((i for i, ev in enumerate(current) if ev.get("id") == event_id), None)
         if idx is not None:
             current[idx] = data
         else:
             current.append(data)
+        self._memory_calendar[self.store_id] = current
         self._save_local_calendar_cache(current)
         return data
 
     def _load_local_calendar(self) -> List[Dict[str, Any]]:
         if not os.path.exists(self.calendar_json_file):
             self._save_local_calendar_cache(REGIONAL_FESTIVAL_CALENDAR)
-            return REGIONAL_FESTIVAL_CALENDAR
+            return list(REGIONAL_FESTIVAL_CALENDAR)
         try:
             with open(self.calendar_json_file, "r", encoding="utf-8") as f:
                 return json.load(f)
         except Exception:
-            return REGIONAL_FESTIVAL_CALENDAR
+            return list(REGIONAL_FESTIVAL_CALENDAR)
 
     def _save_local_calendar_cache(self, events: List[Dict[str, Any]]):
         self._ensure_local_data_dir()
@@ -616,30 +931,42 @@ class DualModeStorageAdapter:
     # ==========================================================================
 
     def get_store_profile(self) -> Dict[str, Any]:
-        """Retrieve store metadata, location, and customer list from stores/{store_id}/store_profile."""
         if self.mode == "CLOUD" and self.client:
             try:
                 doc = self._profile_coll().document("profile").get()
                 if doc.exists:
                     profile = doc.to_dict()
+                    profile["store_id"] = self.store_id
+                    self._memory_profiles[self.store_id] = profile
                     self._save_local_profile_cache(profile)
                     return profile
                 else:
-                    # Seed default store profile for this cloud store
-                    self.save_store_profile(DEFAULT_STORE_PROFILE)
-                    return dict(DEFAULT_STORE_PROFILE)
+                    seed = dict(self._memory_profiles.get(self.store_id, DEFAULT_STORE_PROFILE))
+                    seed["store_id"] = self.store_id
+                    self.save_store_profile(seed)
+                    return seed
             except Exception as e:
                 logger.warning(f"Error reading store profile from Firestore: {e}")
+
+        if self.store_id in self._memory_profiles:
+            return dict(self._memory_profiles[self.store_id])
 
         return self._load_local_profile()
 
     def save_store_profile(self, profile_data: Dict[str, Any]) -> Dict[str, Any]:
-        """Save store metadata, location, and customer list to stores/{store_id}/store_profile."""
         data = dict(profile_data)
+        target_store_id = data.get("store_id") or self.store_id
+        self.store_id = target_store_id
         data["store_id"] = self.store_id
         data["updated_at"] = datetime.now(timezone.utc).isoformat()
         if "customer_list" not in data or not data["customer_list"]:
             data["customer_list"] = DEFAULT_CUSTOMER_LIST
+        if "audience_size" in data and not data.get("whatsapp_audience_size"):
+            data["whatsapp_audience_size"] = data["audience_size"]
+        elif "whatsapp_audience_size" in data and not data.get("audience_size"):
+            data["audience_size"] = data["whatsapp_audience_size"]
+
+        self._memory_profiles[self.store_id] = dict(data)
 
         if self.mode == "CLOUD" and self.client:
             try:
@@ -660,7 +987,9 @@ class DualModeStorageAdapter:
             return dict(DEFAULT_STORE_PROFILE)
         try:
             with open(self.profile_json_file, "r", encoding="utf-8") as f:
-                return json.load(f)
+                prof = json.load(f)
+                self._memory_profiles[self.store_id] = prof
+                return prof
         except Exception:
             return dict(DEFAULT_STORE_PROFILE)
 
@@ -674,11 +1003,6 @@ class DualModeStorageAdapter:
     # ==========================================================================
 
     def rebuild_knowledge_markdown(self, products: Optional[List[Product]] = None) -> str:
-        """
-        Instant Sync with AI Knowledge Base:
-        Any update to Firestore triggers an automatic re-compilation of data/store_knowledge.md
-        for AI agent grounding, and synchronizes the catalog to stores/{store_id}/knowledge_catalog.
-        """
         self._ensure_local_data_dir()
         if products is None:
             products = self.load_products()
@@ -686,7 +1010,7 @@ class DualModeStorageAdapter:
         prof_dict = self.get_store_profile()
         profile = StoreProfile(**prof_dict)
         roi_stats = InvestmentROIEngine.compute_store_roi(
-            products, 
+            products,
             store_capital_budget=profile.total_working_capital_inr or 500000.0
         )
 
@@ -721,69 +1045,11 @@ class DualModeStorageAdapter:
                 f"| `{p.id}` | {p.name} | {p.category} | {p.stock_quantity} | ₹{p.cost_price} | ₹{p.selling_price} | {margin}% | {p.velocity_status} | {days_left}d | {verdict} |"
             )
 
-        lines.extend([
-            "\n---",
-            "## 📈 3. Demand Velocity & 10-Week Growth Trajectories\n"
-        ])
-
-        for p in products:
-            past = p.past_sales_weeks or [30, 32, 35, 38, 40, 45]
-            forecast = p.forecast_sales_weeks or [48, 52, 58, 62]
-            past_str = ", ".join(str(x) for x in past)
-            forecast_str = ", ".join(str(x) for x in forecast)
-            past_avg = round(sum(past) / len(past), 1)
-            fut_avg = round(sum(forecast) / len(forecast), 1)
-            growth = round(((fut_avg - past_avg) / max(0.1, past_avg)) * 100, 1)
-            growth_icon = "📈" if growth > 0 else "📉"
-
-            lines.append(f"### {p.name} (`{p.id}`)")
-            lines.append(f"- **Past 6-Week Sales Units**: `[{past_str}]` (Weekly Avg: **{past_avg}**)")
-            lines.append(f"- **Forecast 4-Week Demand**: `[{forecast_str}]` (Weekly Projected: **{fut_avg}**)")
-            lines.append(f"- **Growth Momentum**: {growth_icon} **{growth:+}% expected demand shift**")
-            lines.append(f"- **Procurement Advice**: {p.reorder_recommendation or 'Maintain standard stock.'}")
-            if p.brand_comparison_insight:
-                lines.append(f"- **Brand Intelligence**: {p.brand_comparison_insight}")
-            if p.alternative_brands:
-                lines.append(f"- **Market Alternatives**: {'; '.join(p.alternative_brands)}")
-            lines.append("")
-
-        # Filter calendar events matching store's selected region
-        reg_events = [e for e in REGIONAL_FESTIVAL_CALENDAR if profile.region.lower().split("&")[0].strip() in e["region"].lower()]
-        if not reg_events:
-            reg_events = REGIONAL_FESTIVAL_CALENDAR[:4]
-
-        lines.extend([
-            "---",
-            f"## 🪔 4. Regional Festival Calendar & Planning Deadlines for {profile.region}\n"
-        ])
-
-        for evt in reg_events:
-            lines.append(f"### {evt['icon']} {evt['name']} ({evt['date_window']}) — +{evt['demand_lift_pct']}% Surge")
-            lines.append(f"- **Regional Tradition**: {evt.get('tradition_notes', evt.get('description', ''))}")
-            lines.append(f"- **Key Regional SKUs**: {', '.join(evt.get('key_items', []))}")
-            lines.append(f"- **Advance Procurement Window**: {evt.get('advance_procurement_window', 'T-14 days')}")
-            lines.append(f"- **Customer Promo Launch**: {evt.get('promo_launch_window', 'T-7 days')}")
-            lines.append(f"- **Clearance Deadline**: {evt.get('clearance_window', 'T+2 days')}")
-            lines.append(f"- **Optimal Promo Archetype**: `{evt.get('recommended_promo_type', 'ANCHOR_MARGIN_BOOSTER')}`")
-            lines.append("")
-
-        lines.extend([
-            "---",
-            "## 🤖 5. Grounding Rules for AI Promotion & Offer Generation",
-            f"1. **Store Identity Grounding**: Personalize campaign titles and WhatsApp copy with store name '{profile.store_name}' and locality '{profile.locality}, {profile.city}'.",
-            f"2. **Cultural Tradition Respect**: Acknowledge local regional customs for {profile.region} (e.g. Diyas and Cow Ghee for Deepavali; Bevu-Bella for Ugadi; Modak for Ganesh Chaturthi).",
-            f"3. **Margin Safeguard**: Never breach the store's minimum net margin of {profile.default_min_margin_pct}%.",
-            "4. **Archetype Alignment**: Align bundle structure with the target goal (Anchor Booster, Expiry Rescue, Festive Hamper, or Volume Slab).",
-            "5. **Cashier Counter Pitch**: Always generate a 1-sentence friendly vernacular checkout pitch for billing counter staff."
-        ])
-
         md_content = "\n".join(lines)
 
-        # 1. Write locally to data/store_knowledge.md for AI agent grounding
         with open(self.knowledge_md_file, "w", encoding="utf-8") as f:
             f.write(md_content)
 
-        # 2. Write to Firestore collection stores/{store_id}/knowledge_catalog
         if self.mode == "CLOUD" and self.client:
             try:
                 catalog_payload = {
@@ -801,7 +1067,6 @@ class DualModeStorageAdapter:
         return md_content
 
     def get_knowledge_markdown(self) -> str:
-        """Retrieve current AI Store Knowledge Markdown catalog."""
         if self.mode == "CLOUD" and self.client:
             try:
                 doc = self._catalog_coll().document("current").get()
@@ -809,7 +1074,6 @@ class DualModeStorageAdapter:
                     data = doc.to_dict()
                     md = data.get("markdown", "")
                     if md:
-                        # Keep local file in sync
                         with open(self.knowledge_md_file, "w", encoding="utf-8") as f:
                             f.write(md)
                         return md
@@ -822,21 +1086,12 @@ class DualModeStorageAdapter:
         with open(self.knowledge_md_file, "r", encoding="utf-8") as f:
             return f.read()
 
-    # ==========================================================================
-    # Real-Time Firestore Synchronization Listener
-    # ==========================================================================
-
     def _start_realtime_sync_listener(self):
-        """
-        Start Firestore snapshot listener on stores/{store_id}/inventory.
-        Any external update to Firestore automatically triggers re-compilation of data/store_knowledge.md.
-        """
         if not self.client or self.mode != "CLOUD":
             return
 
         try:
             def on_inventory_snapshot(col_snapshot, changes, read_time):
-                logger.info(f"Firestore inventory snapshot update detected ({len(col_snapshot)} docs). Rebuilding knowledge catalog...")
                 try:
                     updated_prods = []
                     for doc in col_snapshot:
@@ -845,19 +1100,17 @@ class DualModeStorageAdapter:
                             d["id"] = doc.id
                         updated_prods.append(Product(**d))
                     if updated_prods:
+                        self._memory_inventory[self.store_id] = updated_prods
                         self._save_local_products_cache(updated_prods)
-                        # Rebuild local knowledge markdown
                         self.rebuild_knowledge_markdown(updated_prods)
                 except Exception as ex:
                     logger.warning(f"Error during real-time inventory sync: {ex}")
 
             self._listener_unsubscribe = self._inventory_coll().on_snapshot(on_inventory_snapshot)
-            logger.info(f"Real-time Firestore sync listener attached to stores/{self.store_id}/inventory.")
-        except Exception as e:
-            logger.info(f"Real-time listener could not be registered (standard in serverless/offline environments): {e}")
+        except Exception:
+            pass
 
     def close(self):
-        """Cleanup listeners and connections."""
         if self._listener_unsubscribe:
             try:
                 self._listener_unsubscribe.unsubscribe()
@@ -865,12 +1118,12 @@ class DualModeStorageAdapter:
                 pass
             self._listener_unsubscribe = None
 
-    # ==========================================================================
-    # System Status & Diagnostic Telemetry
-    # ==========================================================================
-
     def get_status(self) -> Dict[str, Any]:
-        """Returns health and connection status of the hybrid storage adapter."""
+        gemini_configured = bool(
+            os.environ.get("GEMINI_API_KEY")
+            or os.environ.get("FIRESTORE_SA_JSON")
+            or os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
+        )
         return {
             "mode": self.mode,
             "firestore_connected": self.mode == "CLOUD",
@@ -892,20 +1145,15 @@ class DualModeStorageAdapter:
                 "calendar_events": self.calendar_json_file,
                 "store_profile": self.profile_json_file,
                 "conflict_logs": self.conflict_logs_file
-            }
+            },
+            "gemini_live_active": gemini_configured
         }
 
 
-# Singleton Default Storage Adapter Instance
 _DEFAULT_ADAPTER = DualModeStorageAdapter()
 
 
 class StoreDataManager:
-    """
-    Facade maintaining 100% backward compatibility for all existing API endpoints
-    and multi-agent reasoning orchestrators, while delegating to DualModeStorageAdapter.
-    """
-
     @classmethod
     def get_adapter(cls) -> DualModeStorageAdapter:
         return _DEFAULT_ADAPTER
@@ -914,6 +1162,14 @@ class StoreDataManager:
     def set_adapter(cls, adapter: DualModeStorageAdapter):
         global _DEFAULT_ADAPTER
         _DEFAULT_ADAPTER = adapter
+
+    @classmethod
+    def switch_store(cls, store_id: str) -> Dict[str, Any]:
+        return _DEFAULT_ADAPTER.switch_store(store_id)
+
+    @classmethod
+    def list_stores(cls) -> List[Dict[str, Any]]:
+        return _DEFAULT_ADAPTER.list_stores()
 
     @classmethod
     def ensure_data_directory(cls):
@@ -932,8 +1188,12 @@ class StoreDataManager:
         return _DEFAULT_ADAPTER.add_or_update_product(product)
 
     @classmethod
-    def import_csv_data(cls, csv_content: str) -> Tuple[int, str]:
-        return _DEFAULT_ADAPTER.import_csv_data(csv_content)
+    def import_csv_data(cls, csv_content: str, replace_existing: bool = False) -> Tuple[int, str]:
+        return _DEFAULT_ADAPTER.import_csv_data(csv_content, replace_existing=replace_existing)
+
+    @classmethod
+    def import_csv_data_with_stats(cls, csv_content: str, replace_existing: bool = False) -> Dict[str, Any]:
+        return _DEFAULT_ADAPTER.import_csv_data_with_stats(csv_content, replace_existing=replace_existing)
 
     @classmethod
     def rebuild_knowledge_markdown(cls, products: Optional[List[Product]] = None) -> str:
@@ -943,7 +1203,6 @@ class StoreDataManager:
     def get_knowledge_markdown(cls) -> str:
         return _DEFAULT_ADAPTER.get_knowledge_markdown()
 
-    # Extended Collections Support
     @classmethod
     def get_promotions(cls) -> List[Dict[str, Any]]:
         return _DEFAULT_ADAPTER.get_promotions()
@@ -951,6 +1210,14 @@ class StoreDataManager:
     @classmethod
     def save_promotion(cls, offer: Dict[str, Any]) -> Dict[str, Any]:
         return _DEFAULT_ADAPTER.save_promotion(offer)
+
+    @classmethod
+    def update_promotion(cls, offer_id: str, updates: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        return _DEFAULT_ADAPTER.update_promotion(offer_id, updates)
+
+    @classmethod
+    def delete_promotion(cls, offer_id: str) -> bool:
+        return _DEFAULT_ADAPTER.delete_promotion(offer_id)
 
     @classmethod
     def log_conflict(cls, conflict_data: Dict[str, Any]) -> Dict[str, Any]:
@@ -969,6 +1236,10 @@ class StoreDataManager:
         return _DEFAULT_ADAPTER.save_calendar_event(event_data)
 
     @classmethod
+    def save_calendar_events_batch(cls, events_list: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        return _DEFAULT_ADAPTER.save_calendar_events_batch(events_list)
+
+    @classmethod
     def get_store_profile(cls) -> Dict[str, Any]:
         return _DEFAULT_ADAPTER.get_store_profile()
 
@@ -980,7 +1251,6 @@ class StoreDataManager:
     def get_storage_status(cls) -> Dict[str, Any]:
         return _DEFAULT_ADAPTER.get_status()
 
-    # Convenience Typed Profile & Dukan ROI Methods
     @classmethod
     def load_profile(cls) -> StoreProfile:
         prof_dict = _DEFAULT_ADAPTER.get_store_profile()
@@ -988,7 +1258,7 @@ class StoreDataManager:
 
     @classmethod
     def save_profile(cls, profile: StoreProfile) -> StoreProfile:
-        saved_dict = _DEFAULT_ADAPTER.save_store_profile(profile.model_dump())
+        saved_dict = _DEFAULT_ADAPTER.save_store_profile(_dump_model(profile))
         return StoreProfile(**saved_dict)
 
     @classmethod

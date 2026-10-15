@@ -2,73 +2,59 @@
 
 import { useState, useEffect, useRef } from "react";
 import {
-  fetchKnowledgeMarkdown,
   uploadCsvFile,
-  uploadRawCsv,
+  fetchInventory,
+  fetchStorageStatus,
 } from "@/lib/api";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
-  UploadCloud,
   FileSpreadsheet,
-  FileText,
   Download,
-  RefreshCw,
-  ChevronDown,
-  ChevronUp,
   CheckCircle2,
   AlertCircle,
   Loader2,
   FolderOpen,
+  Database,
 } from "lucide-react";
 
-const SAMPLE_CSV_CONTENT = `product_id,name,category,brand,stock_quantity,cost_price,selling_price,past_sales_weeks
-SKU_SAMPLE_01,Organic Pure Desi Ghee (1L),Dairy,Local Dairy,60,480.0,620.0,18,20,24,28,32,38
-SKU_SAMPLE_02,Roasted Salted Pistachios (250g),Dry Fruits,Royal Harvest,45,210.0,295.0,12,14,15,16,18,22
-SKU_SAMPLE_03,Artisanal Terracotta Deepas (Pack of 12),Puja & Festive,Mitti Art,150,45.0,90.0,2,3,4,8,25,85
-SKU_SAMPLE_04,Premium Darjeeling First Flush Tea (500g),Beverages,Himalayan Leaf,80,310.0,420.0,30,32,34,35,36,40`;
+const SAMPLE_CSV_CONTENT = `product_id,name,category,brand,stock_quantity,cost_price,selling_price,weekly_sales_avg,expiry_days,customer_name,customer_phone
+SKU_SAMPLE_01,Organic Pure Desi Ghee (1L),Dairy,Local Dairy,60,480.0,620.0,38,240,Deepak Nair,+91 98459 11223
+SKU_SAMPLE_02,Roasted Salted Pistachios (250g),Dry Fruits,Royal Harvest,45,210.0,295.0,18,180,Priya Menon,+91 98459 22334
+SKU_SAMPLE_03,Artisanal Terracotta Deepas (Pack of 12),Puja & Festive,Mitti Art,150,45.0,90.0,45,365,Suresh Babu,+91 98459 33445
+SKU_SAMPLE_04,Premium Darjeeling First Flush Tea (500g),Beverages,Himalayan Leaf,80,310.0,420.0,36,300,Kavitha Shetty,+91 98459 44556`;
 
-export function UploadScreen({ onInventoryUpdated }) {
+export function UploadScreen({ storeProfile, onInventoryUpdated }) {
   const [selectedFile, setSelectedFile] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [uploadResult, setUploadResult] = useState(null);
-
-  const [rawCsvOpen, setRawCsvOpen] = useState(false);
-  const [rawCsvText, setRawCsvText] = useState("");
-  const [parsingRaw, setParsingRaw] = useState(false);
-
-  const [markdownContent, setMarkdownContent] = useState("");
-  const [loadingMarkdown, setLoadingMarkdown] = useState(true);
-  const [syncingMarkdown, setSyncingMarkdown] = useState(false);
   const [dragActive, setDragActive] = useState(false);
+
+  const [syncedProducts, setSyncedProducts] = useState([]);
+  const [loadingInventory, setLoadingInventory] = useState(true);
+  const [storageStatus, setStorageStatus] = useState(null);
 
   const fileInputRef = useRef(null);
 
   useEffect(() => {
-    loadMarkdown();
-  }, []);
+    loadFirestoreInventory();
+  }, [storeProfile?.store_id]);
 
-  async function loadMarkdown() {
-    setLoadingMarkdown(true);
+  async function loadFirestoreInventory() {
+    setLoadingInventory(true);
     try {
-      const data = await fetchKnowledgeMarkdown();
-      setMarkdownContent(data.markdown || "");
+      const [prods, status] = await Promise.all([
+        fetchInventory(),
+        fetchStorageStatus().catch(() => null),
+      ]);
+      if (Array.isArray(prods)) setSyncedProducts(prods);
+      if (status) setStorageStatus(status);
     } catch (e) {
-      console.error("Failed to load knowledge markdown:", e);
-      setMarkdownContent("Could not load knowledge markdown.");
+      console.error("Failed to load Firestore inventory:", e);
     } finally {
-      setLoadingMarkdown(false);
-    }
-  }
-
-  async function handleSyncMarkdown() {
-    setSyncingMarkdown(true);
-    try {
-      await loadMarkdown();
-    } finally {
-      setSyncingMarkdown(false);
+      setLoadingInventory(false);
     }
   }
 
@@ -102,48 +88,34 @@ export function UploadScreen({ onInventoryUpdated }) {
       const res = await uploadCsvFile(formData);
       setUploadResult({
         success: true,
-        title: "Import Succeeded",
-        message: res.message || `Successfully processed ${selectedFile.name}`,
+        title: "Smart Schema Structuring & Firestore Sync Complete",
+        message: res.message,
+        stats: {
+          imported_count: res.imported_count || 0,
+          new_skus_added: res.new_skus_added ?? res.imported_count ?? 0,
+          existing_skus_updated: res.existing_skus_updated || 0,
+          duplicates_prevented: res.duplicates_prevented || 0,
+          broadcast_contacts_synced: res.broadcast_contacts_synced || 0,
+          active_broadcast_reach: res.active_broadcast_reach || storeProfile?.whatsapp_audience_size || 1420,
+          columns_mapped: res.columns_mapped || [],
+        },
       });
       setSelectedFile(null);
-      await loadMarkdown();
-      if (onInventoryUpdated) onInventoryUpdated();
+      if (Array.isArray(res.products)) {
+        setSyncedProducts(res.products);
+      } else {
+        await loadFirestoreInventory();
+      }
+      if (onInventoryUpdated) onInventoryUpdated(res.store_profile);
     } catch (e) {
       console.error("CSV upload error:", e);
       setUploadResult({
         success: false,
-        title: "Upload Failed",
-        message: "Failed to process CSV file. Ensure required columns are present.",
+        title: "Firestore CSV Sync Failed",
+        message: "Failed to process CSV file. Ensure valid product rows are present.",
       });
     } finally {
       setUploading(false);
-    }
-  }
-
-  async function handleParseRawCSV() {
-    if (!rawCsvText.trim()) return;
-    setParsingRaw(true);
-    setUploadResult(null);
-
-    try {
-      const res = await uploadRawCsv(rawCsvText.trim());
-      setUploadResult({
-        success: true,
-        title: "Raw CSV Synced",
-        message: res.message || "Parsed raw text into inventory and updated forecasts.",
-      });
-      setRawCsvText("");
-      await loadMarkdown();
-      if (onInventoryUpdated) onInventoryUpdated();
-    } catch (e) {
-      console.error("Raw CSV error:", e);
-      setUploadResult({
-        success: false,
-        title: "Parse Error",
-        message: "Error parsing raw CSV data. Check column formatting.",
-      });
-    } finally {
-      setParsingRaw(false);
     }
   }
 
@@ -152,20 +124,14 @@ export function UploadScreen({ onInventoryUpdated }) {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "promomind_sample_inventory.csv";
+    a.download = "promomind_smart_inventory_and_broadcast.csv";
     a.click();
     URL.revokeObjectURL(url);
   }
 
-  function handleDownloadMarkdown() {
-    const blob = new Blob([markdownContent], { type: "text/markdown" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "store_knowledge.md";
-    a.click();
-    URL.revokeObjectURL(url);
-  }
+  const collectionPath =
+    storageStatus?.collections?.inventory ||
+    `stores/${storeProfile?.store_id || storageStatus?.store_id || "sharma_supermarket_01"}/inventory`;
 
   return (
     <div className="space-y-6">
@@ -173,225 +139,224 @@ export function UploadScreen({ onInventoryUpdated }) {
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-b border-border pb-4">
         <div>
           <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground flex items-center gap-2">
-            <FileSpreadsheet className="h-6 w-6 text-foreground" />
-            Retail Data Intake &amp; AI Knowledge Sync
+            <Database className="h-6 w-6 text-foreground" />
+            Smart CSV Structurizer &amp; Firestore Sync
           </h2>
           <p className="text-sm text-muted-foreground mt-1">
-            Upload distributor CSV or inventory files. PromoMind AI parses SKUs, executes Holt&apos;s demand forecasting, and compiles the AI Knowledge Base (<code className="font-mono text-xs bg-muted px-1.5 py-0.5 rounded border border-border">store_knowledge.md</code>).
+            Upload any POS or distributor CSV. PromoMind AI automatically structures arbitrary columns into our canonical schema, prevents duplicates on re-upload, updates WhatsApp broadcast reach, and syncs to Firestore (<code className="font-mono text-xs bg-muted px-1.5 py-0.5 rounded border border-border">{collectionPath}</code>).
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
+          <Badge variant="outline" className="px-3 py-1.5 text-xs font-semibold border-border bg-muted/60 text-foreground">
+            Broadcast Reach: {(storeProfile?.whatsapp_audience_size || storeProfile?.audience_size || 1420).toLocaleString("en-IN")} Customers
+          </Badge>
           <Button
             variant="outline"
             onClick={handleDownloadSample}
             className="border-border bg-card text-foreground hover:bg-muted text-xs sm:text-sm h-10 font-medium"
           >
             <Download className="h-4 w-4 mr-2" />
-            Download Sample CSV Template
+            Download Sample CSV
           </Button>
-          <Button
-            onClick={handleSyncMarkdown}
-            disabled={syncingMarkdown}
-            className="bg-primary text-primary-foreground hover:bg-primary/90 text-xs sm:text-sm h-10 font-semibold"
+        </div>
+      </div>
+
+      {/* Single-Stage Smart Firestore CSV Upload Card */}
+      <Card className="border border-border bg-card shadow-xs">
+        <CardHeader className="pb-3 border-b border-border">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <CardTitle className="text-base font-bold text-foreground">
+                Upload Inventory &amp; Broadcast CSV to Firestore
+              </CardTitle>
+              <CardDescription className="text-xs text-muted-foreground mt-0.5">
+                Auto-normalizes column names (e.g., Item/Product, Rate/Cost, Price/MRP, Qty/Stock, Customer WhatsApp) &amp; upserts without duplicating SKUs.
+              </CardDescription>
+            </div>
+            <Badge variant="outline" className="border-border bg-muted/60 text-xs font-semibold text-foreground w-fit">
+              Zero-Duplicate Upsert Engine
+            </Badge>
+          </div>
+        </CardHeader>
+        <CardContent className="p-6 space-y-4">
+          <div
+            onDragOver={(e) => {
+              e.preventDefault();
+              setDragActive(true);
+            }}
+            onDragLeave={() => setDragActive(false)}
+            onDrop={handleFileDrop}
+            onClick={() => fileInputRef.current?.click()}
+            className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-colors ${
+              dragActive
+                ? "border-foreground bg-muted/50"
+                : "border-border hover:border-foreground/40 bg-muted/20"
+            }`}
           >
-            <RefreshCw className={`h-4 w-4 mr-2 ${syncingMarkdown ? "animate-spin" : ""}`} />
-            Sync Knowledge Base Now
-          </Button>
-        </div>
-      </div>
+            <input
+              type="file"
+              ref={fileInputRef}
+              accept=".csv"
+              className="hidden"
+              onChange={handleFileSelect}
+            />
+            <FolderOpen className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
+            <h4 className="text-base font-semibold text-foreground">
+              Drag &amp; Drop any Retail POS or Distributor CSV here
+            </h4>
+            <p className="text-xs text-muted-foreground mt-1">
+              Re-uploading an updated CSV updates stock &amp; prices in place without creating duplicate items
+            </p>
+            <div className="mt-3 text-[11px] text-muted-foreground font-mono bg-muted/60 border border-border px-2.5 py-1 rounded-md inline-block">
+              Auto-maps: Product/Item Name, Category, Stock/Qty, Cost/Buy Rate, MRP/Price, Sales Velocity &amp; Customer WhatsApp
+            </div>
+          </div>
 
-      {/* Two Column Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Left Column: CSV Upload Card */}
-        <div className="lg:col-span-6 space-y-4">
-          <Card className="border border-border bg-card shadow-xs">
-            <CardHeader className="pb-3 border-b border-border">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-base font-bold text-foreground">
-                  1. Upload Inventory CSV Data
-                </CardTitle>
-                <Badge variant="outline" className="border-border bg-muted/60 text-xs font-semibold text-foreground">
-                  Data Intake
-                </Badge>
-              </div>
-            </CardHeader>
-            <CardContent className="p-5 space-y-4">
-              {/* Drag and Drop Dropzone */}
-              <div
-                onDragOver={(e) => {
-                  e.preventDefault();
-                  setDragActive(true);
-                }}
-                onDragLeave={() => setDragActive(false)}
-                onDrop={handleFileDrop}
-                onClick={() => fileInputRef.current?.click()}
-                className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-colors ${
-                  dragActive
-                    ? "border-foreground bg-muted/50"
-                    : "border-border hover:border-foreground/40 bg-muted/20"
-                }`}
-              >
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  accept=".csv"
-                  className="hidden"
-                  onChange={handleFileSelect}
-                />
-                <FolderOpen className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
-                <h4 className="text-base font-semibold text-foreground">
-                  Drag &amp; Drop your Retail CSV here
-                </h4>
-                <p className="text-xs text-muted-foreground mt-1">
-                  or click to browse from your computer
-                </p>
-                <div className="mt-3 text-[11px] text-muted-foreground font-mono bg-muted/60 border border-border px-2.5 py-1 rounded-md inline-block">
-                  Supports .csv (Product ID, Name, Category, Brand, Stock, Cost, MRP, Sales)
-                </div>
-              </div>
-
-              {/* Selected File Status */}
-              {selectedFile && (
-                <div className="p-3.5 rounded-lg border border-border bg-muted/30 flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-2 overflow-hidden">
-                    <FileSpreadsheet className="h-5 w-5 text-foreground shrink-0" />
-                    <span className="text-sm font-semibold text-foreground truncate">
-                      {selectedFile.name}
-                    </span>
-                  </div>
-                  <Button
-                    onClick={handleProcessUploadedCSV}
-                    disabled={uploading}
-                    className="font-semibold text-xs h-9 bg-primary text-primary-foreground hover:bg-primary/90 shrink-0"
-                  >
-                    {uploading ? (
-                      <>
-                        <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />
-                        Forecasting...
-                      </>
-                    ) : (
-                      <>⚡ Process &amp; Forecast</>
-                    )}
-                  </Button>
-                </div>
-              )}
-
-              {/* Or Paste Raw CSV Text */}
-              <div className="border border-border rounded-lg overflow-hidden">
-                <button
-                  type="button"
-                  onClick={() => setRawCsvOpen(!rawCsvOpen)}
-                  className="w-full px-4 py-3 bg-muted/30 hover:bg-muted/50 flex items-center justify-between text-xs sm:text-sm font-semibold text-foreground transition-colors"
-                >
-                  <span className="flex items-center gap-2">
-                    <FileText className="h-4 w-4" />
-                    Or Paste Raw CSV Text
-                  </span>
-                  {rawCsvOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                </button>
-
-                {rawCsvOpen && (
-                  <div className="p-4 space-y-3 bg-card border-t border-border">
-                    <textarea
-                      rows={6}
-                      value={rawCsvText}
-                      onChange={(e) => setRawCsvText(e.target.value)}
-                      placeholder="product_id,name,category,brand,stock_quantity,cost_price,selling_price,past_sales_weeks&#10;SKU_GHEE_99,Organic A2 Desi Cow Ghee,Dairy,Local Farm,50,480.0,620.0,15,18,22,25,28,34"
-                      className="w-full p-3 text-xs font-mono bg-background border border-border rounded-md text-foreground focus:outline-none focus:ring-1 focus:ring-ring"
-                    />
-                    <Button
-                      onClick={handleParseRawCSV}
-                      disabled={!rawCsvText.trim() || parsingRaw}
-                      variant="outline"
-                      className="w-full font-semibold text-xs h-9 border-border bg-secondary text-secondary-foreground hover:bg-secondary/80"
-                    >
-                      {parsingRaw ? (
-                        <>
-                          <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />
-                          Parsing...
-                        </>
-                      ) : (
-                        <>⚡ Parse Raw Text &amp; Update Knowledge</>
-                      )}
-                    </Button>
-                  </div>
-                )}
-              </div>
-
-              {/* Import Log Result */}
-              {uploadResult && (
-                <div
-                  className={`p-4 rounded-lg border text-xs sm:text-sm space-y-1 ${
-                    uploadResult.success
-                      ? "border-border bg-muted/40 text-foreground"
-                      : "border-destructive/40 bg-destructive/10 text-destructive"
-                  }`}
-                >
-                  <div className="font-bold flex items-center gap-1.5">
-                    {uploadResult.success ? (
-                      <CheckCircle2 className="h-4 w-4 text-foreground" />
-                    ) : (
-                      <AlertCircle className="h-4 w-4 text-destructive" />
-                    )}
-                    {uploadResult.title}
-                  </div>
-                  <p className="text-muted-foreground">{uploadResult.message}</p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Right Column: AI Knowledge Base Markdown Viewer */}
-        <div className="lg:col-span-6 space-y-4">
-          <Card className="border border-border bg-card shadow-xs">
-            <CardHeader className="pb-3 border-b border-border">
-              <div className="flex items-center justify-between">
+          {selectedFile && (
+            <div className="p-4 rounded-lg border border-border bg-muted/30 flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2.5 overflow-hidden">
+                <FileSpreadsheet className="h-5 w-5 text-foreground shrink-0" />
                 <div>
-                  <CardTitle className="text-base font-bold text-foreground">
-                    2. AI Grounding Knowledge Base
-                  </CardTitle>
-                  <CardDescription className="text-xs text-muted-foreground font-mono mt-0.5">
-                    data/store_knowledge.md
-                  </CardDescription>
-                </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleDownloadMarkdown}
-                  className="border-border text-xs h-8"
-                >
-                  <Download className="h-3.5 w-3.5 mr-1.5" />
-                  Download .md
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent className="p-5 space-y-3">
-              <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-                This structured Markdown document is auto-generated by the system. Multi-agent models (Gemini Strategy, Inventory &amp; Pricing) query this file to ground recommendations in real stock levels and historical demand.
-              </p>
-
-              <div className="rounded-lg border border-border bg-muted/30 p-4 max-h-[480px] overflow-y-auto">
-                {loadingMarkdown ? (
-                  <div className="space-y-2.5 py-4 animate-pulse">
-                    <Skeleton className="h-4 w-3/4 rounded" />
-                    <Skeleton className="h-4 w-1/2 rounded" />
-                    <Skeleton className="h-4 w-5/6 rounded" />
-                    <Skeleton className="h-4 w-2/3 rounded" />
-                    <Skeleton className="h-4 w-4/5 rounded" />
-                    <Skeleton className="h-4 w-3/5 rounded" />
+                  <div className="text-sm font-semibold text-foreground truncate">
+                    {selectedFile.name}
                   </div>
-                ) : (
-                  <pre className="font-mono text-xs leading-relaxed text-foreground whitespace-pre-wrap select-text">
-                    {markdownContent || "No knowledge base markdown content available."}
-                  </pre>
-                )}
+                  <div className="text-xs text-muted-foreground">
+                    Ready to structure, deduplicate, and sync to {collectionPath}
+                  </div>
+                </div>
               </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+              <Button
+                onClick={handleProcessUploadedCSV}
+                disabled={uploading}
+                className="font-semibold text-xs h-10 px-5 bg-primary text-primary-foreground hover:bg-primary/90 shrink-0"
+              >
+                {uploading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    Structuring &amp; Syncing...
+                  </>
+                ) : (
+                  "Structure & Sync to Firestore"
+                )}
+              </Button>
+            </div>
+          )}
+
+          {/* Detailed Structuring & De-Duplication Telemetry Report */}
+          {uploadResult && (
+            <div
+              className={`p-4 rounded-xl border text-xs sm:text-sm space-y-3 ${
+                uploadResult.success
+                  ? "border-emerald-500/40 bg-emerald-500/10 text-foreground"
+                  : "border-destructive/40 bg-destructive/10 text-destructive"
+              }`}
+            >
+              <div className="font-bold flex items-center gap-1.5">
+                {uploadResult.success ? (
+                  <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                ) : (
+                  <AlertCircle className="h-4 w-4 text-destructive" />
+                )}
+                {uploadResult.title}
+              </div>
+              <p className="text-muted-foreground">{uploadResult.message}</p>
+
+              {uploadResult.stats && (
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-1">
+                  <div className="p-2.5 rounded-lg border border-border bg-card">
+                    <div className="text-[11px] text-muted-foreground">New SKUs Added</div>
+                    <div className="text-base font-bold text-foreground mt-0.5">
+                      +{uploadResult.stats.new_skus_added}
+                    </div>
+                  </div>
+                  <div className="p-2.5 rounded-lg border border-border bg-card">
+                    <div className="text-[11px] text-muted-foreground">Updated In-Place</div>
+                    <div className="text-base font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">
+                      {uploadResult.stats.existing_skus_updated} SKUs
+                    </div>
+                  </div>
+                  <div className="p-2.5 rounded-lg border border-border bg-card">
+                    <div className="text-[11px] text-muted-foreground">Duplicates Prevented</div>
+                    <div className="text-base font-bold text-foreground mt-0.5">
+                      {uploadResult.stats.duplicates_prevented} Merged
+                    </div>
+                  </div>
+                  <div className="p-2.5 rounded-lg border border-border bg-card">
+                    <div className="text-[11px] text-muted-foreground">Broadcast Reach</div>
+                    <div className="text-base font-bold text-foreground mt-0.5">
+                      {uploadResult.stats.active_broadcast_reach.toLocaleString("en-IN")}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Live Synced Firestore Inventory Preview */}
+      <Card className="border border-border bg-card shadow-xs">
+        <CardHeader className="pb-3 border-b border-border">
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-base font-bold text-foreground">
+                Structured Firestore Inventory Collection ({syncedProducts.length} Unique SKUs)
+              </CardTitle>
+              <CardDescription className="text-xs text-muted-foreground font-mono mt-0.5">
+                {collectionPath}
+              </CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="p-0">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs">
+              <thead className="bg-muted/40 text-muted-foreground uppercase tracking-wider font-semibold border-b border-border">
+                <tr>
+                  <th className="px-4 py-3">SKU ID</th>
+                  <th className="px-4 py-3">Product Name</th>
+                  <th className="px-4 py-3">Category</th>
+                  <th className="px-4 py-3">Stock</th>
+                  <th className="px-4 py-3">Cost / MRP</th>
+                  <th className="px-4 py-3">Velocity</th>
+                  <th className="px-4 py-3">4-Week Forecast</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border/60">
+                {loadingInventory ? (
+                  [...Array(4)].map((_, i) => (
+                    <tr key={i}>
+                      <td className="px-4 py-3"><Skeleton className="h-4 w-20" /></td>
+                      <td className="px-4 py-3"><Skeleton className="h-4 w-44" /></td>
+                      <td className="px-4 py-3"><Skeleton className="h-4 w-24" /></td>
+                      <td className="px-4 py-3"><Skeleton className="h-4 w-16" /></td>
+                      <td className="px-4 py-3"><Skeleton className="h-4 w-24" /></td>
+                      <td className="px-4 py-3"><Skeleton className="h-4 w-20" /></td>
+                      <td className="px-4 py-3"><Skeleton className="h-4 w-28" /></td>
+                    </tr>
+                  ))
+                ) : (
+                  syncedProducts.map((p) => (
+                    <tr key={p.id} className="hover:bg-muted/20">
+                      <td className="px-4 py-3 font-mono text-muted-foreground">{p.id}</td>
+                      <td className="px-4 py-3 font-semibold text-foreground">{p.name}</td>
+                      <td className="px-4 py-3">
+                        <Badge variant="outline" className="text-xs font-normal">{p.category}</Badge>
+                      </td>
+                      <td className="px-4 py-3 font-medium">{p.stock_quantity} units</td>
+                      <td className="px-4 py-3">₹{p.cost_price} / <strong>₹{p.selling_price}</strong></td>
+                      <td className="px-4 py-3">{p.velocity_status} ({p.weekly_sales_avg}/wk)</td>
+                      <td className="px-4 py-3 font-mono text-muted-foreground">
+                        [{(p.forecast_sales_weeks || []).join(", ")}]
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
-

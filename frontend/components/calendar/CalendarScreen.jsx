@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import {
   fetchCalendarEvents,
   fetchActiveOffers,
+  updateOfferStatus,
+  deleteOffer,
   checkOfferConflict,
   fetchInventory,
 } from "@/lib/api";
@@ -13,77 +15,144 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CustomSelect } from "@/components/ui/custom-select";
-import {
-  Calendar as CalendarIcon,
-  Search,
-  Sparkles,
-  ShieldCheck,
-  AlertTriangle,
-  Flame,
-  Package,
-  Clock,
-  ArrowRight,
-  TrendingUp,
-  Tag,
-  Loader2,
-  CheckCircle2,
-} from "lucide-react";
+import { Loader2, RefreshCw } from "lucide-react";
 
 function inferCountryFromRegionName(rawRegion) {
   if (!rawRegion) return "India";
   const low = rawRegion.toLowerCase();
+
+  // 1. Australia
+  if (
+    low.includes("australia") ||
+    low.includes("sydney") ||
+    low.includes("melbourne") ||
+    low.includes("brisbane") ||
+    low.includes("perth") ||
+    low.includes("adelaide")
+  ) {
+    return "Australia";
+  }
+
+  // 2. UK
+  if (low.includes("uk") || low.includes("united kingdom") || low.includes("london") || low.includes("england") || low.includes("scotland")) {
+    return "United Kingdom";
+  }
+
+  // 3. Canada
+  if (low.includes("canada") || low.includes("ontario") || low.includes("toronto") || low.includes("vancouver") || low.includes("montreal")) {
+    return "Canada";
+  }
+
+  // 4. Global Countries
+  if (low.includes("germany") || low.includes("berlin") || low.includes("munich")) return "Germany";
+  if (low.includes("france") || low.includes("paris")) return "France";
+  if (low.includes("japan") || low.includes("tokyo")) return "Japan";
+  if (low.includes("singapore")) return "Singapore";
+  if (low.includes("uae") || low.includes("dubai") || low.includes("abu dhabi")) return "United Arab Emirates";
+  if (low.includes("new zealand") || low.includes("auckland")) return "New Zealand";
+
+  // 5. United States
   const usStates = [
     "california", "texas", "florida", "new york", "illinois", "pennsylvania", "ohio",
     "georgia", "north carolina", "michigan", "new jersey", "virginia", "washington",
-    "arizona", "massachusetts", "tennessee", "indiana", "missouri", "maryland", "wisconsin",
-    "colorado", "minnesota", "south carolina", "alabama", "louisiana", "kentucky", "oregon",
-    "oklahoma", "connecticut", "utah", "iowa", "nevada", "arkansas", "mississippi", "kansas",
-    "new mexico", "nebraska", "idaho", "west virginia", "hawaii", "new hampshire", "maine",
-    "montana", "rhode island", "delaware", "south dakota", "north dakota", "alaska", "vermont",
-    "wyoming", "usa", "united states",
+    "arizona", "massachusetts", "colorado", "nevada", "usa", "united states",
   ];
   if (usStates.some((s) => low.includes(s))) return "USA";
-  if (low.includes("uk") || low.includes("london") || low.includes("england") || low.includes("britain")) return "UK";
-  if (low.includes("canada") || low.includes("ontario") || low.includes("toronto")) return "Canada";
-  if (low.includes("australia") || low.includes("sydney")) return "Australia";
-  return "India";
+
+  // 6. India
+  const indiaRegions = [
+    "karnataka", "maharashtra", "bengal", "tamil", "gujarat", "kerala", "delhi", "punjab",
+    "rajasthan", "haryana", "uttar pradesh", "bihar", "odisha", "assam", "bengaluru", "mumbai",
+    "delhi", "kolkata", "chennai", "hyderabad", "pune", "ahmedabad", "jaipur", "india"
+  ];
+  if (indiaRegions.some((s) => low.includes(s))) return "India";
+
+  return rawRegion.trim();
 }
 
-const QUICK_STATES = [
-  { name: "Karnataka", label: "👑 Karnataka (Dasara, Ugadi, Deepavali)" },
-  { name: "Maharashtra", label: "🐘 Maharashtra (Ganesh Utsav, Faral)" },
-  { name: "West Bengal", label: "🌸 West Bengal (Durga Puja, Kali Puja)" },
-  { name: "Tamil Nadu", label: "🌾 Tamil Nadu (Pongal, Karthigai)" },
-  { name: "Gujarat", label: "💃 Gujarat (Navratri, Uttarayan)" },
-  { name: "Kerala", label: "🌼 Kerala (Onam Sadya, Vishu)" },
-  { name: "Delhi-NCR", label: "🪔 Delhi-NCR (Diwali, Holi)" },
-];
+export function CalendarScreen({ storeProfile, onLaunchPromo }) {
+  const storeRegionClean = storeProfile?.region
+    ? storeProfile.region.split("&")[0].trim()
+    : "Karnataka";
+  const storeCityClean = storeProfile?.city || "Bengaluru";
 
-export function CalendarScreen({ onLaunchPromo }) {
-  const [regionInput, setRegionInput] = useState("Karnataka");
-  const [activeRegion, setActiveRegion] = useState("Karnataka");
-  const [activeCountry, setActiveCountry] = useState("India");
+  const [activeRegion, setActiveRegion] = useState(storeRegionClean);
+  const [activeCity, setActiveCity] = useState(storeCityClean);
+  const [activeCountry, setActiveCountry] = useState(
+    storeProfile?.country || inferCountryFromRegionName(storeRegionClean)
+  );
+
+  const [customRegionOpen, setCustomRegionOpen] = useState(false);
+  const [customRegionInput, setCustomRegionInput] = useState("");
+
   const [events, setEvents] = useState([]);
   const [loadingEvents, setLoadingEvents] = useState(true);
+  const [syncingEvents, setSyncingEvents] = useState(false);
+  const [lastSyncedAt, setLastSyncedAt] = useState(null);
 
+  // Active & Scheduled Store Offers state
   const [activeOffers, setActiveOffers] = useState([]);
   const [loadingOffers, setLoadingOffers] = useState(true);
+  const [offerFilter, setOfferFilter] = useState("ALL"); // "ALL" | "ACTIVE" | "SCHEDULED" | "PAUSED"
 
+  // Conflict Check state
   const [inventoryItems, setInventoryItems] = useState([]);
   const [conflictSku, setConflictSku] = useState("");
   const [conflictDiscount, setConflictDiscount] = useState(20);
   const [checkingConflict, setCheckingConflict] = useState(false);
   const [conflictResult, setConflictResult] = useState(null);
 
+  // Automatically load festivals from the logged-in store's saved region
   useEffect(() => {
-    // Initial fetch from stored region or fallback
-    const savedRegion = typeof window !== "undefined" ? localStorage.getItem("promomind_region") : null;
-    const initialRegion = savedRegion ? savedRegion.split("&")[0].trim() : "Karnataka";
-    setRegionInput(initialRegion);
-    handleDiscoverRegion(initialRegion, false);
+    const reg = storeProfile?.region
+      ? storeProfile.region.split("&")[0].trim()
+      : (typeof window !== "undefined" && localStorage.getItem("promomind_region")?.split("&")[0]?.trim()) || "Karnataka";
+    const cty = storeProfile?.city || (typeof window !== "undefined" && localStorage.getItem("promomind_city")) || "Bengaluru";
+    const ctry = storeProfile?.country || inferCountryFromRegionName(reg);
+
+    setActiveRegion(reg);
+    setActiveCity(cty);
+    setActiveCountry(ctry);
+
+    loadStoredFestivals(reg, ctry, cty);
     loadOffers();
     loadInventory();
-  }, []);
+  }, [storeProfile?.store_id, storeProfile?.region, storeProfile?.city]);
+
+  async function loadStoredFestivals(reg, ctry, cty) {
+    setLoadingEvents(true);
+    try {
+      const data = await fetchCalendarEvents(reg, false, ctry, cty);
+      setEvents(data || []);
+      if (data && data[0]?.synced_at) {
+        setLastSyncedAt(new Date(data[0].synced_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }));
+      }
+    } catch (e) {
+      console.error("Failed to load stored calendar events:", e);
+    } finally {
+      setLoadingEvents(false);
+    }
+  }
+
+  async function handleSyncNewFestivals(overrideRegion = null) {
+    const reg = (overrideRegion || activeRegion || storeRegionClean).trim();
+    const ctry = inferCountryFromRegionName(reg);
+    const cty = overrideRegion ? reg : activeCity;
+
+    setActiveRegion(reg);
+    setActiveCountry(ctry);
+    setSyncingEvents(true);
+
+    try {
+      const data = await fetchCalendarEvents(reg, true, ctry, cty);
+      setEvents(data || []);
+      setLastSyncedAt(new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }));
+    } catch (e) {
+      console.error("Failed to sync festivals from Gemini AI:", e);
+    } finally {
+      setSyncingEvents(false);
+    }
+  }
 
   async function loadOffers() {
     setLoadingOffers(true);
@@ -97,29 +166,30 @@ export function CalendarScreen({ onLaunchPromo }) {
     }
   }
 
+  async function handleToggleOfferStatus(offer, nextStatus) {
+    try {
+      await updateOfferStatus(offer.id, { status: nextStatus });
+      await loadOffers();
+    } catch (e) {
+      console.error("Failed to update offer status:", e);
+    }
+  }
+
+  async function handleDeleteOffer(offerId) {
+    try {
+      await deleteOffer(offerId);
+      await loadOffers();
+    } catch (e) {
+      console.error("Failed to delete offer:", e);
+    }
+  }
+
   async function loadInventory() {
     try {
       const data = await fetchInventory();
       setInventoryItems(data || []);
     } catch (e) {
       console.error("Failed to load inventory for conflict test:", e);
-    }
-  }
-
-  async function handleDiscoverRegion(targetRegion, isRefresh = true) {
-    const reg = (targetRegion || regionInput || "Karnataka").trim();
-    const ctry = inferCountryFromRegionName(reg);
-    setActiveRegion(reg);
-    setActiveCountry(ctry);
-    setLoadingEvents(true);
-
-    try {
-      const data = await fetchCalendarEvents(reg, isRefresh, ctry);
-      setEvents(data || []);
-    } catch (e) {
-      console.error("Failed to load calendar events:", e);
-    } finally {
-      setLoadingEvents(false);
     }
   }
 
@@ -142,127 +212,120 @@ export function CalendarScreen({ onLaunchPromo }) {
     }
   }
 
+  const filteredOffers = activeOffers.filter((off) => {
+    if (offerFilter === "ALL") return true;
+    if (offerFilter === "PAUSED") return off.status === "PAUSED" || off.status === "COMPLETED";
+    return off.status === offerFilter;
+  });
+
+  const activeCount = activeOffers.filter((o) => o.status === "ACTIVE").length;
+  const scheduledCount = activeOffers.filter((o) => o.status === "SCHEDULED").length;
+
   return (
     <div className="space-y-6">
-      {/* Screen Header */}
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between border-b border-border pb-4">
+      {/* Screen Header — Bound to Logged-In Store Region with 1-Click Sync */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-b border-border pb-4">
         <div>
-          <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground flex items-center gap-2">
-            <CalendarIcon className="h-6 w-6 text-foreground" />
-            Regional Festival Calendar & FMCG Demand Surge Engine
+          <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
+            Regional Festival Calendar &amp; Campaign Schedule
           </h2>
           <p className="text-sm text-muted-foreground mt-1">
-            Type your State or City. Gemini AI dynamically discovers top upcoming regional festivals and predicts FMCG inventory demand surges.
+            Automatically synced to your logged-in store location (<strong className="text-foreground">{activeCity}, {activeRegion}</strong>) and persisted in Firestore (<code className="font-mono text-xs bg-muted px-1.5 py-0.5 rounded border border-border">stores/{storeProfile?.store_id || "sharma_supermarket_01"}/calendar_events</code>).
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <Badge variant="outline" className="px-3 py-1.5 text-xs font-medium border-border bg-muted/60 text-foreground">
-            📍 Active: {activeRegion} ({activeCountry})
-          </Badge>
+
+        <div className="flex flex-wrap items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCustomRegionOpen(!customRegionOpen)}
+            className="h-10 px-3 text-xs font-medium border-border"
+          >
+            {customRegionOpen ? "Hide Region Override" : "Preview Another Region"}
+          </Button>
+          <Button
+            onClick={() => handleSyncNewFestivals()}
+            disabled={syncingEvents || loadingEvents}
+            className="h-10 px-4 text-xs sm:text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-2"
+          >
+            <RefreshCw className={`h-4 w-4 ${syncingEvents ? "animate-spin" : ""}`} />
+            <span>{syncingEvents ? "Syncing via Gemini AI..." : "Sync / Update Upcoming Festivals"}</span>
+          </Button>
         </div>
       </div>
 
-      {/* Dynamic Regional AI Discovery Bar */}
-      <Card className="border border-border bg-card">
-        <CardContent className="p-4 sm:p-5 space-y-4">
-          <div className="flex flex-col sm:flex-row gap-2">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+      {/* Optional Region Override Drawer (Only shown if retailer wants to preview another region) */}
+      {customRegionOpen && (
+        <Card className="border border-border bg-card">
+          <CardContent className="p-4 space-y-3">
+            <div className="flex flex-col sm:flex-row gap-2">
               <Input
                 type="text"
-                placeholder="Type your State, Province or Region (e.g. Karnataka, Maharashtra, California, London...)"
-                value={regionInput}
-                onChange={(e) => setRegionInput(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleDiscoverRegion(regionInput, true)}
-                className="pl-9 h-11 text-base bg-background border-border"
+                placeholder="Enter another State, City, or Country to preview (e.g. Maharashtra, Kerala, Punjab, Hyderabad...)"
+                value={customRegionInput}
+                onChange={(e) => setCustomRegionInput(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && customRegionInput.trim() && handleSyncNewFestivals(customRegionInput)}
+                className="h-10 text-sm bg-background border-border flex-1"
               />
+              <Button
+                onClick={() => customRegionInput.trim() && handleSyncNewFestivals(customRegionInput)}
+                disabled={syncingEvents || !customRegionInput.trim()}
+                className="h-10 px-4 text-xs font-semibold"
+              >
+                Sync Custom Region
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setCustomRegionInput("");
+                  handleSyncNewFestivals(storeRegionClean);
+                }}
+                className="h-10 px-3 text-xs"
+              >
+                Reset to Store Region ({storeRegionClean})
+              </Button>
             </div>
-            <Button
-              onClick={() => handleDiscoverRegion(regionInput, true)}
-              disabled={loadingEvents}
-              className="h-11 px-5 font-semibold bg-primary text-primary-foreground hover:bg-primary/90"
-            >
-              {loadingEvents ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Discovering...
-                </>
-              ) : (
-                <>
-                  <Sparkles className="h-4 w-4 mr-2" />
-                  AI Festival Discovery
-                </>
-              )}
-            </Button>
-          </div>
+          </CardContent>
+        </Card>
+      )}
 
-          {/* Quick State Pills */}
-          <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-border/40">
-            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mr-1">
-              Quick States:
-            </span>
-            {QUICK_STATES.map((st) => {
-              const isActive = activeRegion.toLowerCase() === st.name.toLowerCase();
-              return (
-                <button
-                  key={st.name}
-                  type="button"
-                  onClick={() => {
-                    setRegionInput(st.name);
-                    handleDiscoverRegion(st.name, true);
-                  }}
-                  className={`text-xs px-3 py-1.5 rounded-full transition-colors border font-medium ${
-                    isActive
-                      ? "bg-foreground text-background border-foreground font-semibold"
-                      : "bg-muted/50 text-foreground border-border hover:bg-muted hover:border-foreground/40"
-                  }`}
-                >
-                  {st.label}
-                </button>
-              );
-            })}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Regional Demand Intelligence Banner */}
+      {/* Store Location & Demand Intelligence Summary Strip */}
       <Card className="border border-border bg-muted/20">
         <CardContent className="p-4 sm:p-5">
-          <div className="flex items-start gap-3 mb-4">
-            <div className="h-8 w-8 rounded-lg bg-muted flex items-center justify-center text-foreground shrink-0 text-base">
-              📍
-            </div>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
             <div>
               <h3 className="text-base sm:text-lg font-bold text-foreground">
-                AI Cultural Retail Intelligence for {activeRegion}, {activeCountry}
+                Persisted Regional Demand Signals for {storeProfile?.store_name || "Your Store"} ({activeCity}, {activeRegion})
               </h3>
               <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
-                Festive demand in retail is heavily localized. Demand for specific SKUs fluctuates dramatically by calendar dates.
+                Festivals are automatically matched against your store&apos;s live Firestore inventory SKUs.
               </p>
             </div>
+            {lastSyncedAt && (
+              <Badge variant="outline" className="text-xs font-mono border-border bg-card w-fit">
+                Synced at {lastSyncedAt}
+              </Badge>
+            )}
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             {events.slice(0, 2).map((ev, idx) => (
-              <div key={idx} className="p-3.5 rounded-lg border border-border bg-card flex items-start gap-3">
-                <span className="text-2xl">{ev.icon || "🪔"}</span>
-                <div className="text-xs sm:text-sm space-y-1">
-                  <div className="font-semibold text-foreground">{ev.name}</div>
-                  <p className="text-muted-foreground leading-relaxed">
-                    Demand for <strong className="text-foreground">{ev.key_items?.slice(0, 3).join(", ")}</strong> surges by{" "}
-                    <strong className="text-foreground">+{Math.round(ev.demand_lift_pct)}%</strong>.
-                  </p>
-                </div>
-              </div>
-            ))}
-            <div className="p-3.5 rounded-lg border border-border bg-card flex items-start gap-3">
-              <span className="text-2xl">🛡️</span>
-              <div className="text-xs sm:text-sm space-y-1">
-                <div className="font-semibold text-foreground">Offer Conflict Prevention</div>
-                <p className="text-muted-foreground leading-relaxed">
-                  Running simultaneous discounts on the same SKU causes retailer margin dilution. PromoMind AI flags overlapping dates before promotions go live.
+              <div key={idx} className="p-3.5 rounded-lg border border-border bg-card space-y-1">
+                <div className="text-xs sm:text-sm font-semibold text-foreground">{ev.name}</div>
+                <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                  Demand for <strong className="text-foreground">{ev.key_items?.slice(0, 3).join(", ")}</strong> surges by{" "}
+                  <strong className="text-foreground">+{Math.round(ev.demand_lift_pct)}%</strong>.
                 </p>
               </div>
+            ))}
+            <div className="p-3.5 rounded-lg border border-border bg-card space-y-1">
+              <div className="text-xs sm:text-sm font-semibold text-foreground">
+                Active &amp; Scheduled Campaigns ({activeOffers.length})
+              </div>
+              <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                <strong className="text-foreground">{activeCount} Active</strong> running now and{" "}
+                <strong className="text-foreground">{scheduledCount} Scheduled</strong> for upcoming festival windows in Firestore.
+              </p>
             </div>
           </div>
         </CardContent>
@@ -270,26 +333,25 @@ export function CalendarScreen({ onLaunchPromo }) {
 
       {/* Two-Column Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Left Column: Upcoming Regional Festivals */}
+        {/* Left Column: Persisted Regional Festivals */}
         <div className="lg:col-span-7 space-y-4">
           <div className="flex items-center justify-between pb-1">
-            <h3 className="text-lg font-semibold text-foreground">Upcoming Regional Festivals & Spikes</h3>
+            <h3 className="text-lg font-semibold text-foreground">
+              Upcoming Regional Festivals ({activeRegion})
+            </h3>
             <Badge variant="outline" className="text-xs px-2.5 py-1 font-semibold">
-              {events.length} Upcoming Festivals
+              {events.length} Stored Events
             </Badge>
           </div>
 
-          {loadingEvents ? (
+          {loadingEvents || syncingEvents ? (
             <div className="space-y-4">
               {[...Array(3)].map((_, i) => (
                 <Card key={i} className="border border-border bg-card p-5 space-y-4">
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <Skeleton className="h-10 w-10 rounded-lg" />
-                      <div className="space-y-2">
-                        <Skeleton className="h-5 w-48 rounded" />
-                        <Skeleton className="h-3 w-32 rounded" />
-                      </div>
+                    <div className="space-y-2">
+                      <Skeleton className="h-5 w-48 rounded" />
+                      <Skeleton className="h-3 w-32 rounded" />
                     </div>
                     <Skeleton className="h-6 w-24 rounded-full" />
                   </div>
@@ -305,7 +367,7 @@ export function CalendarScreen({ onLaunchPromo }) {
             </div>
           ) : events.length === 0 ? (
             <Card className="border border-border p-8 text-center text-sm text-muted-foreground">
-              No festival events found for this region. Click &quot;AI Festival Discovery&quot; above to search.
+              No festival events stored yet. Click &quot;Sync / Update Upcoming Festivals&quot; above.
             </Card>
           ) : (
             <div className="space-y-4">
@@ -314,21 +376,24 @@ export function CalendarScreen({ onLaunchPromo }) {
                 return (
                   <Card key={idx} className="border border-border bg-card shadow-xs overflow-hidden">
                     <CardContent className="p-5 space-y-4">
-                      {/* Festival Top Row */}
+                      {/* Festival Header */}
                       <div className="flex items-start justify-between gap-3">
-                        <div className="flex items-center gap-3">
-                          <span className="text-3xl">{evt.icon || "🪔"}</span>
-                          <div>
-                            <h4 className="text-base sm:text-lg font-bold text-foreground">{evt.name}</h4>
-                            <p className="text-xs sm:text-sm text-muted-foreground">
-                              {evt.date_window} • <span className="font-semibold text-foreground">{evt.region}</span>
-                            </p>
-                          </div>
+                        <div>
+                          <h4 className="text-base sm:text-lg font-bold text-foreground">{evt.name}</h4>
+                          <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
+                            {evt.date_window} • <span className="font-semibold text-foreground">{evt.region}</span>
+                          </p>
                         </div>
-                        <Badge variant="outline" className="border-border bg-muted/60 text-foreground font-semibold text-xs px-2.5 py-1 shrink-0">
-                          <Flame className="h-3.5 w-3.5 mr-1 text-foreground" />
-                          +{Math.round(evt.demand_lift_pct)}% Surge
-                        </Badge>
+                        <div className="flex flex-col items-end gap-1.5 shrink-0">
+                          <Badge variant="outline" className="border-border bg-muted/60 text-foreground font-semibold text-xs px-2.5 py-1">
+                            +{Math.round(evt.demand_lift_pct)}% Surge
+                          </Badge>
+                          {evt.generation_source && (
+                            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-muted/80 text-muted-foreground border border-border">
+                              {evt.generation_source.startsWith("LIVE_") ? "● Live AI: " : "● "}{evt.generation_source}
+                            </span>
+                          )}
+                        </div>
                       </div>
 
                       {/* Description */}
@@ -337,7 +402,7 @@ export function CalendarScreen({ onLaunchPromo }) {
                       {/* Cultural Tradition Note */}
                       {evt.tradition_notes && (
                         <div className="p-3 rounded-lg bg-muted/40 border border-border/70 text-xs sm:text-sm text-foreground">
-                          <span className="font-semibold">✨ Cultural Retail Tradition:</span> {evt.tradition_notes}
+                          <span className="font-semibold">Cultural Retail Tradition:</span> {evt.tradition_notes}
                         </div>
                       )}
 
@@ -345,12 +410,11 @@ export function CalendarScreen({ onLaunchPromo }) {
                       {matched.length > 0 && (
                         <div className="p-3.5 rounded-lg border border-border bg-muted/20 space-y-2">
                           <div className="flex items-center justify-between text-xs font-semibold">
-                            <span className="text-foreground flex items-center gap-1.5">
-                              <Package className="h-3.5 w-3.5" />
-                              Live Store SKUs Matching Demand ({matched.length}):
+                            <span className="text-foreground">
+                              Matched Store Inventory SKUs ({matched.length}):
                             </span>
-                            <span className="text-foreground flex items-center gap-1">
-                              <CheckCircle2 className="h-3.5 w-3.5" /> High Margin &amp; Ready
+                            <span className="text-emerald-600 dark:text-emerald-400">
+                              In Stock &amp; Ready
                             </span>
                           </div>
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
@@ -373,24 +437,24 @@ export function CalendarScreen({ onLaunchPromo }) {
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
                         {evt.advance_procurement_window && (
                           <div className="p-2.5 rounded-md border border-border bg-muted/20">
-                            <div className="font-semibold text-foreground flex items-center gap-1 mb-1">
-                              <Clock className="h-3.5 w-3.5" /> T-14d Procurement:
+                            <div className="font-semibold text-foreground mb-1">
+                              T-14d Procurement:
                             </div>
                             <div className="text-muted-foreground">{evt.advance_procurement_window}</div>
                           </div>
                         )}
                         {evt.promo_launch_window && (
                           <div className="p-2.5 rounded-md border border-border bg-muted/20">
-                            <div className="font-semibold text-foreground flex items-center gap-1 mb-1">
-                              <Flame className="h-3.5 w-3.5" /> T-7d Promo Launch:
+                            <div className="font-semibold text-foreground mb-1">
+                              T-7d Promo Launch:
                             </div>
                             <div className="text-muted-foreground">{evt.promo_launch_window}</div>
                           </div>
                         )}
                         {evt.clearance_window && (
                           <div className="p-2.5 rounded-md border border-border bg-muted/20">
-                            <div className="font-semibold text-foreground flex items-center gap-1 mb-1">
-                              <TrendingUp className="h-3.5 w-3.5" /> T+2d Clearance:
+                            <div className="font-semibold text-foreground mb-1">
+                              T+2d Clearance:
                             </div>
                             <div className="text-muted-foreground">{evt.clearance_window}</div>
                           </div>
@@ -402,7 +466,7 @@ export function CalendarScreen({ onLaunchPromo }) {
                         <div className="flex flex-wrap gap-1.5 pt-1">
                           {evt.key_items.map((item, i) => (
                             <Badge key={i} variant="outline" className="text-xs bg-muted/30 border-border text-foreground font-normal">
-                              🏷️ {item}
+                              {item}
                             </Badge>
                           ))}
                         </div>
@@ -419,9 +483,8 @@ export function CalendarScreen({ onLaunchPromo }) {
                             );
                           }
                         }}
-                        className="w-full font-semibold h-11 bg-primary text-primary-foreground hover:bg-primary/90 flex items-center justify-center gap-2"
+                        className="w-full font-semibold h-11 bg-primary text-primary-foreground hover:bg-primary/90"
                       >
-                        <Sparkles className="h-4 w-4" />
                         Generate AI Promo Offer for {evt.name.split("(")[0].trim()}
                       </Button>
                     </CardContent>
@@ -432,154 +495,232 @@ export function CalendarScreen({ onLaunchPromo }) {
           )}
         </div>
 
-        {/* Right Column: Scheduled Offers & Conflict Sandbox */}
+        {/* Right Column: Advanced Store Offers Lifecycle Manager & Conflict Sandbox */}
         <div className="lg:col-span-5 space-y-6">
-          {/* Active Store Offers */}
-          <div className="space-y-4">
-            <div className="flex items-center justify-between pb-1">
-              <h3 className="text-lg font-semibold text-foreground">Active &amp; Scheduled Store Offers</h3>
-              <Badge variant="outline" className="text-xs px-2.5 py-1 font-semibold">
-                {activeOffers.length} Active
-              </Badge>
-            </div>
+          {/* Active & Scheduled Store Offers Manager */}
+          <Card className="border border-border bg-card shadow-xs">
+            <CardHeader className="pb-3 border-b border-border space-y-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-base font-bold text-foreground">
+                    Current &amp; Scheduled Store Offers
+                  </CardTitle>
+                  <CardDescription className="text-xs text-muted-foreground font-mono mt-0.5">
+                    stores/{storeProfile?.store_id || "sharma_supermarket_01"}/promotions
+                  </CardDescription>
+                </div>
+                <Badge variant="outline" className="text-xs px-2.5 py-1 font-semibold">
+                  {activeOffers.length} Total
+                </Badge>
+              </div>
 
-            {loadingOffers ? (
-              <div className="space-y-3">
-                {[...Array(2)].map((_, i) => (
-                  <Card key={i} className="border border-border bg-card p-4 space-y-2">
-                    <div className="flex items-center justify-between">
-                      <Skeleton className="h-4 w-36 rounded" />
-                      <Skeleton className="h-4 w-16 rounded-full" />
+              {/* Filter Tabs */}
+              <div className="grid grid-cols-4 gap-1 bg-muted/50 p-1 rounded-lg border border-border text-xs font-medium">
+                {[
+                  { id: "ALL", label: `All (${activeOffers.length})` },
+                  { id: "ACTIVE", label: `Active (${activeCount})` },
+                  { id: "SCHEDULED", label: `Scheduled (${scheduledCount})` },
+                  { id: "PAUSED", label: "Paused" },
+                ].map((tab) => (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => setOfferFilter(tab.id)}
+                    className={`py-1.5 rounded-md transition-colors text-center ${
+                      offerFilter === tab.id
+                        ? "bg-card text-foreground font-semibold shadow-xs"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+            </CardHeader>
+
+            <CardContent className="p-4 space-y-3 max-h-[540px] overflow-y-auto">
+              {loadingOffers ? (
+                <div className="space-y-3">
+                  {[...Array(2)].map((_, i) => (
+                    <div key={i} className="border border-border rounded-lg p-4 space-y-2">
+                      <Skeleton className="h-4 w-40 rounded" />
+                      <Skeleton className="h-3 w-52 rounded" />
+                      <Skeleton className="h-8 w-full rounded" />
                     </div>
-                    <Skeleton className="h-3 w-48 rounded" />
-                    <Skeleton className="h-3 w-32 rounded" />
-                  </Card>
-                ))}
-              </div>
-            ) : activeOffers.length === 0 ? (
-              <Card className="border border-border p-6 text-center text-sm text-muted-foreground">
-                No active scheduled promotions currently running.
-              </Card>
-            ) : (
-              <div className="space-y-3">
-                {activeOffers.map((off, idx) => (
-                  <Card key={idx} className="border border-border bg-card shadow-xs">
-                    <CardContent className="p-4 flex items-start justify-between gap-3">
-                      <div className="space-y-1">
-                        <div className="font-semibold text-foreground text-sm">{off.title}</div>
-                        <p className="text-xs text-muted-foreground">
-                          📅 {off.start_date} to {off.end_date} •{" "}
-                          <strong className="text-foreground">{off.discount_pct}% OFF (₹{off.combo_price})</strong>
-                        </p>
-                        <p className="text-xs text-muted-foreground font-mono">
-                          SKUs: {off.anchor_id} + {off.attached_id}
-                        </p>
+                  ))}
+                </div>
+              ) : filteredOffers.length === 0 ? (
+                <div className="p-6 text-center text-xs sm:text-sm text-muted-foreground">
+                  No campaigns in this view. Generate an offer in the AI Sales Copilot to activate or schedule it.
+                </div>
+              ) : (
+                filteredOffers.map((off, idx) => {
+                  const isActive = off.status === "ACTIVE";
+                  const isScheduled = off.status === "SCHEDULED";
+                  return (
+                    <div
+                      key={off.id || idx}
+                      className="rounded-xl border border-border bg-background p-4 space-y-2.5 transition-colors hover:bg-muted/20"
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <div>
+                          <div className="font-bold text-foreground text-sm">{off.title}</div>
+                          <div className="text-[11px] text-muted-foreground mt-0.5">
+                            Theme: <strong className="text-foreground">{off.event_theme || "Store Promo"}</strong>
+                          </div>
+                        </div>
+                        <Badge
+                          variant="outline"
+                          className={`text-[10px] font-semibold px-2 py-0.5 shrink-0 ${
+                            isActive
+                              ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                              : isScheduled
+                              ? "border-amber-500/40 bg-amber-500/10 text-amber-600 dark:text-amber-400"
+                              : "border-border bg-muted text-muted-foreground"
+                          }`}
+                        >
+                          {off.status}
+                        </Badge>
                       </div>
-                      <Badge variant="outline" className="bg-muted text-foreground border-border text-xs shrink-0 font-medium">
-                        {off.status}
-                      </Badge>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            )}
-          </div>
+
+                      <div className="text-xs text-muted-foreground">
+                        SKUs: <span className="font-medium text-foreground">{off.anchor_name || off.anchor_id}</span> +{" "}
+                        <span className="font-medium text-foreground">{off.attached_name || off.attached_id}</span>
+                      </div>
+
+                      <div className="flex flex-wrap items-center justify-between gap-2 text-xs pt-1 border-t border-border/50">
+                        <div>
+                          <span className="font-bold text-foreground text-sm">₹{Math.round(off.combo_price)}</span>
+                          {off.original_mrp && (
+                            <span className="text-muted-foreground line-through ml-1.5">
+                              ₹{Math.round(off.original_mrp)}
+                            </span>
+                          )}
+                          <span className="text-emerald-600 dark:text-emerald-400 font-semibold ml-2">
+                            {off.discount_pct}% OFF
+                          </span>
+                        </div>
+                        <div className="text-[11px] text-muted-foreground font-mono">
+                          {off.start_date} → {off.end_date}
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between gap-2 pt-2 border-t border-border/50">
+                        <span className="text-[11px] text-muted-foreground">
+                          Broadcast Reach: <strong>{off.broadcast_reach || storeProfile?.whatsapp_audience_size || 1420}</strong> customers
+                        </span>
+                        <div className="flex items-center gap-1.5">
+                          {isScheduled && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleToggleOfferStatus(off, "ACTIVE")}
+                              className="h-7 px-2.5 text-[11px] font-semibold"
+                            >
+                              Activate Now
+                            </Button>
+                          )}
+                          {isActive && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleToggleOfferStatus(off, "PAUSED")}
+                              className="h-7 px-2.5 text-[11px]"
+                            >
+                              Pause
+                            </Button>
+                          )}
+                          {off.status === "PAUSED" && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleToggleOfferStatus(off, "ACTIVE")}
+                              className="h-7 px-2.5 text-[11px] font-semibold"
+                            >
+                              Resume
+                            </Button>
+                          )}
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDeleteOffer(off.id)}
+                            className="h-7 px-2 text-[11px] text-muted-foreground hover:text-destructive"
+                          >
+                            Remove
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </CardContent>
+          </Card>
 
           {/* Interactive Conflict Check Sandbox */}
           <Card className="border border-border bg-card shadow-xs">
             <CardHeader className="pb-3">
-              <div className="flex items-center gap-2">
-                <ShieldCheck className="h-5 w-5 text-foreground" />
-                <CardTitle className="text-base font-bold">Test New Proposed Offer for Conflicts</CardTitle>
-              </div>
+              <CardTitle className="text-base font-bold">Test New Proposed Offer for Conflicts</CardTitle>
               <CardDescription className="text-xs text-muted-foreground leading-relaxed">
-                Simulate a prospective offer to check if it overlaps with an active promotion on the same SKU, preventing margin cannibalization.
+                Simulate a prospective offer to check if it overlaps with an active or scheduled promotion on the same SKU.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-foreground">Check SKU:</label>
+                <label className="text-xs font-semibold text-foreground">Select Anchor Product SKU:</label>
                 <CustomSelect
                   value={conflictSku}
                   onChange={setConflictSku}
                   options={inventoryItems.map((item) => ({
                     value: item.id,
-                    label: `${item.name} (${item.id})`,
-                    sublabel: `₹${Math.round(item.selling_price)} • Stock: ${item.stock_quantity}`,
+                    label: `${item.name} (${item.id}) — ₹${item.selling_price}`,
                   }))}
-                  placeholder="Select SKU to test for conflicts..."
+                  placeholder="Choose SKU to check..."
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-foreground">Proposed Discount %:</label>
-                  <Input
-                    type="number"
-                    min="5"
-                    max="50"
-                    value={conflictDiscount}
-                    onChange={(e) => setConflictDiscount(Number(e.target.value))}
-                    className="h-10 text-sm bg-background border-border"
-                  />
+              <div className="space-y-1.5">
+                <div className="flex justify-between text-xs">
+                  <span className="font-semibold text-foreground">Proposed Discount Depth:</span>
+                  <span className="font-bold text-foreground">{conflictDiscount}% OFF</span>
                 </div>
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-foreground">Simulation Window:</label>
-                  <Input
-                    type="text"
-                    value="Oct 20 - Oct 30, 2026"
-                    readOnly
-                    className="h-10 text-sm bg-muted/40 border-border text-muted-foreground"
-                  />
-                </div>
+                <input
+                  type="range"
+                  min="5"
+                  max="35"
+                  value={conflictDiscount}
+                  onChange={(e) => setConflictDiscount(Number(e.target.value))}
+                  className="w-full accent-primary h-1.5 bg-muted rounded-lg cursor-pointer"
+                />
               </div>
 
               <Button
                 onClick={handleConflictCheck}
                 disabled={!conflictSku || checkingConflict}
                 variant="outline"
-                className="w-full font-semibold h-10 border-border bg-secondary text-secondary-foreground hover:bg-secondary/80 flex items-center justify-center gap-2"
+                className="w-full h-10 text-xs font-semibold border-border bg-secondary text-secondary-foreground hover:bg-secondary/80"
               >
-                {checkingConflict ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Simulating Collision Engine...
-                  </>
-                ) : (
-                  <>
-                    <ShieldCheck className="h-4 w-4" />
-                    Check for Overlap &amp; Cannibalization
-                  </>
-                )}
+                {checkingConflict ? "Checking Active Campaigns..." : "Run Conflict & Margin Audit"}
               </Button>
 
-              {/* Sandbox Result */}
               {conflictResult && (
                 <div
-                  className={`p-3.5 rounded-lg border text-xs sm:text-sm space-y-1.5 ${
+                  className={`p-3.5 rounded-lg border text-xs space-y-1.5 ${
                     conflictResult.has_conflict
-                      ? "border-amber-600/40 bg-amber-500/10 text-foreground"
-                      : "border-border bg-muted/40 text-foreground"
+                      ? "border-amber-500/40 bg-amber-500/10 text-foreground"
+                      : "border-emerald-500/40 bg-emerald-500/10 text-foreground"
                   }`}
                 >
-                  <div className="font-bold flex items-center gap-1.5">
-                    {conflictResult.has_conflict ? (
-                      <>
-                        <AlertTriangle className="h-4 w-4 text-amber-500" />
-                        OFFER CONFLICT DETECTED!
-                      </>
-                    ) : (
-                      <>
-                        <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                        NO OVERLAPPING CONFLICTS!
-                      </>
-                    )}
+                  <div className="font-bold">
+                    {conflictResult.has_conflict
+                      ? "Conflict Detected — Margin Cannibalization Risk"
+                      : "No Conflict Detected — Safe to Launch"}
                   </div>
                   {conflictResult.conflict_reason && (
-                    <p className="text-muted-foreground">{conflictResult.conflict_reason}</p>
+                    <p className="text-muted-foreground leading-relaxed">{conflictResult.conflict_reason}</p>
                   )}
-                  <p className="text-foreground font-medium pt-1">
-                    <strong>Strategy:</strong> {conflictResult.recommended_action}
+                  <p className="font-medium text-foreground pt-1">
+                    Recommendation: {conflictResult.recommended_action}
                   </p>
                 </div>
               )}
@@ -590,4 +731,3 @@ export function CalendarScreen({ onLaunchPromo }) {
     </div>
   );
 }
-

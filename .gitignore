@@ -14,7 +14,7 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
+/lib/
 lib64/
 parts/
 sdist/
@@ -23,6 +23,10 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+
+# Explicitly allow frontend/lib/
+!frontend/lib/
+!frontend/lib/**
 
 # Environment Variables & Secrets
 .env

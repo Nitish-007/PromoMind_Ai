@@ -472,7 +472,7 @@
       80
     ],
     "sell_through_verdict": "STRONG_INVEST_BUY",
-    "verdict_badge": "🟢 Strong Buy / Restock Now",
+    "verdict_badge": "Strong Buy / Restock Now",
     "days_inventory_remaining": 28,
     "sell_through_rate_pct": 100.0,
     "reorder_recommendation": "High surge predicted. Restock aggressively to capitalize on event demand.",
@@ -595,6 +595,43 @@
   },
   {
     "id": "PROD_CUSTOM_22",
+    "name": "Tata Salt Vacuum Evaporated (1kg)",
+    "category": "Staples",
+    "cost_price": 20.0,
+    "selling_price": 28.0,
+    "stock_quantity": 200,
+    "days_in_stock": 5,
+    "expiry_days": 300,
+    "velocity_status": "FAST_MOVING",
+    "weekly_sales_avg": 50,
+    "image_url": "product_default.png",
+    "past_sales_weeks": [
+      42,
+      45,
+      47,
+      50,
+      52,
+      50
+    ],
+    "forecast_sales_weeks": [
+      60,
+      66,
+      73,
+      80
+    ],
+    "sell_through_verdict": "STRONG_INVEST_BUY",
+    "verdict_badge": "🟢 Strong Buy / Restock Now",
+    "days_inventory_remaining": 28,
+    "sell_through_rate_pct": 100.0,
+    "reorder_recommendation": "High surge predicted. Restock aggressively to capitalize on event demand.",
+    "brand_comparison_insight": "Custom retailer SKU with expected growth of +46.3%.",
+    "alternative_brands": [
+      "Local Wholesaler Grade-A",
+      "National Market Alternative"
+    ]
+  },
+  {
+    "id": "PROD_CUSTOM_23",
     "name": "Tata Salt Vacuum Evaporated (1kg)",
     "category": "Staples",
     "cost_price": 20.0,
@@ -818,6 +855,154 @@
       "Tata Tea Gold (500g) — 26% margin, +15% pull",
       "Brooke Bond Red Label (500g) — 24% margin, steady volume",
       "Wagh Bakri Premium (500g) — 28% margin, regional favorite"
+    ]
+  },
+  {
+    "id": "SKU_COORG_FILTER_C_24",
+    "name": "Coorg Filter Coffee Powder (500g)",
+    "category": "Beverages",
+    "cost_price": 226.2,
+    "selling_price": 290.0,
+    "stock_quantity": 75,
+    "days_in_stock": 5,
+    "expiry_days": 180,
+    "velocity_status": "MODERATE",
+    "weekly_sales_avg": 32,
+    "image_url": "product_default.png",
+    "past_sales_weeks": [
+      27,
+      28,
+      30,
+      32,
+      33,
+      32
+    ],
+    "forecast_sales_weeks": [
+      38,
+      42,
+      46,
+      51
+    ],
+    "sell_through_verdict": "STRONG_INVEST_BUY",
+    "verdict_badge": "Strong Buy / Restock Now",
+    "days_inventory_remaining": 16,
+    "sell_through_rate_pct": 100.0,
+    "reorder_recommendation": "High surge predicted. Restock aggressively to capitalize on event demand.",
+    "brand_comparison_insight": "Structured & forecasted SKU in Beverages.",
+    "alternative_brands": [
+      "Local Wholesaler Grade-A",
+      "National Market Alternative"
+    ]
+  },
+  {
+    "id": "SKU_COORG_FILTER_C_26",
+    "name": "Coorg Filter Coffee Test 0a0bea (500g)",
+    "category": "Beverages",
+    "cost_price": 230.1,
+    "selling_price": 295.0,
+    "stock_quantity": 120,
+    "days_in_stock": 5,
+    "expiry_days": 180,
+    "velocity_status": "FAST_MOVING",
+    "weekly_sales_avg": 36,
+    "image_url": "product_default.png",
+    "past_sales_weeks": [
+      30,
+      32,
+      34,
+      36,
+      37,
+      36
+    ],
+    "forecast_sales_weeks": [
+      44,
+      49,
+      54,
+      59
+    ],
+    "sell_through_verdict": "STRONG_INVEST_BUY",
+    "verdict_badge": "Strong Buy / Restock Now",
+    "days_inventory_remaining": 23,
+    "sell_through_rate_pct": 100.0,
+    "reorder_recommendation": "High surge predicted. Restock aggressively to capitalize on event demand.",
+    "brand_comparison_insight": "Structured & forecasted SKU in Beverages.",
+    "alternative_brands": [
+      "Local Wholesaler Grade-A",
+      "National Market Alternative"
+    ]
+  },
+  {
+    "id": "SKU_MYSORE_SANDAL__25",
+    "name": "Mysore Sandal Soap Pack (3x150g)",
+    "category": "Staples & Oils",
+    "cost_price": 152.1,
+    "selling_price": 195.0,
+    "stock_quantity": 90,
+    "days_in_stock": 5,
+    "expiry_days": 180,
+    "velocity_status": "FAST_MOVING",
+    "weekly_sales_avg": 40,
+    "image_url": "product_default.png",
+    "past_sales_weeks": [
+      34,
+      36,
+      38,
+      40,
+      42,
+      40
+    ],
+    "forecast_sales_weeks": [
+      48,
+      54,
+      59,
+      65
+    ],
+    "sell_through_verdict": "STRONG_INVEST_BUY",
+    "verdict_badge": "Strong Buy / Restock Now",
+    "days_inventory_remaining": 15,
+    "sell_through_rate_pct": 100.0,
+    "reorder_recommendation": "High surge predicted. Restock aggressively to capitalize on event demand.",
+    "brand_comparison_insight": "Structured & forecasted SKU in Staples & Oils.",
+    "alternative_brands": [
+      "Local Wholesaler Grade-A",
+      "National Market Alternative"
+    ]
+  },
+  {
+    "id": "SKU_MYSORE_SANDAL__27",
+    "name": "Mysore Sandal Soap Test 0a0bea (3x150g)",
+    "category": "Staples & Oils",
+    "cost_price": 152.1,
+    "selling_price": 195.0,
+    "stock_quantity": 110,
+    "days_in_stock": 5,
+    "expiry_days": 180,
+    "velocity_status": "FAST_MOVING",
+    "weekly_sales_avg": 42,
+    "image_url": "product_default.png",
+    "past_sales_weeks": [
+      35,
+      37,
+      39,
+      42,
+      44,
+      42
+    ],
+    "forecast_sales_weeks": [
+      51,
+      56,
+      63,
+      69
+    ],
+    "sell_through_verdict": "STRONG_INVEST_BUY",
+    "verdict_badge": "Strong Buy / Restock Now",
+    "days_inventory_remaining": 18,
+    "sell_through_rate_pct": 100.0,
+    "reorder_recommendation": "High surge predicted. Restock aggressively to capitalize on event demand.",
+    "brand_comparison_insight": "Structured & forecasted SKU in Staples & Oils.",
+    "alternative_brands": [
+      "Local Wholesaler Grade-A",
+      "National Market Alternative"
     ]
   }
 ]

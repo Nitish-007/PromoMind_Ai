@@ -5,6 +5,9 @@ import {
   fetchStoreProfile,
   saveStoreProfile,
   fetchStorageStatus,
+  fetchStores,
+  loginStore,
+  configureGeminiApiKey,
 } from "@/lib/api";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -14,23 +17,16 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { CustomSelect } from "@/components/ui/custom-select";
 import {
   Store,
-  User,
-  Phone,
-  Building,
-  MapPin,
-  Coins,
-  Percent,
   CheckCircle2,
   AlertCircle,
   AlertTriangle,
   Save,
   Loader2,
-  Database,
   Moon,
   Sun,
-  Server,
-  Layers,
   RefreshCw,
+  KeyRound,
+  LogIn,
 } from "lucide-react";
 
 const STORE_FORMAT_OPTIONS = [
@@ -45,14 +41,23 @@ const REGION_OPTIONS = [
   { value: "Maharashtra & West India", label: "Maharashtra & West India (Ganesh, Modak, Diwali)" },
   { value: "Delhi-NCR & North India", label: "Delhi-NCR & North India (Karwa Chauth, Diwali)" },
   { value: "West Bengal & East India", label: "West Bengal & East India (Durga Puja, Sweets)" },
+  { value: "Tamil Nadu & South India", label: "Tamil Nadu & South India (Pongal, Karthigai)" },
+  { value: "Gujarat & West India", label: "Gujarat & West India (Navratri, Uttarayan)" },
+  { value: "Kerala & South India", label: "Kerala & South India (Onam, Vishu)" },
 ];
 
-export function ProfileScreen({ onProfileUpdated }) {
+export function ProfileScreen({ onProfileUpdated, onOpenLoginModal }) {
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
   const [isFallback, setIsFallback] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+
+  // Store Management state
+  const [availableStores, setAvailableStores] = useState([]);
+  const [activeStoreId, setActiveStoreId] = useState("sharma_supermarket_01");
+  const [geminiApiKey, setGeminiApiKey] = useState("");
+  const [apiKeySaved, setApiKeySaved] = useState(false);
 
   // Form fields
   const [storeName, setStoreName] = useState("");
@@ -62,7 +67,7 @@ export function ProfileScreen({ onProfileUpdated }) {
   const [storeType, setStoreType] = useState("Supermarket");
   const [audienceSize, setAudienceSize] = useState(1420);
   const [workingCapital, setWorkingCapital] = useState(500000);
-  const [minMargin, setMinMargin] = useState(15.0);
+  const [minMargin, setMinMargin] = useState(18.0);
 
   // Regional Demographics
   const [stateRegion, setStateRegion] = useState("Karnataka & South India");
@@ -77,25 +82,77 @@ export function ProfileScreen({ onProfileUpdated }) {
   const [storageInfo, setStorageInfo] = useState({
     mode: "CLOUD",
     firestore_connected: true,
-    store_id: "store_blr_001",
+    store_id: "sharma_supermarket_01",
+    gemini_live_active: true,
   });
 
   useEffect(() => {
     loadProfileData();
     loadStorageData();
+    loadStoresRegistry();
 
+    if (typeof window !== "undefined") {
+      setGeminiApiKey(localStorage.getItem("promomind_gemini_api_key") || "");
+    }
     if (typeof document !== "undefined") {
       const isDark = document.documentElement.classList.contains("dark");
       setThemeMode(isDark ? "dark" : "light");
     }
   }, []);
 
+  async function loadStoresRegistry() {
+    try {
+      const res = await fetchStores();
+      if (res && Array.isArray(res.stores)) {
+        setAvailableStores(res.stores);
+        if (res.active_store_id) setActiveStoreId(res.active_store_id);
+      }
+    } catch (e) {
+      console.warn("Could not query stores registry:", e);
+    }
+  }
+
   async function loadStorageData() {
     try {
       const st = await fetchStorageStatus();
-      if (st) setStorageInfo(st);
+      if (st) {
+        setStorageInfo(st);
+        if (st.store_id) setActiveStoreId(st.store_id);
+      }
     } catch (e) {
       console.warn("Could not query storage status:", e);
+    }
+  }
+
+  async function handleQuickSwitchStore(targetId) {
+    setActiveStoreId(targetId);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("promomind_store_id", targetId);
+    }
+    try {
+      const res = await loginStore({ store_id: targetId });
+      if (res && res.profile) {
+        populateFields(res.profile);
+        if (onProfileUpdated) onProfileUpdated(res.profile);
+        await loadStorageData();
+      }
+    } catch (e) {
+      console.error("Failed switching store:", e);
+    }
+  }
+
+  async function handleSaveApiKey() {
+    if (!geminiApiKey.trim()) return;
+    if (typeof window !== "undefined") {
+      localStorage.setItem("promomind_gemini_api_key", geminiApiKey.trim());
+    }
+    try {
+      await configureGeminiApiKey(geminiApiKey.trim());
+      setApiKeySaved(true);
+      await loadStorageData();
+      setTimeout(() => setApiKeySaved(false), 3000);
+    } catch (e) {
+      console.error("Failed configuring API key:", e);
     }
   }
 
@@ -105,7 +162,6 @@ export function ProfileScreen({ onProfileUpdated }) {
     setIsFallback(false);
 
     try {
-      // 1. Try remote API first
       const prof = await fetchStoreProfile();
       if (prof && (prof.store_name || prof.owner_name)) {
         populateFields(prof);
@@ -115,7 +171,6 @@ export function ProfileScreen({ onProfileUpdated }) {
       throw new Error("Empty remote profile received");
     } catch (e) {
       console.warn("Remote profile fetch failed, checking local cache:", e);
-      // Fallback to localStorage
       if (typeof window !== "undefined") {
         const cachedStore = localStorage.getItem("promomind_store_name");
         if (cachedStore) {
@@ -131,7 +186,7 @@ export function ProfileScreen({ onProfileUpdated }) {
             locality: localStorage.getItem("promomind_locality") || "Koramangala 4th Block",
             pin_code: localStorage.getItem("promomind_pin") || "560034",
             working_capital: parseFloat(localStorage.getItem("promomind_capital") || "500000"),
-            min_gross_margin_target_pct: parseFloat(localStorage.getItem("promomind_margin") || "15.0"),
+            min_gross_margin_target_pct: parseFloat(localStorage.getItem("promomind_margin") || "18.0"),
           };
           populateFields(fallbackProf);
           setIsFallback(true);
@@ -140,10 +195,9 @@ export function ProfileScreen({ onProfileUpdated }) {
         }
       }
 
-      // If no remote and no local cache, set default and mark error
       setLoadError(true);
       populateFields({
-        store_name: "Metro Supermarket & Retail Mart",
+        store_name: "Sharma Supermarket & Kirana",
         owner_name: "Ramesh Sharma",
         phone: "+91 98450 12345",
         gstin: "29AAAAA0000A1Z5",
@@ -154,14 +208,15 @@ export function ProfileScreen({ onProfileUpdated }) {
         locality: "Koramangala 4th Block",
         pin_code: "560034",
         working_capital: 500000,
-        min_gross_margin_target_pct: 15.0,
+        min_gross_margin_target_pct: 18.0,
       });
       setLoading(false);
     }
   }
 
   function populateFields(prof) {
-    setStoreName(prof.store_name || "Metro Supermarket & Retail Mart");
+    if (prof.store_id) setActiveStoreId(prof.store_id);
+    setStoreName(prof.store_name || "Sharma Supermarket & Kirana");
     setOwnerName(prof.owner_name || "Ramesh Sharma");
     setPhone(prof.phone || "+91 98450 12345");
     setGstin(prof.gstin || "29AAAAA0000A1Z5");
@@ -183,7 +238,7 @@ export function ProfileScreen({ onProfileUpdated }) {
     setWorkingCapital(cap || 500000);
 
     const margin = prof.default_min_margin_pct || prof.min_gross_margin_target_pct;
-    setMinMargin(margin || 15.0);
+    setMinMargin(margin || 18.0);
   }
 
   function handleThemeChange(mode) {
@@ -204,27 +259,24 @@ export function ProfileScreen({ onProfileUpdated }) {
     setSaveSuccess(false);
 
     const payload = {
+      store_id: activeStoreId,
       store_name: storeName.trim(),
       owner_name: ownerName.trim(),
       phone: phone.trim(),
       gstin: gstin.trim(),
       store_type: storeType,
       audience_size: Number(audienceSize),
-      audience_reach: Number(audienceSize),
-      working_capital: Number(workingCapital),
+      whatsapp_audience_size: Number(audienceSize),
       total_working_capital_inr: Number(workingCapital),
-      min_gross_margin_target_pct: Number(minMargin),
       default_min_margin_pct: Number(minMargin),
       region: stateRegion,
-      state_region: stateRegion,
       city: city.trim(),
       locality: locality.trim(),
       pin_code: pinCode.trim(),
-      pincode: pinCode.trim(),
     };
 
-    // Cache in localStorage
     if (typeof window !== "undefined") {
+      localStorage.setItem("promomind_store_id", payload.store_id);
       localStorage.setItem("promomind_store_name", payload.store_name);
       localStorage.setItem("promomind_owner_name", payload.owner_name);
       localStorage.setItem("promomind_phone", payload.phone);
@@ -235,23 +287,16 @@ export function ProfileScreen({ onProfileUpdated }) {
       localStorage.setItem("promomind_city", payload.city);
       localStorage.setItem("promomind_locality", payload.locality);
       localStorage.setItem("promomind_pin", payload.pin_code);
-      localStorage.setItem("promomind_capital", String(payload.working_capital));
-      localStorage.setItem("promomind_margin", String(payload.min_gross_margin_target_pct));
+      localStorage.setItem("promomind_capital", String(payload.total_working_capital_inr));
+      localStorage.setItem("promomind_margin", String(payload.default_min_margin_pct));
     }
 
     try {
       await saveStoreProfile(payload);
-      try {
-        await fetch("/api/profile", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
-      } catch (e) {}
-
       setSaveSuccess(true);
       setIsFallback(false);
       setLoadError(false);
+      await loadStoresRegistry();
 
       if (onProfileUpdated) {
         onProfileUpdated(payload);
@@ -265,11 +310,9 @@ export function ProfileScreen({ onProfileUpdated }) {
     }
   }
 
-  // SKELETON LOADER STATE
   if (loading) {
     return (
       <div className="space-y-6 animate-pulse">
-        {/* Header Skeleton */}
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-b border-border pb-4">
           <div className="space-y-2">
             <Skeleton className="h-8 w-64 rounded-md" />
@@ -277,104 +320,14 @@ export function ProfileScreen({ onProfileUpdated }) {
           </div>
           <Skeleton className="h-10 w-32 rounded-md" />
         </div>
-
-        {/* 4 Cards Grid Skeleton */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Card 1 Skeleton */}
           <Card className="border border-border bg-card p-5 space-y-5">
-            <div className="flex items-center justify-between pb-3 border-b border-border">
-              <Skeleton className="h-5 w-40 rounded" />
-              <Skeleton className="h-5 w-24 rounded-full" />
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Skeleton className="h-3 w-20 rounded" />
-                <Skeleton className="h-10 w-full rounded-md" />
-              </div>
-              <div className="space-y-2">
-                <Skeleton className="h-3 w-28 rounded" />
-                <Skeleton className="h-10 w-full rounded-md" />
-              </div>
-              <div className="space-y-2">
-                <Skeleton className="h-3 w-32 rounded" />
-                <Skeleton className="h-10 w-full rounded-md" />
-              </div>
-              <div className="space-y-2">
-                <Skeleton className="h-3 w-28 rounded" />
-                <Skeleton className="h-10 w-full rounded-md" />
-              </div>
-              <div className="space-y-2">
-                <Skeleton className="h-3 w-24 rounded" />
-                <Skeleton className="h-10 w-full rounded-md" />
-              </div>
-              <div className="space-y-2">
-                <Skeleton className="h-3 w-32 rounded" />
-                <Skeleton className="h-10 w-full rounded-md" />
-              </div>
-              <div className="space-y-2">
-                <Skeleton className="h-3 w-36 rounded" />
-                <Skeleton className="h-10 w-full rounded-md" />
-              </div>
-              <div className="space-y-2">
-                <Skeleton className="h-3 w-32 rounded" />
-                <Skeleton className="h-10 w-full rounded-md" />
-              </div>
-            </div>
+            <Skeleton className="h-5 w-40 rounded" />
+            <Skeleton className="h-32 w-full rounded" />
           </Card>
-
-          {/* Card 2 Skeleton */}
           <Card className="border border-border bg-card p-5 space-y-5">
-            <div className="flex items-center justify-between pb-3 border-b border-border">
-              <Skeleton className="h-5 w-44 rounded" />
-              <Skeleton className="h-5 w-28 rounded-full" />
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Skeleton className="h-3 w-32 rounded" />
-                <Skeleton className="h-10 w-full rounded-md" />
-              </div>
-              <div className="space-y-2">
-                <Skeleton className="h-3 w-24 rounded" />
-                <Skeleton className="h-10 w-full rounded-md" />
-              </div>
-              <div className="space-y-2">
-                <Skeleton className="h-3 w-24 rounded" />
-                <Skeleton className="h-10 w-full rounded-md" />
-              </div>
-              <div className="space-y-2">
-                <Skeleton className="h-3 w-24 rounded" />
-                <Skeleton className="h-10 w-full rounded-md" />
-              </div>
-            </div>
-            <Skeleton className="h-16 w-full rounded-lg" />
-          </Card>
-
-          {/* Card 3 Skeleton */}
-          <Card className="border border-border bg-card p-5 space-y-5">
-            <div className="flex items-center justify-between pb-3 border-b border-border">
-              <Skeleton className="h-5 w-32 rounded" />
-              <Skeleton className="h-5 w-24 rounded-full" />
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <Skeleton className="h-20 w-full rounded-xl" />
-              <Skeleton className="h-20 w-full rounded-xl" />
-            </div>
-          </Card>
-
-          {/* Card 4 Skeleton */}
-          <Card className="border border-border bg-card p-5 space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-border">
-              <Skeleton className="h-5 w-52 rounded" />
-              <Skeleton className="h-5 w-28 rounded-full" />
-            </div>
-            <div className="space-y-3">
-              {[...Array(6)].map((_, i) => (
-                <div key={i} className="flex items-center justify-between py-1.5 border-b border-border/40">
-                  <Skeleton className="h-4 w-40 rounded" />
-                  <Skeleton className="h-4 w-48 rounded" />
-                </div>
-              ))}
-            </div>
+            <Skeleton className="h-5 w-44 rounded" />
+            <Skeleton className="h-32 w-full rounded" />
           </Card>
         </div>
       </div>
@@ -388,10 +341,10 @@ export function ProfileScreen({ onProfileUpdated }) {
         <div>
           <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground flex items-center gap-2">
             <Store className="h-6 w-6 text-foreground" />
-            Retailer Profile &amp; Regional Settings
+            Store Management, Login &amp; Regional Settings
           </h2>
           <p className="text-sm text-muted-foreground mt-1">
-            Manage store identity, regional location, customer demographics, and appearance preferences.
+            Manage multi-store Firestore profiles, regional demographics, and live Gemini API credentials.
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -399,6 +352,16 @@ export function ProfileScreen({ onProfileUpdated }) {
             <span className="text-xs font-semibold text-emerald-500 flex items-center gap-1.5 mr-2">
               <CheckCircle2 className="h-4 w-4" /> Profile Saved!
             </span>
+          )}
+          {onOpenLoginModal && (
+            <Button
+              variant="outline"
+              onClick={onOpenLoginModal}
+              className="h-10 px-4 text-xs font-semibold border-border flex items-center gap-1.5"
+            >
+              <LogIn className="h-4 w-4" />
+              Switch / Add Store
+            </Button>
           )}
           <Button
             onClick={handleSave}
@@ -420,13 +383,70 @@ export function ProfileScreen({ onProfileUpdated }) {
         </div>
       </div>
 
-      {/* Fallback or Error Notification Banner */}
+      {/* Multi-Store Switcher & Live Gemini API Key Bar (Issue #9) */}
+      <Card className="border border-border bg-card shadow-xs">
+        <CardContent className="p-5 grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="space-y-2">
+            <label className="text-xs font-bold uppercase tracking-wider text-foreground">
+              Active Firestore Store Branch ({availableStores.length} Stores):
+            </label>
+            <div className="flex flex-wrap gap-2">
+              {availableStores.map((st) => {
+                const isCurr = st.store_id === activeStoreId;
+                return (
+                  <button
+                    key={st.store_id}
+                    type="button"
+                    onClick={() => handleQuickSwitchStore(st.store_id)}
+                    className={`px-3 py-2 rounded-lg border text-xs font-medium transition-colors text-left ${
+                      isCurr
+                        ? "bg-foreground text-background border-foreground font-semibold"
+                        : "bg-muted/40 text-foreground border-border hover:bg-muted"
+                    }`}
+                  >
+                    <div>{st.store_name}</div>
+                    <div className="text-[10px] opacity-75">{st.city} • {st.owner_name}</div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-xs font-bold uppercase tracking-wider text-foreground flex items-center gap-1.5">
+              <KeyRound className="h-3.5 w-3.5" />
+              Live Gemini API Key (Search-Time Generation):
+            </label>
+            <div className="flex gap-2">
+              <Input
+                type="password"
+                placeholder="Paste AIza... or AQ.... key to override server .env"
+                value={geminiApiKey}
+                onChange={(e) => setGeminiApiKey(e.target.value)}
+                className="h-9 text-xs font-mono bg-background"
+              />
+              <Button
+                type="button"
+                size="sm"
+                onClick={handleSaveApiKey}
+                className="h-9 px-4 text-xs font-semibold shrink-0"
+              >
+                {apiKeySaved ? "Key Active!" : "Apply Key"}
+              </Button>
+            </div>
+            <p className="text-[11px] text-muted-foreground">
+              Supports both Google AI Studio keys (<code className="font-mono">AIza...</code>) and Vertex AI Express keys (<code className="font-mono">AQ....</code>).
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+
       {isFallback && (
         <div className="p-3.5 rounded-lg border border-amber-500/40 bg-amber-500/10 text-foreground flex items-center justify-between text-xs sm:text-sm">
           <div className="flex items-center gap-2">
             <AlertTriangle className="h-4 w-4 text-amber-500 shrink-0" />
             <span>
-              <strong>Offline Cached Profile:</strong> Cloud server was temporarily unreachable. Displaying your last saved local settings.
+              <strong>Offline Cached Profile:</strong> Displaying your last saved local settings.
             </span>
           </div>
           <Button
@@ -435,7 +455,7 @@ export function ProfileScreen({ onProfileUpdated }) {
             onClick={loadProfileData}
             className="h-8 text-xs font-medium border-border hover:bg-muted ml-3 shrink-0"
           >
-            <RefreshCw className="h-3 w-3 mr-1" /> Retry Cloud Sync
+            <RefreshCw className="h-3 w-3 mr-1" /> Retry Sync
           </Button>
         </div>
       )}
@@ -445,7 +465,7 @@ export function ProfileScreen({ onProfileUpdated }) {
           <div className="flex items-center gap-2">
             <AlertCircle className="h-4 w-4 text-destructive shrink-0" />
             <span>
-              <strong>Failed to reach cloud profile server.</strong> Default settings loaded. You can still edit and save changes.
+              <strong>Could not reach profile server.</strong> Default settings loaded.
             </span>
           </div>
           <Button
@@ -469,7 +489,7 @@ export function ProfileScreen({ onProfileUpdated }) {
                 Store Identity &amp; Contact
               </CardTitle>
               <Badge variant="outline" className="border-border bg-muted/60 text-xs font-semibold text-foreground">
-                Active Business
+                Active Store: {activeStoreId}
               </Badge>
             </div>
           </CardHeader>
@@ -573,13 +593,26 @@ export function ProfileScreen({ onProfileUpdated }) {
           <CardContent className="p-5 space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-foreground">State &amp; Cultural Region:</label>
-                <CustomSelect
+                <label className="text-xs font-semibold text-foreground">State &amp; Cultural Region (Type Any State / Region):</label>
+                <Input
+                  type="text"
+                  placeholder="e.g. Karnataka, Maharashtra, Telangana, Gujarat..."
                   value={stateRegion}
-                  onChange={setStateRegion}
-                  options={REGION_OPTIONS}
-                  placeholder="Select state & cultural region..."
+                  onChange={(e) => setStateRegion(e.target.value)}
+                  className="h-10 text-sm bg-background border-border"
                 />
+                <div className="flex flex-wrap gap-1 pt-1">
+                  {REGION_OPTIONS.slice(0, 4).map((opt) => (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      onClick={() => setStateRegion(opt.value)}
+                      className="text-[10px] px-2 py-0.5 rounded border border-border bg-muted/40 hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      {opt.value.split("&")[0].trim()}
+                    </button>
+                  ))}
+                </div>
               </div>
               <div className="space-y-1.5">
                 <label className="text-xs font-semibold text-foreground">City / District:</label>
@@ -611,7 +644,7 @@ export function ProfileScreen({ onProfileUpdated }) {
             </div>
 
             <div className="p-3.5 rounded-lg border border-border bg-muted/20 text-xs text-muted-foreground leading-relaxed mt-4">
-              💡 <strong>Geographic Grounding:</strong> Regional Demographics feed into the Gemini Demand Surge engine and localize vernacular messaging scripts across POS cashier cards and WhatsApp broadcasts.
+              <strong>Geographic Grounding:</strong> Regional Demographics feed directly into live Gemini Festival Discovery and localize vernacular messaging scripts across POS cashier cards and WhatsApp broadcasts.
             </div>
           </CardContent>
         </Card>
@@ -630,7 +663,6 @@ export function ProfileScreen({ onProfileUpdated }) {
           </CardHeader>
           <CardContent className="p-5 space-y-3">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {/* Dark Slate Option */}
               <div
                 onClick={() => handleThemeChange("dark")}
                 className={`p-4 rounded-xl border cursor-pointer transition-all ${
@@ -644,11 +676,10 @@ export function ProfileScreen({ onProfileUpdated }) {
                   <strong className="text-sm font-semibold text-foreground">Modern Dark Slate</strong>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Minimalist high-contrast monochrome design inspired by X.com and shadcn UI.
+                  Minimalist high-contrast monochrome design.
                 </p>
               </div>
 
-              {/* Light Option */}
               <div
                 onClick={() => handleThemeChange("light")}
                 className={`p-4 rounded-xl border cursor-pointer transition-all ${
@@ -662,7 +693,7 @@ export function ProfileScreen({ onProfileUpdated }) {
                   <strong className="text-sm font-semibold text-foreground">Clean Light Mode</strong>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Neutral daylight surfaces with sharp typography and high readability.
+                  Neutral daylight surfaces with sharp typography.
                 </p>
               </div>
             </div>
@@ -674,7 +705,7 @@ export function ProfileScreen({ onProfileUpdated }) {
           <CardHeader className="pb-3 border-b border-border">
             <div className="flex items-center justify-between">
               <CardTitle className="text-base font-bold text-foreground">
-                Store Health &amp; Capital Allocation
+                Cloud Architecture &amp; Live Engine Status
               </CardTitle>
               <Badge variant="outline" className="border-border bg-muted/60 text-xs font-semibold text-foreground">
                 Live System Metrics
@@ -683,43 +714,36 @@ export function ProfileScreen({ onProfileUpdated }) {
           </CardHeader>
           <CardContent className="p-5 space-y-3 text-xs sm:text-sm">
             <div className="flex items-center justify-between py-1.5 border-b border-border/50">
-              <span className="text-muted-foreground font-medium">Dual-Mode Storage Adapter:</span>
+              <span className="text-muted-foreground font-medium">Live Gemini Search Engine:</span>
+              <span className="font-semibold text-emerald-600 dark:text-emerald-400">
+                {storageInfo?.gemini_live_active ? "Active (Real-Time Search Generation)" : "Standby"}
+              </span>
+            </div>
+
+            <div className="flex items-center justify-between py-1.5 border-b border-border/50">
+              <span className="text-muted-foreground font-medium">Storage Adapter Mode:</span>
               <span className="font-semibold text-foreground">
                 {storageInfo?.mode === "CLOUD" && storageInfo?.firestore_connected
-                  ? "🟢 Cloud Mode (Firestore Live)"
-                  : "🟡 Local Fallback Mode (Zero Downtime)"}
+                  ? "Cloud Mode (Firestore Live)"
+                  : "Hybrid Adapter Active"}
               </span>
             </div>
 
             <div className="flex items-center justify-between py-1.5 border-b border-border/50">
-              <span className="text-muted-foreground font-medium">Firestore Collections:</span>
+              <span className="text-muted-foreground font-medium">Firestore Namespace:</span>
               <span className="font-mono text-xs text-foreground bg-muted/60 px-2 py-0.5 rounded border border-border">
-                stores/{storageInfo?.store_id || "store_blr_001"}/...
+                stores/{storageInfo?.store_id || activeStoreId}/...
               </span>
             </div>
 
             <div className="flex items-center justify-between py-1.5 border-b border-border/50">
-              <span className="text-muted-foreground font-medium">Google Cloud Firestore:</span>
-              <span className="font-semibold text-foreground">
-                {storageInfo?.firestore_connected ? "🟢 Dual-Mode Sync Active" : "🟡 Offline Buffer Active"}
-              </span>
-            </div>
-
-            <div className="flex items-center justify-between py-1.5 border-b border-border/50">
-              <span className="text-muted-foreground font-medium">Open-Source Forecasting Engine:</span>
+              <span className="text-muted-foreground font-medium">Demand Forecasting Engine:</span>
               <span className="font-semibold text-foreground">Holt-Winters Double Exponential Smoothing</span>
             </div>
 
-            <div className="flex items-center justify-between py-1.5 border-b border-border/50">
-              <span className="text-muted-foreground font-medium">Smart Pairing Algorithm:</span>
-              <span className="font-semibold text-foreground">Apriori Market Basket Probability (Support/Lift)</span>
-            </div>
-
             <div className="flex items-center justify-between py-1.5">
-              <span className="text-muted-foreground font-medium">AI Knowledge Base Sync:</span>
-              <span className="font-semibold text-foreground">
-                ⚡ Instant Re-compilation Grounded in <code className="font-mono text-xs">store_knowledge.md</code>
-              </span>
+              <span className="text-muted-foreground font-medium">Smart Pairing Algorithm:</span>
+              <span className="font-semibold text-foreground">Gemini Semantic Matching + Apriori Lift</span>
             </div>
           </CardContent>
         </Card>

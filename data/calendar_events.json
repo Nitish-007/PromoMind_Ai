@@ -1,84 +1,222 @@
 [
   {
-    "date_window": "Oct 10 - Oct 13, 2026",
-    "demand_lift_pct": 60.0,
-    "icon": "🌾",
-    "key_items": [
-      "Puffed Rice (Pori)",
-      "Jaggery (Bella)",
-      "Sunflower Oil",
-      "Ash Gourd",
-      "Flowers & Lemon"
-    ],
-    "region": "Karnataka",
+    "id": "EVT_DURGA_PUJA",
+    "name": "Durga Puja & Bijoya Dashami (Pujo'r Maha Utsav)",
+    "region": "West Bengal, India",
+    "date_window": "Oct 15 - Oct 20, 2026",
     "status": "UPCOMING",
-    "description": "Massive corporate and vehicle puja demand. Bulk restocking of sweets and sunflower oil for frying.",
-    "name": "Ayudha Puja & Vijayadashami",
-    "id": "EVT_AYUDHA_PUJA_2026"
-  },
-  {
-    "date_window": "Oct 24 - Oct 29, 2026",
-    "demand_lift_pct": 85.0,
-    "icon": "🪔",
+    "demand_lift_pct": 160.0,
     "key_items": [
-      "Clay Diyas & Deepas",
+      "Mustard Oil (Kachi Ghani)",
+      "Basmati Rice",
+      "Traditional Sweets (Rasgulla & Sandesh)",
       "Pure Cow Ghee",
-      "Gulab Jamun & Sweets",
       "California Almonds",
-      "Puja Camphor & Wicks"
+      "Spices & Panch Phoron"
     ],
-    "region": "Karnataka & South India",
-    "status": "UPCOMING",
-    "description": "Peak festive season in Bengaluru. Deepas and Cow Ghee require 3x normal stock. Non-festive days require only minimal puja stock.",
-    "name": "Diwali / Deepavali (Deepa & Lakshmi Puja)",
-    "id": "EVT_DIWALI_2026"
+    "icon": "",
+    "description": "Bengal's biggest socio-cultural festival. 5 days of pandal-hopping, grand community feasts, and Bijoya gifting.",
+    "tradition_notes": "Bhog offerings, grand family meals, and Bijoya Dashami sweet exchange where every guest is served mishti.",
+    "advance_procurement_window": "T-15 Days: Heavy stocking of Mustard Oil tins, Basmati rice, and Ghee.",
+    "promo_launch_window": "T-7 Days: 'Pujo Maha Bhog & Sweet Gifting Box'.",
+    "clearance_window": "T+2 Days: Post-Bijoya markdown of perishable sweet tins.",
+    "recommended_promo_type": "FESTIVE_CELEBRATION_HAMPER",
+    "matched_inventory_items": [
+      {
+        "product_id": "PROD_CSV_08",
+        "name": "Nandini Pure Cow Ghee Pouch (500ml)",
+        "category": "Dairy & Oils",
+        "selling_price": 315.0,
+        "cost_price": 260.0,
+        "stock_quantity": 95,
+        "margin_pct": 17.5,
+        "velocity_status": "FAST_MOVING",
+        "surge_lift_pct": 160.0
+      },
+      {
+        "product_id": "PROD_CSV_13",
+        "name": "Nandini Pure Cow Ghee Pouch (500ml)",
+        "category": "Dairy & Oils",
+        "selling_price": 315.0,
+        "cost_price": 260.0,
+        "stock_quantity": 95,
+        "margin_pct": 17.5,
+        "velocity_status": "FAST_MOVING",
+        "surge_lift_pct": 160.0
+      },
+      {
+        "product_id": "PROD_GHEE_01",
+        "name": "Amul Pure Cow Ghee Tin (1 Litre)",
+        "category": "Dairy & Oils",
+        "selling_price": 640.0,
+        "cost_price": 530.0,
+        "stock_quantity": 85,
+        "margin_pct": 17.2,
+        "velocity_status": "FAST_MOVING",
+        "surge_lift_pct": 160.0
+      },
+      {
+        "product_id": "PROD_OIL_01",
+        "name": "Fortune Sunlite Refined Sunflower Oil (1 Litre)",
+        "category": "Staples & Oils",
+        "selling_price": 148.0,
+        "cost_price": 125.0,
+        "stock_quantity": 220,
+        "margin_pct": 15.5,
+        "velocity_status": "FAST_MOVING",
+        "surge_lift_pct": 160.0
+      }
+    ],
+    "suggested_combo_title": "Sharod Utsav Bhog & Sweet Box",
+    "country": "India",
+    "city": "Bengaluru",
+    "generation_source": "HYBRID_REGIONAL_SYNTHESIS",
+    "synced_at": "2026-10-15T17:16:53.421024+00:00"
   },
   {
-    "date_window": "Nov 14 - Nov 20, 2026",
-    "demand_lift_pct": 45.0,
-    "icon": "🕯️",
-    "key_items": [
-      "Earthen Deepas (Clay Lamps)",
-      "Sesame Gingelly Oil",
-      "Cotton Wicks",
-      "Cow Ghee"
-    ],
-    "region": "Karnataka & Tamil Nadu",
+    "id": "EVT_KALI_PUJA",
+    "name": "Kali Puja & Shyama Puja",
+    "region": "West Bengal, India",
+    "date_window": "Oct 25 - Oct 29, 2026",
     "status": "UPCOMING",
-    "description": "Month of lights across temples and households. Heavy surge in clay deepas and lighting oils.",
-    "name": "Karthika Deepotsava",
-    "id": "EVT_KARTHIKA_DEEPAM_2026"
+    "demand_lift_pct": 120.0,
+    "key_items": [
+      "Earthen Pradips (Diyas)",
+      "Mustard Oil for Lamps",
+      "Pure Cow Ghee",
+      "Sweets & Gulab Jamun",
+      "Puja Camphor & Dhoop"
+    ],
+    "icon": "",
+    "description": "Illumination of homes with pradips and midnight puja rituals across Kolkata and West Bengal.",
+    "tradition_notes": "14 earthen lamps (Choddo Saak & Choddo Pradip) lit before Kali Puja; high consumption of mustard oil for clay pradips.",
+    "advance_procurement_window": "T-10 Days: Stock clay pradips and lamp oil.",
+    "promo_launch_window": "T-5 Days: 'Kali Puja Pradip & Sweet Lighting Duo'.",
+    "clearance_window": "T+2 Days: Liquidate leftover terracotta lamps.",
+    "recommended_promo_type": "FESTIVE_CELEBRATION_HAMPER",
+    "matched_inventory_items": [
+      {
+        "product_id": "PROD_ALMOND_01",
+        "name": "Nutraj California Premium Almonds (500g)",
+        "category": "Dry Fruits",
+        "selling_price": 470.0,
+        "cost_price": 330.0,
+        "stock_quantity": 110,
+        "margin_pct": 29.8,
+        "velocity_status": "SLOW_MOVING",
+        "surge_lift_pct": 120.0
+      },
+      {
+        "product_id": "PROD_CSV_08",
+        "name": "Nandini Pure Cow Ghee Pouch (500ml)",
+        "category": "Dairy & Oils",
+        "selling_price": 315.0,
+        "cost_price": 260.0,
+        "stock_quantity": 95,
+        "margin_pct": 17.5,
+        "velocity_status": "FAST_MOVING",
+        "surge_lift_pct": 120.0
+      },
+      {
+        "product_id": "PROD_CSV_13",
+        "name": "Nandini Pure Cow Ghee Pouch (500ml)",
+        "category": "Dairy & Oils",
+        "selling_price": 315.0,
+        "cost_price": 260.0,
+        "stock_quantity": 95,
+        "margin_pct": 17.5,
+        "velocity_status": "FAST_MOVING",
+        "surge_lift_pct": 120.0
+      },
+      {
+        "product_id": "PROD_GHEE_01",
+        "name": "Amul Pure Cow Ghee Tin (1 Litre)",
+        "category": "Dairy & Oils",
+        "selling_price": 640.0,
+        "cost_price": 530.0,
+        "stock_quantity": 85,
+        "margin_pct": 17.2,
+        "velocity_status": "FAST_MOVING",
+        "surge_lift_pct": 120.0
+      }
+    ],
+    "suggested_combo_title": "Kali Puja Pradip & Pure Ghee Saver",
+    "country": "India",
+    "city": "Bengaluru",
+    "generation_source": "HYBRID_REGIONAL_SYNTHESIS",
+    "synced_at": "2026-10-15T17:16:53.421024+00:00"
   },
   {
-    "date_window": "Jul 15 - Aug 30, 2026",
-    "demand_lift_pct": 35.0,
-    "icon": "🌧️",
+    "id": "EVT_POILA_BOISHAKH",
+    "name": "Poila Boishakh (Noboborsho & Haal Khata)",
+    "region": "West Bengal, India",
+    "date_window": "Apr 14 - Apr 16, 2027",
+    "status": "UPCOMING",
+    "demand_lift_pct": 70.0,
     "key_items": [
+      "Traditional Sweets",
+      "Beverages & Cold Drinks",
       "Premium Tea",
-      "Biscuits",
-      "Garam Masala",
-      "Ginger",
-      "Snacks"
+      "Cooking Oil",
+      "Gifting Dry Fruits"
     ],
-    "region": "Karnataka Urban",
-    "status": "COMPLETED",
-    "description": "Cool monsoon evenings trigger evening chai & biscuit combo demand.",
-    "name": "Monsoon Refresh Bonanza",
-    "id": "EVT_MONSOON_BONANZA_2026"
-  },
-  {
-    "id": "EVT_UGADI_2026",
-    "name": "Ugadi New Year",
-    "region": "Karnataka",
-    "date_window": "March 2026",
-    "demand_lift_pct": 50.0,
-    "key_items": [
-      "Jaggery",
-      "Neem",
-      "Raw Mango"
+    "icon": "",
+    "description": "Bengali New Year and Haal Khata opening day in commercial retail and residential areas.",
+    "tradition_notes": "Shoppers visit local retail stores to clear annual accounts and receive sweet boxes and cold drinks as goodwill.",
+    "advance_procurement_window": "T-7 Days: Procure sweet gift boxes and beverage crates.",
+    "promo_launch_window": "T-3 Days: 'Noboborsho Haal Khata Greeting Box'.",
+    "clearance_window": "T+2 Days: Clear open beverage inventory.",
+    "recommended_promo_type": "ANCHOR_MARGIN_BOOSTER",
+    "matched_inventory_items": [
+      {
+        "product_id": "PROD_SWEET_01",
+        "name": "Haldiram's Gulab Jamun Traditional Tin (1kg)",
+        "category": "Sweets & Confectionery",
+        "selling_price": 260.0,
+        "cost_price": 190.0,
+        "stock_quantity": 120,
+        "margin_pct": 26.9,
+        "velocity_status": "FAST_MOVING",
+        "surge_lift_pct": 70.0
+      },
+      {
+        "product_id": "PROD_TEA_01",
+        "name": "Taj Mahal Premium Gold Tea (500g)",
+        "category": "Beverages",
+        "selling_price": 310.0,
+        "cost_price": 240.0,
+        "stock_quantity": 140,
+        "margin_pct": 22.6,
+        "velocity_status": "FAST_MOVING",
+        "surge_lift_pct": 70.0
+      },
+      {
+        "product_id": "SKU_COORG_FILTER_C_24",
+        "name": "Coorg Filter Coffee Powder (500g)",
+        "category": "Beverages",
+        "selling_price": 290.0,
+        "cost_price": 226.2,
+        "stock_quantity": 75,
+        "margin_pct": 22.0,
+        "velocity_status": "MODERATE",
+        "surge_lift_pct": 70.0
+      },
+      {
+        "product_id": "SKU_COORG_FILTER_C_26",
+        "name": "Coorg Filter Coffee Test 0a0bea (500g)",
+        "category": "Beverages",
+        "selling_price": 295.0,
+        "cost_price": 230.1,
+        "stock_quantity": 120,
+        "margin_pct": 22.0,
+        "velocity_status": "FAST_MOVING",
+        "surge_lift_pct": 70.0
+      }
     ],
-    "status": "UPCOMING",
-    "icon": "🪔",
-    "description": ""
+    "suggested_combo_title": "Noboborsho Sweet & Tea Hospitality Pack",
+    "country": "India",
+    "city": "Bengaluru",
+    "generation_source": "HYBRID_REGIONAL_SYNTHESIS",
+    "synced_at": "2026-10-15T17:16:53.421024+00:00"
   }
 ]
