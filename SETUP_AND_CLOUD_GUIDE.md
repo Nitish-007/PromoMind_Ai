@@ -63,15 +63,17 @@ PromoMind AI bridges the technology divide between small independent retailers (
 ## 💻 Prerequisites & Local Environment Setup
 
 ### 1. System Requirements
-- **Python:** 3.9 or higher (Python 3.11 / 3.12 recommended)
+- **Python:** 3.10 or higher (Python 3.11 / 3.12 recommended)
+- **Node.js:** 18.17 or higher (Node 20+ recommended)
 - **Git:** Version 2.30+ installed
 - **Operating System:** Windows 10/11, macOS, or Linux
 - **Web Browser:** Modern browser (Chrome, Edge, Firefox, Safari)
 
-### 2. Clone and Setup Environment
+### 2. Backend Setup (FastAPI)
 
 ```bash
-# 1. Clone repository (or navigate to existing directory)
+# 1. Clone repository
+git clone https://github.com/Nitish-007/PromoMind_Ai.git
 cd promomind_ai
 
 # 2. Create a virtual environment
@@ -83,81 +85,76 @@ python -m venv venv
 # On Linux / macOS:
 source venv/bin/activate
 
-# 4. Install dependencies
+# 4. Install backend dependencies
 pip install -r requirements.txt
-```
 
-### 3. Environment Variables Configuration
+# 5. Configure environment variables (.env)
+# Provide your Google Cloud Service Account JSON and credentials:
+# FIRESTORE_SA_JSON='{"type":"service_account","project_id":"your-project",...}'
+# GEMINI_API_KEY=AIzaSy... (optional)
 
-Copy the example environment template:
-
-```bash
-# On Windows PowerShell:
-Copy-Item .env.example .env
-
-# On Linux / macOS:
-cp .env.example .env
-```
-
-Edit `.env` if you have a Google Gemini API Key from [Google AI Studio](https://aistudio.google.com/):
-
-```env
-PORT=8080
-ENVIRONMENT=development
-GEMINI_API_KEY=your_gemini_api_key_here
-```
-
-*(Note: If no API key is provided, PromoMind AI gracefully falls back to deterministic rule-based algorithms with realistic retail marketing copy so you can test all features offline.)*
-
-### 4. Start the Local Server
-
-```bash
+# 6. Start the FastAPI backend server
 python backend/main.py
 ```
 
-The application will launch on:
-👉 **`http://localhost:8080`**
+The FastAPI backend will start on: 👉 **`http://127.0.0.1:8080`**
+
+### 3. Frontend Setup (Next.js 15)
+
+In a separate terminal:
+
+```bash
+# 1. Navigate into frontend directory
+cd frontend
+
+# 2. Install Node dependencies
+npm install
+
+# 3. Configure frontend environment (.env.local)
+echo "NEXT_PUBLIC_API_URL=http://127.0.0.1:8080" > .env.local
+
+# 4. Start Next.js development server
+npm run dev
+```
+
+The modern web application will launch on: 👉 **`http://localhost:3000`**
 
 ---
 
 ## 📱 How to Use the Application (Screen-by-Screen Guide)
 
-The application is structured into 5 single-purpose app screens:
+The application provides dedicated interactive modules:
 
-### Screen 1: 📦 Stock & Inventory Profile (`screen-inventory`)
+### 1. 📦 Stock & Inventory Profile (`InventoryScreen`)
 1. **Explore Inventory Metrics:** Review Total SKUs, Inventory Valuation, High-Velocity Anchors, and Stockout Warnings at a glance.
 2. **Search & Filter:** Search by SKU name, SKU ID, or category pill (Dairy, Beverages, Snacks, Staples, Dry Fruits, Puja).
 3. **Inspect Margin & Velocity:** Check unit cost price, selling MRP, profit margin %, and average weekly sales.
 4. **View Multi-Brand Sales Curves:**
    - Click the **"📊 Brand Curves"** button on any product (e.g. Pure Cow Ghee or Premium Tea).
-   - A modal drawer opens rendering an interactive **Multi-Brand Comparative SVG Chart**.
-   - Compare competing brands (e.g., **Amul Pure Cow Ghee** in Blue, **Nandini Pure Cow Ghee** in Green, and **Mother Dairy Cow Ghee** in Red) on the exact same axis.
-   - Inspect the historical 8-week sales line (solid) and the 4-week Holt-Winters festive forecast surge (dashed).
-   - Review the AI stocking recommendation: reveals whether to stock for brand pull or higher profit margin.
+   - An interactive drawer opens rendering a **Multi-Brand Comparative SVG Chart** (e.g., Amul vs Nandini vs Mother Dairy).
+   - Inspect historical 8-week sales curves (solid) and 4-week Holt-Winters festive forecasts (dashed).
+5. **Interactive "What-If" ROI Simulator:** Adjust discount depth % and expected volume lift % to simulate resulting net profit and cash velocity acceleration in real time.
 
-### Screen 2: ⚡ Promo Generator (`screen-promos`)
-1. **Choose a Goal Preset:** Select *Diwali Festive Saver*, *Clear Slow Movers (BOGO)*, *High Margin Basket*, or *Weekend Kirana Rush*.
-2. **Select Anchor Product:** Choose a core traffic driver (e.g., Pure Cow Ghee or Premium Tea).
-3. **Select Smart Pair:** Review Apriori affinity recommendations calculated with probability $P(B|A)$ and Lift (e.g., Biscuits or Almonds).
-4. **Set Margin Guard:** Move the Target Margin Slider (e.g. 18%).
-5. **Live Conflict Pre-Check:** The system queries the conflict engine. If the SKU already has an active discount, a high-visibility warning banner alerts you before you run the campaign!
-6. **Generate Plan:** Click **"✨ Generate AI Promotional Plan"**.
-   - Inspect bundle economics (Combined MRP, Deal Price, Savings, Net Retailer Margin %).
-   - Read the Gemini retail strategy pitch.
-   - **WhatsApp Broadcast:** Preview customer message, 1-click copy text, or click "Share on WhatsApp".
-   - **In-Store Poster:** Switch to the Poster tab for a printable, high-contrast store shelf banner.
-7. **Schedule & Activate:** Click **"🚀 Schedule & Activate Offer in Calendar"** to push the promotion directly into active store operations.
+### 2. 🤖 Dynamic AI Retail Sales Copilot (`CopilotScreen`)
+1. **100% Dynamic Conversational Reasoning:** Chat with the retail copilot powered by Google Gemini 2.5 Flash Lite on Vertex AI.
+2. **Inventory-Grounded Analysis:** Automatically detects slow-moving items, calculates dead capital at risk, and designs clearance combos.
+3. **Margin-Protected Optimization:** Enforces your target net margin floor (e.g., minimum 22%) without sacrificing profitability.
+4. **Cashier Checkout Script:** Auto-generates a 10-second verbal pitch for checkout staff in local vernacular.
+5. **Collateral Studio:** Instantly preview and format WhatsApp customer broadcasts and print-ready high-contrast shelf posters.
 
-### Screen 3: 📅 Regional Festival Calendar & Conflict Tracker (`screen-calendar`)
-1. **Regional Demographics Selector:** Choose your region (*Karnataka & South India*, *Maharashtra*, *Delhi-NCR*, *West Bengal*).
-2. **Regional Demand Rules:** Review hyper-local demand behaviors:
-   - **Deepavali (Karnataka):** Demand for Clay Deepas/Diyas, Pure Cow Ghee, and Cotton Wicks surges by **+140%**, while returning to near zero (<5 units/month) during non-festival periods.
-   - **Ayudha Puja:** Local demand surges for Ash Gourd (Kumbalakai), Puffed Rice (Pori), Lemons, and Jaggery.
-3. **Active Scheduled Offers:** View all currently running promotional offers in the store with date windows and discount percentages.
-4. **Interactive Conflict Sandbox:** Test any prospective SKU and proposed discount against scheduled offers. The engine validates date and SKU overlap to guarantee retail margins aren't eroded.
+### 3. 📅 Regional Festival Calendar & Worldwide AI Discovery (`CalendarScreen`)
+1. **Regional Demographics Selector:** Choose regions across India (*Karnataka & South India*, *Maharashtra*, *Delhi-NCR*, *West Bengal*) or international destinations (*Australia*, *Spain*, *Japan*, *UK*, *US*).
+2. **Live Vertex AI Discovery:** Click **"🔍 Live AI Search"** to query Vertex AI for upcoming festivals in real time.
+3. **Transparent Source Badges:** Every festival card displays whether data came from `LIVE_VERTEX_SA_API` or `HYBRID_REGIONAL_SYNTHESIS`.
+4. **Three-Horizon Planning Deadlines:**
+   - **T-14 Days:** Advance procurement wholesale alerts before mandi price hikes.
+   - **T-7 Days:** Early-bird WhatsApp broadcast hampers and pre-orders.
+   - **T+2 Days:** Mandatory markdown window to liquidate leftover items at cost price.
 
-### Screen 4: 📁 Data Import & AI Knowledge Sync (`screen-upload`)
-1. **Drag-and-Drop CSV Intake:** Drag any retail CSV file into the dropzone or click "Browse".
+### 4. 📁 Data Import & AI Knowledge Sync (`UploadScreen`)
+1. **Smart POS CSV Intake:** Upload arbitrary POS formats; automatic column detection extracts Item Name, Buy Rate, Retail Price, and Stock.
+2. **Intelligent Deduplication:** Re-uploading CSV updates existing SKU stock levels without creating duplicate items.
+3. **Auto-Recompiled Grounding:** Automatically synchronizes and compiles `store_knowledge.md` for live Gemini context.
 2. **Sample CSV:** Click "Download Sample CSV Template" to inspect the required columns (`product_id, name, category, brand, stock_quantity, cost_price, selling_price, past_sales_weeks`).
 3. **Automatic Forecast & Parse:** Click "Process & Forecast". PromoMind AI updates product records, runs Holt-Winters smoothing, and updates `data/inventory_store.json`.
 4. **Live Markdown Catalog Sync (`data/store_knowledge.md`):** Inspect the live rendered AI Knowledge Base. AI agents query this structured Markdown file for real stock grounding during prompt execution.
