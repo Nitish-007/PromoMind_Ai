@@ -249,6 +249,7 @@ class DualModeStorageAdapter:
             k: dict(v) for k, v in PRESET_STORES_REGISTRY.items()
         }
         self._memory_users: Dict[str, Dict[str, Any]] = {}
+        self._memory_markdown: Dict[str, str] = {}
 
         self.data_dir = data_dir or os.environ.get("PROMOMIND_DATA_DIR") or DATA_DIR
         self.store_json_file = os.path.join(self.data_dir, "inventory_store.json")
@@ -260,8 +261,8 @@ class DualModeStorageAdapter:
         self.users_json_file = os.path.join(self.data_dir, "users_store.json")
 
         self._ensure_local_data_dir()
-        self._init_users()
         self._init_connection(force_mode)
+        self._init_users()
 
     def _ensure_local_data_dir(self):
         os.makedirs(self.data_dir, exist_ok=True)
@@ -706,6 +707,8 @@ class DualModeStorageAdapter:
             return list(INVENTORY_DATA)
 
     def _save_local_products_cache(self, products: List[Product]):
+        if self.mode == "CLOUD":
+            return  # Directly stored in Cloud Firestore; no local backup file write
         self._ensure_local_data_dir()
         data = [_dump_model(p) for p in products]
         with open(self.store_json_file, "w", encoding="utf-8") as f:
@@ -829,6 +832,7 @@ class DualModeStorageAdapter:
                 self._promotions_coll().document(log_id).set(entry)
             except Exception as e:
                 logger.warning(f"Failed to log conflict to Firestore: {e}")
+            return entry
 
         self._ensure_local_data_dir()
         logs = []
@@ -871,6 +875,8 @@ class DualModeStorageAdapter:
             return list(SCHEDULED_OFFERS)
 
     def _save_local_promotions_cache(self, promos: List[Dict[str, Any]]):
+        if self.mode == "CLOUD":
+            return  # Directly stored in Cloud Firestore; no local backup file write
         self._ensure_local_data_dir()
         with open(self.promotions_json_file, "w", encoding="utf-8") as f:
             json.dump(promos, f, indent=2, ensure_ascii=False)
@@ -971,6 +977,8 @@ class DualModeStorageAdapter:
             return list(REGIONAL_FESTIVAL_CALENDAR)
 
     def _save_local_calendar_cache(self, events: List[Dict[str, Any]]):
+        if self.mode == "CLOUD":
+            return  # Directly stored in Cloud Firestore; no local backup file write
         self._ensure_local_data_dir()
         with open(self.calendar_json_file, "w", encoding="utf-8") as f:
             json.dump(events, f, indent=2, ensure_ascii=False)
@@ -987,7 +995,6 @@ class DualModeStorageAdapter:
                     profile = doc.to_dict()
                     profile["store_id"] = self.store_id
                     self._memory_profiles[self.store_id] = profile
-                    self._save_local_profile_cache(profile)
                     return profile
                 else:
                     seed = dict(self._memory_profiles.get(self.store_id, DEFAULT_STORE_PROFILE))
@@ -1043,6 +1050,8 @@ class DualModeStorageAdapter:
             return dict(DEFAULT_STORE_PROFILE)
 
     def _save_local_profile_cache(self, profile: Dict[str, Any]):
+        if self.mode == "CLOUD":
+            return  # Directly stored in Cloud Firestore; no local backup file write
         self._ensure_local_data_dir()
         with open(self.profile_json_file, "w", encoding="utf-8") as f:
             json.dump(profile, f, indent=2, ensure_ascii=False)
@@ -1095,9 +1104,7 @@ class DualModeStorageAdapter:
             )
 
         md_content = "\n".join(lines)
-
-        with open(self.knowledge_md_file, "w", encoding="utf-8") as f:
-            f.write(md_content)
+        self._memory_markdown[self.store_id] = md_content
 
         if self.mode == "CLOUD" and self.client:
             try:
@@ -1111,6 +1118,11 @@ class DualModeStorageAdapter:
                 self._catalog_coll().document("current").set(catalog_payload)
             except Exception as e:
                 logger.warning(f"Error persisting knowledge catalog to Firestore: {e}")
+            self.last_sync_timestamp = datetime.now(timezone.utc).isoformat()
+            return md_content
+
+        with open(self.knowledge_md_file, "w", encoding="utf-8") as f:
+            f.write(md_content)
 
         self.last_sync_timestamp = datetime.now(timezone.utc).isoformat()
         return md_content
@@ -1123,11 +1135,13 @@ class DualModeStorageAdapter:
                     data = doc.to_dict()
                     md = data.get("markdown", "")
                     if md:
-                        with open(self.knowledge_md_file, "w", encoding="utf-8") as f:
-                            f.write(md)
+                        self._memory_markdown[self.store_id] = md
                         return md
             except Exception as e:
                 logger.warning(f"Failed to fetch knowledge catalog from Firestore: {e}")
+
+        if self.store_id in self._memory_markdown and self._memory_markdown[self.store_id]:
+            return self._memory_markdown[self.store_id]
 
         if not os.path.exists(self.knowledge_md_file):
             return self.rebuild_knowledge_markdown()
@@ -1203,17 +1217,37 @@ class DualModeStorageAdapter:
     # ==========================================================================
 
     def _init_users(self):
+        # 1. Preset users into memory
+        for uid, dat in DEFAULT_USERS_REGISTRY.items():
+            self._memory_users[uid] = dict(dat)
+            if "email" in dat:
+                self._memory_users[dat["email"].lower()] = dict(dat)
+
+        # 2. In CLOUD mode, query Firestore collection "users" directly
+        if self.mode == "CLOUD" and self.client:
+            try:
+                docs = list(self.client.collection("users").stream())
+                for doc in docs:
+                    dat = doc.to_dict()
+                    uid = dat.get("user_id") or doc.id
+                    dat["user_id"] = uid
+                    self._memory_users[uid] = dat
+                    if "email" in dat:
+                        self._memory_users[dat["email"].lower()] = dat
+                logger.info(f"Loaded {len(docs)} users directly from Firestore.")
+                return
+            except Exception as e:
+                logger.warning(f"Failed querying users collection from Firestore: {e}")
+
         local_users = self._load_local_users()
         for uid, dat in local_users.items():
             self._memory_users[uid] = dat
             if "email" in dat:
                 self._memory_users[dat["email"].lower()] = dat
-        for uid, dat in DEFAULT_USERS_REGISTRY.items():
-            if uid not in self._memory_users:
-                self._memory_users[uid] = dat
-                self._memory_users[dat["email"].lower()] = dat
 
     def _save_local_users_cache(self, users_dict: Dict[str, Dict[str, Any]]):
+        if self.mode == "CLOUD":
+            return  # Directly stored in Cloud Firestore; no local backup file write
         self._ensure_local_data_dir()
         try:
             with open(self.users_json_file, "w", encoding="utf-8") as f:
@@ -1241,17 +1275,18 @@ class DualModeStorageAdapter:
         self._memory_users[user_id] = u
         self._memory_users[email] = u
 
-        canonical_users = {
-            uid: dat for uid, dat in self._memory_users.items()
-            if uid.startswith("usr_")
-        }
-        self._save_local_users_cache(canonical_users)
-
         if self.mode == "CLOUD" and self.client:
             try:
                 self.client.collection("users").document(user_id).set(u)
             except Exception as e:
                 logger.warning(f"Failed writing user to Firestore: {e}")
+            return  # Directly stored in Cloud Firestore; no local backup file write
+
+        canonical_users = {
+            uid: dat for uid, dat in self._memory_users.items()
+            if uid.startswith("usr_")
+        }
+        self._save_local_users_cache(canonical_users)
 
     def get_user_by_email(self, email: str) -> Optional[Dict[str, Any]]:
         email_clean = (email or "").strip().lower()

@@ -50,3 +50,7 @@ Thumbs.db
 scratch/
 .system_generated/
 .pytest_cache/
+
+# Local data cache
+data/*.json
+data/*.md
