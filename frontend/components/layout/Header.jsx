@@ -45,7 +45,7 @@ export function Header({
               </Badge>
             </div>
             <p className="text-sm text-muted-foreground hidden sm:block">
-              Demand Forecasting &amp; Multi-Brand Retailer OS
+              Demand Forecasting &amp; Profit Optimization for Retail &amp; Commerce
             </p>
           </div>
         </div>

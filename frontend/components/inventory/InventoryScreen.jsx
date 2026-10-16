@@ -12,7 +12,7 @@ const PERSONAS = [
   {
     id: "owner",
     label: "Store Owner (Capital & ROI)",
-    desc: "Focuses on working capital recovery, net dukan profit, and unlocking cash from slow movers.",
+    desc: "Focuses on working capital recovery, net store profit, and unlocking cash from slow movers.",
   },
   {
     id: "procurement",

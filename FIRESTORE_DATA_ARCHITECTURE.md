@@ -93,7 +93,7 @@ Default `store_id`: `sharma_supermarket_01` (configurable via `STORE_ID` in `.en
   "days_inventory_remaining": 7,
   "sell_through_rate_pct": 90.5,
   "reorder_recommendation": "Surge incoming (+40%). Order 45 units immediately.",
-  "brand_comparison_insight": "Tata Tea holds 58% Kirana category share with 17.6% margin.",
+  "brand_comparison_insight": "Tata Tea holds 58% retail category share with 17.6% margin.",
   "alternative_brands": ["Wagh Bakri Premium Leaf Tea", "Red Label Natural Care"]
 }
 ```
@@ -172,7 +172,7 @@ Default `store_id`: `sharma_supermarket_01` (configurable via `STORE_ID` in `.en
 ```json
 {
   "store_id": "sharma_supermarket_01",
-  "store_name": "Sharma Supermarket & Kirana",
+  "store_name": "Sharma Supermarket & Provisions",
   "owner_name": "Ramesh Sharma",
   "phone": "+91 98450 12345",
   "gstin": "29AAAAA0000A1Z5",

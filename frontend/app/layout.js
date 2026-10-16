@@ -2,8 +2,8 @@ import "./globals.css";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
 export const metadata = {
-  title: "PromoMind AI — Intelligent Retail Demand Forecasting & Multi-Brand Optimization",
-  description: "Smart Demand Forecasting & Multi-Brand Retailer OS",
+  title: "PromoMind AI — Intelligent Demand Forecasting & Profit Optimization for Retail & Commerce",
+  description: "AI-Powered Demand Forecasting, Dynamic Sales Copilot & Capital Profit Optimization for Retail & Commerce",
 };
 
 export default function RootLayout({ children }) {

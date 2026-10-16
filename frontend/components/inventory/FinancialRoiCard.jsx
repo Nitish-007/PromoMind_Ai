@@ -47,7 +47,7 @@ export function FinancialRoiCard({ roiData, onSimulate, isSimulating }) {
             </div>
             <div>
               <CardTitle className="text-base sm:text-lg font-bold flex items-center gap-2">
-                <span>Dukan Capital Investment & Returns</span>
+                <span>Store Capital Investment & Returns</span>
                 <Badge variant="outline" className="text-xs font-medium border-border text-muted-foreground">
                   Financial Intel
                 </Badge>
@@ -99,7 +99,7 @@ export function FinancialRoiCard({ roiData, onSimulate, isSimulating }) {
 
           {/* Net Profit */}
           <div className="rounded-lg border border-border bg-card p-3.5 transition-colors hover:bg-muted/40">
-            <div className="text-xs font-medium text-muted-foreground">Net Dukan Profit</div>
+            <div className="text-xs font-medium text-muted-foreground">Net Store Profit</div>
             <div className="text-lg sm:text-xl font-bold tracking-tight text-foreground mt-1">
               ₹{projectedProfit.toLocaleString("en-IN")}
             </div>

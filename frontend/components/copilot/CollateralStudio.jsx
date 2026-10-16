@@ -45,7 +45,7 @@ export function CollateralStudio({ plan, storeProfile, onScheduleOffer }) {
     );
   }
 
-  const storeName = storeProfile?.store_name || "Sharma Supermarket & Kirana";
+  const storeName = storeProfile?.store_name || "Sharma Supermarket & Provisions";
   const storeCity = storeProfile?.city || "Bengaluru";
   const broadcastReach =
     storeProfile?.whatsapp_audience_size || storeProfile?.audience_size || 1420;

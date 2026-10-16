@@ -55,7 +55,7 @@ DEFAULT_CUSTOMER_LIST: List[Dict[str, Any]] = [
 
 DEFAULT_STORE_PROFILE: Dict[str, Any] = {
     "store_id": "sharma_supermarket_01",
-    "store_name": "Sharma Supermarket & Kirana",
+    "store_name": "Sharma Supermarket & Provisions",
     "owner_name": "Ramesh Sharma",
     "email": "ramesh@sharmamart.in",
     "phone": "+91 98450 12345",
@@ -1075,7 +1075,7 @@ class DualModeStorageAdapter:
             "## 💰 1. Working Capital Investment & Return on Capital (ROI) Intelligence\n",
             f"- **Total Inventory Capital Invested**: ₹{int(roi_stats['total_inventory_invested_inr']):,}",
             f"- **Projected 30-Day Sales Turnover**: ₹{int(roi_stats['projected_sales_revenue_inr']):,}",
-            f"- **Projected Net Dukan Profit**: ₹{int(roi_stats['projected_gross_profit_inr']):,} (**{roi_stats['overall_roi_pct']}% Net Return on Capital**)",
+            f"- **Projected Net Store Profit**: ₹{int(roi_stats['projected_gross_profit_inr']):,} (**{roi_stats['overall_roi_pct']}% Net Return on Capital**)",
             f"- **Dead Working Capital Trapped in Slow Movers**: ₹{int(roi_stats['dead_capital_at_risk_inr']):,} ({roi_stats['slow_mover_skus_count']} at-risk SKUs)",
             f"- **Capital Unlocked via Smart Promo Bundles**: **₹{int(roi_stats['unlocked_capital_from_promos_inr']):,}** cash freed within 12 days (+₹{int(roi_stats['net_promo_profit_boost_inr']):,} net promo profit)",
             f"- **Cash Turnover Velocity**: Every **{roi_stats['capital_turnover_days']} days**",
@@ -1598,3 +1598,5 @@ class StoreDataManager:
         prof = cls.load_profile()
         budget = prof.total_working_capital_inr if hasattr(prof, "total_working_capital_inr") and prof.total_working_capital_inr else 500000.0
         return InvestmentROIEngine.compute_store_roi(products, store_capital_budget=budget)
+
+    get_store_capital_roi = get_dukan_capital_roi

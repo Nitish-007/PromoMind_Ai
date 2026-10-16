@@ -120,7 +120,7 @@ class OpenSourceForecastingEngine:
         # Baseline confidence from affinity matrix percentage
         confidence = round(min(0.95, max(0.05, affinity_score / 100.0)), 3)
         
-        # Support: probability of basket containing both items in an urban kirana (~12% - 35%)
+        # Support: probability of basket containing both items in retail stores (~12% - 35%)
         support = round(min(0.40, max(0.05, confidence * 0.45)), 3)
         
         # Marginal probability P(B) assumed between 15% - 30%
@@ -224,7 +224,7 @@ class PriceElasticityOptimizer:
             tentative_price = anchor_mrp + (attached_mrp * (0.78 - urgency_discount_bonus))
             effective_discount_pct = ((combined_mrp - tentative_price) / combined_mrp) * 100.0
 
-        # Round to nearest psychological Indian Kirana retail price ending in 9 (e.g., 289, 399, 1059)
+        # Round to nearest psychological retail price ending in 9 (e.g., 289, 399, 1059)
         rounded_price = math.floor(tentative_price / 10) * 10 + 9
         if rounded_price >= combined_mrp:
             rounded_price = math.floor((combined_mrp - 5) / 10) * 10 + 9

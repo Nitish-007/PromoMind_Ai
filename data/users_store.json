@@ -11,7 +11,7 @@
       "patel_fresh_mart_02",
       "sen_bazar_03"
     ],
-    "active_store_id": "sharma_supermarket_01",
+    "active_store_id": "patel_fresh_mart_02",
     "created_at": "2026-10-15T10:00:00Z"
   },
   "usr_ramesh_02": {
@@ -26,33 +26,5 @@
     ],
     "active_store_id": "sharma_supermarket_01",
     "created_at": "2026-10-15T10:00:00Z"
-  },
-  "usr_retailer1792_1792129908": {
-    "user_id": "usr_retailer1792_1792129908",
-    "email": "retailer_1792129907@storemail.com",
-    "full_name": "Vikram Sethi",
-    "phone": "+91 98765 43210",
-    "password_hash": "0daafd73fc0e63157a46f90d85b2699d245720a7d33e43fd94e25d2a2d125e51",
-    "salt": "promomind_2026",
-    "store_ids": [
-      "store_retailer1792",
-      "sethi_gourmet_mart_indir"
-    ],
-    "active_store_id": "sethi_gourmet_mart_indir",
-    "created_at": "2026-10-16T05:51:53.960145+00:00"
-  },
-  "usr_retailer1792_1792130012": {
-    "user_id": "usr_retailer1792_1792130012",
-    "email": "retailer_1792130007@storemail.com",
-    "full_name": "Vikram Sethi",
-    "phone": "+91 98765 43210",
-    "password_hash": "0daafd73fc0e63157a46f90d85b2699d245720a7d33e43fd94e25d2a2d125e51",
-    "salt": "promomind_2026",
-    "store_ids": [
-      "store_retailer1792",
-      "sethi_gourmet_mart_indir"
-    ],
-    "active_store_id": "store_retailer1792",
-    "created_at": "2026-10-16T05:53:34.993450+00:00"
   }
 }

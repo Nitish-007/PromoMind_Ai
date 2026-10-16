@@ -8,7 +8,7 @@ if CURRENT_DIR not in sys.path:
 
 from models import Product, DemandForecast
 
-# Realistic Inventory Dataset for an Urban Kirana / Supermarket
+# Realistic Inventory Dataset for Retail Stores & Supermarkets
 INVENTORY_DATA: List[Product] = [
     Product(
         id="PROD_TEA_01",
@@ -107,9 +107,9 @@ INVENTORY_DATA: List[Product] = [
         days_inventory_remaining=70,
         sell_through_rate_pct=30.0,
         reorder_recommendation="Hold off on Nutraj branded reorders: 110 units will cover the next 70 days. Let the Diwali surge clear existing packs in bundles before restocking.",
-        brand_comparison_insight="Nutraj branded MRP of ₹470 meets consumer price resistance. Local APMC loose/pouch almonds sell for ₹390 with a 38% retailer margin vs Nutraj's 29.8%. Switching to local grade-A pouches yields higher net cash.",
+        brand_comparison_insight="Nutraj branded MRP of ₹470 meets consumer price resistance. Wholesale grade-A loose/pouch almonds sell for ₹390 with a 38% retailer margin vs Nutraj's 29.8%. Switching to wholesale grade-A pouches yields higher net cash.",
         alternative_brands=[
-            "APMC Mandi Loose Grade-A Almonds (500g pouch) — 38% margin, ₹390 price",
+            "Wholesale Grade-A Almonds (500g pouch) — 38% margin, ₹390 price",
             "Happilo California Almonds (500g) — 31% margin, attractive tin pack",
             "Tata Sampann California Almonds (500g) — 27% margin, high trust"
         ]
@@ -159,7 +159,7 @@ INVENTORY_DATA: List[Product] = [
         days_inventory_remaining=52,
         sell_through_rate_pct=40.0,
         reorder_recommendation="Maintain stock level: 90 packs in inventory are sufficient for 7+ weeks. Avoid tying up working capital until inventory drops below 30 units.",
-        brand_comparison_insight="In Indiranagar/Bengaluru kiranas, MDH Garam Masala records 1.6x higher repeat purchases than Everest. Everest offers 34% margin, but MDH generates higher cumulative rupee profits due to faster churn.",
+        brand_comparison_insight="In retail grocery stores, MDH Garam Masala records 1.6x higher repeat purchases than Everest. Everest offers 34% margin, but MDH generates higher cumulative rupee profits due to faster churn.",
         alternative_brands=[
             "MDH Garam Masala (100g) — 31% margin, 1.6x faster churn",
             "Catch Super Garam Masala (100g) — 33% margin, table-top sprinkler pack",
@@ -643,7 +643,7 @@ SCHEDULED_OFFERS: List[Dict[str, Any]] = [
         "end_date": "2026-10-22",
         "discount_pct": 17.2,
         "combo_price": 389.0,
-        "event_theme": "Super Weekend Kirana Rush",
+        "event_theme": "Super Weekend Retail Rush",
         "status": "ACTIVE"
     },
     {

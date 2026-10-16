@@ -9,6 +9,7 @@ import { CopilotScreen } from "@/components/copilot/CopilotScreen";
 import { BrandComparisonModal } from "@/components/modals/BrandComparisonModal";
 import { AddProductModal } from "@/components/modals/AddProductModal";
 import { UserAuthModal } from "@/components/modals/UserAuthModal";
+import { AuthLandingPage } from "@/components/auth/AuthLandingPage";
 import {
   fetchInventory,
   fetchFinancialRoi,
@@ -28,12 +29,13 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState("inventory");
   const [theme, setTheme] = useState("light");
   const [copilotPrompt, setCopilotPrompt] = useState("");
+  const [isHydrated, setIsHydrated] = useState(false);
 
   // Authenticated User & Multi-Store Profile
   const [currentUser, setCurrentUser] = useState(null);
   const [storeProfile, setStoreProfile] = useState({
     store_id: "sharma_supermarket_01",
-    store_name: "Sharma Supermarket & Kirana",
+    store_name: "Sharma Supermarket & Provisions",
     owner_name: "Ramesh Sharma",
     city: "Bengaluru",
     region: "Karnataka & South India",
@@ -63,18 +65,13 @@ export default function Home() {
       document.documentElement.classList.remove("dark");
     }
 
-    // Check if user has an active session
+    // Restore user from cached session
     const cachedUser = localStorage.getItem("promomind_user");
     if (cachedUser) {
       try {
         const u = JSON.parse(cachedUser);
         setCurrentUser(u);
       } catch (_) {}
-    } else {
-      const hasLoggedIn = localStorage.getItem("promomind_logged_in");
-      if (!hasLoggedIn) {
-        setIsLoginModalOpen(true);
-      }
     }
 
     const cachedStoreName = localStorage.getItem("promomind_store_name");
@@ -93,6 +90,7 @@ export default function Home() {
       }));
     }
 
+    setIsHydrated(true);
     loadInitialData();
   }, []);
 
@@ -222,8 +220,23 @@ export default function Home() {
       localStorage.removeItem("promomind_user");
       localStorage.removeItem("promomind_logged_in");
     }
-    setIsLoginModalOpen(true);
   };
+
+  // ─── AUTH GATE: Show landing page if not authenticated ───
+  if (isHydrated && !currentUser) {
+    return <AuthLandingPage onUserAuthenticated={handleUserAuthenticated} />;
+  }
+
+  // Don't render anything until hydrated to prevent flash
+  if (!isHydrated) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="h-10 w-10 rounded-xl bg-foreground text-background flex items-center justify-center text-lg font-bold animate-pulse">
+          PM
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground transition-colors">
@@ -315,7 +328,7 @@ export default function Home() {
         onAddProduct={handleAddSku}
       />
 
-      {/* Dedicated Clean User Sign Up & Sign In Modal */}
+      {/* In-App User Auth Modal (for account switching while already signed in) */}
       <UserAuthModal
         isOpen={isLoginModalOpen}
         onClose={() => setIsLoginModalOpen(false)}

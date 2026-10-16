@@ -287,7 +287,7 @@ export function ProfileScreen({
 
       setLoadError(true);
       populateFields({
-        store_name: "Sharma Supermarket & Kirana",
+        store_name: "Sharma Supermarket & Provisions",
         owner_name: "Ramesh Sharma",
         phone: "+91 98450 12345",
         gstin: "29AAAAA0000A1Z5",
@@ -306,7 +306,7 @@ export function ProfileScreen({
 
   function populateFields(prof) {
     if (prof.store_id) setActiveStoreId(prof.store_id);
-    setStoreName(prof.store_name || "Sharma Supermarket & Kirana");
+    setStoreName(prof.store_name || "Sharma Supermarket & Provisions");
     setOwnerName(prof.owner_name || "Ramesh Sharma");
     setPhone(prof.phone || "+91 98450 12345");
     setGstin(prof.gstin || "29AAAAA0000A1Z5");

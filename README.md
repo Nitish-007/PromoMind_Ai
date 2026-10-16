@@ -1,6 +1,6 @@
 # PromoMind AI — Autonomous Retail Demand Forecasting, Dynamic AI Sales Copilot, Worldwide Festival Discovery & Capital Intelligence
 
-> **Autonomous multi-agent demand forecasting, real-time conversational AI Sales Copilot, open-source price elasticity modeling, worldwide cultural festival planning horizons, and Dukan Capital ROI intelligence for neighborhood Kiranas & Supermarkets.**  
+> **Autonomous multi-agent demand forecasting, real-time conversational AI Sales Copilot, open-source price elasticity modeling, worldwide cultural festival planning horizons, and Store Capital ROI intelligence for independent retailers & supermarkets.**  
 > *Architected for Google Cloud Platform (Vertex AI, Cloud Firestore, Cloud Run), Next.js 15, FastAPI, and Google Material Design 3.*
 
 ---
@@ -19,11 +19,11 @@
   - `LIVE_VERTEX_SA_API (gemini-2.5-flash-lite)`: Dynamically discovered in real time via live Vertex AI search.
   - `HYBRID_REGIONAL_SYNTHESIS`: High-confidence offline regional synthesis.
 - **Three-Horizon Planning Deadlines**:
-  - **📦 T-14 Days Advance Procurement**: Restock bulk surge SKUs before wholesale distributor mandi rates spike.
+  - **📦 T-14 Days Advance Procurement**: Restock bulk surge SKUs before wholesale distributor rates spike.
   - **🚀 T-7 Days Promo Launch**: Early-bird WhatsApp broadcast hampers and advance bookings.
   - **🧹 T+2 Days Post-Festival Clearance**: Rapid cost-price markdown on leftover seasonal items to prevent 100% inventory loss.
 
-### 3. 💰 Dukan Capital Investment & Returns / Profit Predictor
+### 3. 💰 Store Capital Investment & Returns / Profit Predictor
 - **Real-Time Working Capital Health**: Computes total working capital invested in inventory, projected 30-day sales turnover, and net gross profit.
 - **Dead Capital at Risk**: Automatically flags working capital trapped in slow-moving SKUs (>60 days shelf life) before products expire into dead loss.
 - **Cash Unlocked via Smart Promos**: Tracks fresh liquidity freed up within 12 days through algorithmic clearance bundles.
@@ -255,7 +255,7 @@ PromoMind AI operates in **Dual-Mode**: It runs out-of-the-box in local offline 
 | `GET` | `/api/auth/store-exists` | Checks if a store ID exists in Firestore or local storage |
 | `GET` | `/api/health` | Service health status and storage configuration telemetry |
 | `GET` | `/api/storage/status` | Hybrid storage adapter telemetry (Cloud vs Local, Firestore collections) |
-| `GET` | `/api/store/financial-roi` | Dukan Capital ROI metrics (turnover, net profit, dead capital risk) |
+| `GET` | `/api/store/financial-roi` | Store Capital ROI metrics (turnover, net profit, dead capital risk) |
 | `POST` | `/api/store/simulate-roi` | "What-If" ROI simulation (adjust discount depth & volume lift) |
 | `GET` | `/api/inventory` | Retailer inventory, velocities, cost, MRP, and stock status |
 | `POST` | `/api/products` | Add new SKU, run Holt-Winters forecasts, and sync AI Knowledge Base |

@@ -11,7 +11,7 @@
 
 - **Total Inventory Capital Invested**: ₹494,860
 - **Projected 30-Day Sales Turnover**: ₹1,209,860
-- **Projected Net Dukan Profit**: ₹295,372 (**59.7% Net Return on Capital**)
+- **Projected Net Store Profit**: ₹295,372 (**59.7% Net Return on Capital**)
 - **Dead Working Capital Trapped in Slow Movers**: ₹124,170 (7 at-risk SKUs)
 - **Capital Unlocked via Smart Promo Bundles**: **₹80,710** cash freed within 12 days (+₹17,756 net promo profit)
 - **Cash Turnover Velocity**: Every **16 days**

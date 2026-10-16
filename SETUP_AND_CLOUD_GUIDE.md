@@ -1,7 +1,7 @@
 # PromoMind AI — Setup, Usage & Google Cloud Integration Guide
 
 > **Intelligent Retail Demand Forecasting, Multi-Brand Curves & Conflict-Aware Promotion Engine**  
-> *Targeted for Urban & Rural Indian Kiranas, Supermarkets, and Independent Retailers.*
+> *Targeted for Independent Retailers, Supermarkets, and Local Commerce Stores.*
 
 ---
 
@@ -22,7 +22,7 @@
 
 ## 🏗️ System Overview & Architecture
 
-PromoMind AI bridges the technology divide between small independent retailers (Kiranas/Supermarkets) and modern algorithmic quick-commerce giants (Blinkit, Zepto, Instamart). It provides:
+PromoMind AI bridges the technology divide between independent retailers (Local Marts/Supermarkets) and modern algorithmic quick-commerce giants (Blinkit, Zepto, Instamart). It provides:
 
 - **Open-Source Demand Forecasting:** Mathematical Holt-Winters Double Exponential Smoothing predicting weekly sales velocity without heavy cloud compute dependencies.
 - **Multi-Brand Comparison Curves:** Direct side-by-side comparison of competing brands (e.g., Amul vs Nandini vs Mother Dairy) on the exact same sales axis.
@@ -147,7 +147,7 @@ The application provides dedicated interactive modules:
 2. **Live Vertex AI Discovery:** Click **"🔍 Live AI Search"** to query Vertex AI for upcoming festivals in real time.
 3. **Transparent Source Badges:** Every festival card displays whether data came from `LIVE_VERTEX_SA_API` or `HYBRID_REGIONAL_SYNTHESIS`.
 4. **Three-Horizon Planning Deadlines:**
-   - **T-14 Days:** Advance procurement wholesale alerts before mandi price hikes.
+   - **T-14 Days:** Advance procurement wholesale alerts before wholesale distributor price hikes.
    - **T-7 Days:** Early-bird WhatsApp broadcast hampers and pre-orders.
    - **T+2 Days:** Mandatory markdown window to liquidate leftover items at cost price.
 
@@ -179,7 +179,7 @@ To date, the core mathematical, agentic, and interface modules have been verifie
 | **Regional Festive Calendar** | ✅ Tested & Operational | Hyper-local calendar tracking Deepavali (Deepas/Ghee), Ayudha Puja (Ash Gourd), and Karthika Deepotsava. |
 | **Offer Conflict Prevention** | ✅ Tested & Operational | Validation endpoint (`/api/offers/check-conflict`) flagging overlapping campaigns and margin cannibalization. |
 | **CSV-to-Markdown Sync** | ✅ Tested & Operational | File uploader parsing CSVs and compiling structured `data/store_knowledge.md` for AI grounding. |
-| **Local Mock Data Fallback** | ✅ Tested & Operational | Operates seamlessly offline with realistic Kirana and supermarket inventory datasets. |
+| **Local Mock Data Fallback** | ✅ Tested & Operational | Operates seamlessly offline with realistic retail and supermarket inventory datasets. |
 
 ---
 
@@ -272,7 +272,7 @@ Replace heuristic fallback copy with live **Vertex AI Gemini 1.5 Pro** multi-age
 
    def generate_gemini_pitch(prompt: str, context_md: str) -> str:
        system_instruction = f"""
-       You are PromoMind AI, an elite retail strategist for Indian Kiranas.
+       You are PromoMind AI, an elite retail strategist for independent retailers and commerce merchants.
        Ground your reasoning strictly in this store catalog:
        {context_md}
        """
@@ -391,7 +391,7 @@ PromoMind AI integrates directly with **Google Cloud Firestore** via the **Dual-
    ```bash
    echo -n "AIzaSy..." | gcloud secrets create gemini-api-key --data-file=-
    ```
-2. **BigQuery Telemetry (Optional):** Stream POS sales data into BigQuery to continuously train Holt-Winters trend coefficients and Apriori association matrices across thousands of Kirana stores.
+2. **BigQuery Telemetry (Optional):** Stream POS sales data into BigQuery to continuously train Holt-Winters trend coefficients and Apriori association matrices across thousands of retail stores.
 
 ---
 

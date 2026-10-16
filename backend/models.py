@@ -76,7 +76,7 @@ class CustomerInfo(CompatBaseModel):
 
 class StoreProfile(CompatBaseModel):
     store_id: str = "sharma_supermarket_01"
-    store_name: str = "Sharma Supermarket & Kirana"
+    store_name: str = "Sharma Supermarket & Provisions"
     owner_name: str = "Ramesh Sharma"
     email: Optional[str] = "ramesh@sharmamart.in"
     phone: str = "+91 98450 12345"

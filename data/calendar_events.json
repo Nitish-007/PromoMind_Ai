@@ -1,121 +1,35 @@
 [
   {
-    "id": "EVT_DIWALI_2026",
-    "name": "Deepavali (Diwali)",
-    "region": "Karnataka & South India, India",
-    "date_window": "Nov 10 - Nov 14, 2026",
+    "id": "EVT_CHRISTMAS_2026",
+    "name": "Christmas",
+    "region": "Maharashtra, India",
+    "date_window": "Dec 24 - Dec 26, 2026",
     "status": "UPCOMING",
-    "demand_lift_pct": 150.5,
+    "demand_lift_pct": 75.2,
     "key_items": [
-      "Kalyan Clay Diya Gift Box (Set of 24) (Puja & Festive)",
-      "Nandini Pure Cow Ghee Pouch (500ml) (Dairy & Oils)",
+      "Britannia Good Day Butter Cookies (Pack of 6) (Bakery & Snacks)",
       "Nutraj California Premium Almonds (500g) (Dry Fruits)",
-      "Tata Sampann Premium Cashews W320 (500g) (Dry Fruits)",
-      "Aashirvaad Shahi Garam Masala Box (200g) (Spices)",
-      "Britannia Good Day Butter Cookies (Pack of 6) (Bakery & Snacks)"
+      "Fortune Sunlite Refined Sunflower Oil (1 Litre) (Staples & Oils)",
+      "Taj Mahal Premium Gold Tea (500g) (Beverages)"
     ],
     "icon": "",
-    "description": "Deepavali, the festival of lights, is a major celebration in Karnataka and across South India, marked by extensive home cleaning, elaborate poojas, and the preparation of traditional sweets and savories. This period sees a significant surge in demand for puja items, cooking essentials, and festive snacks as families gather and exchange gifts.",
-    "tradition_notes": "Clay diyas are central to the lighting ceremonies symbolizing the victory of light over darkness. Ghee is a staple for preparing sweets and for lighting lamps, while dry fruits and nuts are used in traditional sweets and offered as gifts. Garam masala is essential for festive culinary preparations.",
-    "advance_procurement_window": "T-30 Days: Stock up on diyas and puja essentials",
-    "promo_launch_window": "T-15 Days: Launch 'Festival of Lights' hamper promotions",
-    "clearance_window": "T+3 Days: Offer discounts on remaining festive decor",
-    "recommended_promo_type": "FESTIVE_CELEBRATION_HAMPER",
-    "matched_inventory_items": [
-      {
-        "product_id": "PROD_CSV_10",
-        "name": "Kalyan Clay Diya Gift Box (Set of 24)",
-        "category": "Puja & Festive",
-        "selling_price": 149.0,
-        "cost_price": 70.0,
-        "stock_quantity": 180,
-        "margin_pct": 53.0,
-        "velocity_status": "FAST_MOVING",
-        "surge_lift_pct": 150.5
-      },
-      {
-        "product_id": "PROD_CSV_12",
-        "name": "Aashirvaad Shahi Garam Masala Box (200g)",
-        "category": "Spices",
-        "selling_price": 155.0,
-        "cost_price": 105.0,
-        "stock_quantity": 50,
-        "margin_pct": 32.3,
-        "velocity_status": "SLOW_MOVING",
-        "surge_lift_pct": 150.5
-      },
-      {
-        "product_id": "PROD_CSV_15",
-        "name": "Kalyan Clay Diya Gift Box (Set of 24)",
-        "category": "Puja & Festive",
-        "selling_price": 149.0,
-        "cost_price": 70.0,
-        "stock_quantity": 180,
-        "margin_pct": 53.0,
-        "velocity_status": "FAST_MOVING",
-        "surge_lift_pct": 150.5
-      },
-      {
-        "product_id": "PROD_CSV_17",
-        "name": "Aashirvaad Shahi Garam Masala Box (200g)",
-        "category": "Spices",
-        "selling_price": 155.0,
-        "cost_price": 105.0,
-        "stock_quantity": 50,
-        "margin_pct": 32.3,
-        "velocity_status": "SLOW_MOVING",
-        "surge_lift_pct": 150.5
-      }
-    ],
-    "suggested_combo_title": "Diwali Delight: Diyas, Sweets & Savories",
-    "country": "India",
-    "city": "Bengaluru",
-    "generation_source": "LIVE_VERTEX_SA_API (gemini-2.5-flash-lite)",
-    "synced_at": "2026-10-16T05:54:37.934587+00:00"
-  },
-  {
-    "id": "EVT_KARNATAKA_RAJYOTSAVA_2026",
-    "name": "Karnataka Rajyotsava",
-    "region": "Karnataka & South India, India",
-    "date_window": "Nov 01 - Nov 01, 2026",
-    "status": "UPCOMING",
-    "demand_lift_pct": 75.0,
-    "key_items": [
-      "Nandini Pure Cow Ghee Pouch (500ml) (Dairy & Oils)",
-      "Aashirvaad Shahi Garam Masala Box (200g) (Spices)",
-      "Nutraj California Premium Almonds (500g) (Dry Fruits)",
-      "Tata Sampann Premium Cashews W320 (500g) (Dry Fruits)",
-      "Britannia Good Day Butter Cookies (Pack of 6) (Bakery & Snacks)"
-    ],
-    "icon": "",
-    "description": "Karnataka Rajyotsava celebrates the formation of the state and is marked by cultural events and community gatherings across Bengaluru and the state. This occasion sees increased demand for traditional snacks and ingredients for celebratory meals.",
-    "tradition_notes": "While not as intensely focused on specific food items as Deepavali, Rajyotsava celebrations often involve community feasts and sharing of sweets and snacks. Ghee, spices, and dry fruits are common ingredients for festive preparations, and cookies are popular for casual gatherings.",
-    "advance_procurement_window": "T-14 Days: Stock up on ghee, spices, dry fruits, and popular snack items.",
-    "promo_launch_window": "T-7 Days: Announce 'Karnataka Pride' offers on regional favorites and snack assortments.",
-    "clearance_window": "T+1 Day: Clear excess stock of non-perishable snacks and ingredients.",
+    "description": "Christmas sees a noticeable uptick in demand for baking ingredients, snacks, and beverages as households prepare for celebrations and gatherings. While not as dominant as Diwali, it represents a significant festive shopping period in Mumbai and West India.",
+    "tradition_notes": "Cookies and dry fruits are popular for festive baking and snacking during Christmas. Tea and cooking oils are essential for hosting guests and preparing festive meals.",
+    "advance_procurement_window": "T-14 Days: Stock up on cookies, dry fruits, and baking essentials",
+    "promo_launch_window": "T-7 Days: Announce Christmas special offers on snack and beverage bundles",
+    "clearance_window": "T+2 Days: Discount remaining Christmas-themed snacks",
     "recommended_promo_type": "ANCHOR_MARGIN_BOOSTER",
     "matched_inventory_items": [
       {
-        "product_id": "PROD_CSV_08",
-        "name": "Nandini Pure Cow Ghee Pouch (500ml)",
-        "category": "Dairy & Oils",
-        "selling_price": 315.0,
-        "cost_price": 260.0,
-        "stock_quantity": 95,
-        "margin_pct": 17.5,
-        "velocity_status": "FAST_MOVING",
-        "surge_lift_pct": 75.0
-      },
-      {
-        "product_id": "PROD_CSV_13",
-        "name": "Nandini Pure Cow Ghee Pouch (500ml)",
-        "category": "Dairy & Oils",
-        "selling_price": 315.0,
-        "cost_price": 260.0,
-        "stock_quantity": 95,
-        "margin_pct": 17.5,
-        "velocity_status": "FAST_MOVING",
-        "surge_lift_pct": 75.0
+        "product_id": "PROD_BISCUIT_01",
+        "name": "Britannia Good Day Butter Cookies (Pack of 6)",
+        "category": "Bakery & Snacks",
+        "selling_price": 160.0,
+        "cost_price": 110.0,
+        "stock_quantity": 195,
+        "margin_pct": 31.2,
+        "velocity_status": "SLOW_MOVING",
+        "surge_lift_pct": 75.2
       },
       {
         "product_id": "PROD_GHEE_01",
@@ -126,7 +40,81 @@
         "stock_quantity": 85,
         "margin_pct": 17.2,
         "velocity_status": "FAST_MOVING",
-        "surge_lift_pct": 75.0
+        "surge_lift_pct": 75.2
+      },
+      {
+        "product_id": "PROD_ALMOND_01",
+        "name": "Nutraj California Premium Almonds (500g)",
+        "category": "Dry Fruits",
+        "selling_price": 470.0,
+        "cost_price": 330.0,
+        "stock_quantity": 110,
+        "margin_pct": 29.8,
+        "velocity_status": "SLOW_MOVING",
+        "surge_lift_pct": 75.2
+      },
+      {
+        "product_id": "PROD_TEA_01",
+        "name": "Taj Mahal Premium Gold Tea (500g)",
+        "category": "Beverages",
+        "selling_price": 310.0,
+        "cost_price": 240.0,
+        "stock_quantity": 140,
+        "margin_pct": 22.6,
+        "velocity_status": "FAST_MOVING",
+        "surge_lift_pct": 75.2
+      }
+    ],
+    "suggested_combo_title": "Merry Munchies Combo: Cookies, Nuts & Tea",
+    "country": "India",
+    "city": "Mumbai",
+    "generation_source": "LIVE_VERTEX_SA_API (gemini-2.5-flash-lite)",
+    "synced_at": "2026-10-16T06:54:04.290467+00:00"
+  },
+  {
+    "id": "EVT_DIWALI_2026",
+    "name": "Diwali (Deepavali)",
+    "region": "Maharashtra, India",
+    "date_window": "Nov 11 - Nov 15, 2026",
+    "status": "UPCOMING",
+    "demand_lift_pct": 180.5,
+    "key_items": [
+      "Haldiram's Gulab Jamun Traditional Tin (1kg) (Sweets & Confectionery)",
+      "Amul Pure Cow Ghee Tin (1 Litre) (Dairy & Oils)",
+      "Britannia Good Day Butter Cookies (Pack of 6) (Bakery & Snacks)",
+      "Nutraj California Premium Almonds (500g) (Dry Fruits)",
+      "Everest Shahi Garam Masala (100g) (Spices)",
+      "Fortune Sunlite Refined Sunflower Oil (1 Litre) (Staples & Oils)"
+    ],
+    "icon": "",
+    "description": "Diwali, the festival of lights, is a major shopping occasion in Maharashtra, with a significant surge in demand for sweets, savories, cooking essentials, and gifting items. Families prepare elaborate feasts and exchange gifts, driving substantial sales for grocery retailers.",
+    "tradition_notes": "Sweets like Gulab Jamun and the use of Ghee are central to Diwali feasts and gifting. Dry fruits and spices are essential for traditional recipes and snacks prepared during the festival. Cookies and oils are also popular for household consumption and guest hospitality.",
+    "advance_procurement_window": "T-21 Days: Secure bulk orders for sweets, ghee, and dry fruits",
+    "promo_launch_window": "T-14 Days: Launch Diwali gift hamper promotions",
+    "clearance_window": "T+3 Days: Offer discounts on remaining festive sweets and snacks",
+    "recommended_promo_type": "FESTIVE_CELEBRATION_HAMPER",
+    "matched_inventory_items": [
+      {
+        "product_id": "PROD_GHEE_01",
+        "name": "Amul Pure Cow Ghee Tin (1 Litre)",
+        "category": "Dairy & Oils",
+        "selling_price": 640.0,
+        "cost_price": 530.0,
+        "stock_quantity": 85,
+        "margin_pct": 17.2,
+        "velocity_status": "FAST_MOVING",
+        "surge_lift_pct": 180.5
+      },
+      {
+        "product_id": "PROD_SWEET_01",
+        "name": "Haldiram's Gulab Jamun Traditional Tin (1kg)",
+        "category": "Sweets & Confectionery",
+        "selling_price": 260.0,
+        "cost_price": 190.0,
+        "stock_quantity": 120,
+        "margin_pct": 26.9,
+        "velocity_status": "FAST_MOVING",
+        "surge_lift_pct": 180.5
       },
       {
         "product_id": "PROD_OIL_01",
@@ -137,85 +125,96 @@
         "stock_quantity": 220,
         "margin_pct": 15.5,
         "velocity_status": "FAST_MOVING",
-        "surge_lift_pct": 75.0
+        "surge_lift_pct": 180.5
+      },
+      {
+        "product_id": "PROD_BISCUIT_01",
+        "name": "Britannia Good Day Butter Cookies (Pack of 6)",
+        "category": "Bakery & Snacks",
+        "selling_price": 160.0,
+        "cost_price": 110.0,
+        "stock_quantity": 195,
+        "margin_pct": 31.2,
+        "velocity_status": "SLOW_MOVING",
+        "surge_lift_pct": 180.5
       }
     ],
-    "suggested_combo_title": "Taste of Karnataka: Ghee, Masala & Snacks",
+    "suggested_combo_title": "Diwali Delight Hamper: Sweets, Snacks & Ghee",
     "country": "India",
-    "city": "Bengaluru",
+    "city": "Mumbai",
     "generation_source": "LIVE_VERTEX_SA_API (gemini-2.5-flash-lite)",
-    "synced_at": "2026-10-16T05:54:37.934587+00:00"
+    "synced_at": "2026-10-16T06:54:04.290467+00:00"
   },
   {
-    "id": "EVT_KARTHIK_POORNIMA_2026",
-    "name": "Karthik Pournami / Karthigai Deepam",
-    "region": "Karnataka & South India, India",
-    "date_window": "Nov 29 - Nov 30, 2026",
+    "id": "EVT_NEW_YEAR_2027",
+    "name": "New Year's Eve / Day",
+    "region": "Maharashtra, India",
+    "date_window": "Dec 31, 2026 - Jan 01, 2027",
     "status": "UPCOMING",
-    "demand_lift_pct": 75.0,
+    "demand_lift_pct": 60.0,
     "key_items": [
-      "Kalyan Clay Diya Gift Box (Set of 24) (Puja & Festive)",
-      "Nandini Pure Cow Ghee Pouch (500ml) (Dairy & Oils)",
-      "Aashirvaad Shahi Garam Masala Box (200g) (Spices)",
-      "Nutraj California Premium Almonds (500g) (Dry Fruits)"
+      "Taj Mahal Premium Gold Tea (500g) (Beverages)",
+      "Britannia Good Day Butter Cookies (Pack of 6) (Bakery & Snacks)",
+      "Fortune Sunlite Refined Sunflower Oil (1 Litre) (Staples & Oils)",
+      "Amul Pure Cow Ghee Tin (1 Litre) (Dairy & Oils)"
     ],
     "icon": "",
-    "description": "Karthik Pournami, also known as Karthigai Deepam in some South Indian regions, is celebrated with the lighting of lamps and devotional activities. This period sees increased demand for decorative lamps and ingredients for special meals.",
-    "tradition_notes": "Lighting lamps (diyas) is a central ritual, symbolizing knowledge and the dispelling of ignorance. Ghee is often used in lamps and for preparing devotional foods, while dry fruits and spices enhance festive culinary offerings.",
-    "advance_procurement_window": "T-20 Days: Procure additional stock of clay diyas and puja oils",
-    "promo_launch_window": "T-10 Days: Offer 'Karthik Lamp' bundle deals",
-    "clearance_window": "T+2 Days: Discount on remaining diya sets",
+    "description": "New Year's Eve and Day celebrations in Mumbai lead to increased demand for beverages, snacks, and cooking essentials as people host parties or enjoy family gatherings. Retailers can capitalize on this by offering convenient party packs and staple items.",
+    "tradition_notes": "Tea and cookies are common for social gatherings and late-night celebrations. Cooking oils and ghee are used for preparing snacks and meals for guests during the New Year festivities.",
+    "advance_procurement_window": "T-10 Days: Ensure adequate stock of beverages and snack items",
+    "promo_launch_window": "T-5 Days: Promote 'New Year Party Essentials' bundles",
+    "clearance_window": "T+1 Day: Offer special pricing on remaining party snacks",
     "recommended_promo_type": "ANCHOR_MARGIN_BOOSTER",
     "matched_inventory_items": [
       {
-        "product_id": "PROD_CSV_10",
-        "name": "Kalyan Clay Diya Gift Box (Set of 24)",
-        "category": "Puja & Festive",
-        "selling_price": 149.0,
-        "cost_price": 70.0,
-        "stock_quantity": 180,
-        "margin_pct": 53.0,
-        "velocity_status": "FAST_MOVING",
-        "surge_lift_pct": 75.0
-      },
-      {
-        "product_id": "PROD_CSV_12",
-        "name": "Aashirvaad Shahi Garam Masala Box (200g)",
-        "category": "Spices",
-        "selling_price": 155.0,
-        "cost_price": 105.0,
-        "stock_quantity": 50,
-        "margin_pct": 32.3,
+        "product_id": "PROD_ALMOND_01",
+        "name": "Nutraj California Premium Almonds (500g)",
+        "category": "Dry Fruits",
+        "selling_price": 470.0,
+        "cost_price": 330.0,
+        "stock_quantity": 110,
+        "margin_pct": 29.8,
         "velocity_status": "SLOW_MOVING",
-        "surge_lift_pct": 75.0
+        "surge_lift_pct": 60.0
       },
       {
-        "product_id": "PROD_CSV_15",
-        "name": "Kalyan Clay Diya Gift Box (Set of 24)",
-        "category": "Puja & Festive",
-        "selling_price": 149.0,
-        "cost_price": 70.0,
-        "stock_quantity": 180,
-        "margin_pct": 53.0,
+        "product_id": "PROD_TEA_01",
+        "name": "Taj Mahal Premium Gold Tea (500g)",
+        "category": "Beverages",
+        "selling_price": 310.0,
+        "cost_price": 240.0,
+        "stock_quantity": 140,
+        "margin_pct": 22.6,
         "velocity_status": "FAST_MOVING",
-        "surge_lift_pct": 75.0
+        "surge_lift_pct": 60.0
       },
       {
-        "product_id": "PROD_CSV_17",
-        "name": "Aashirvaad Shahi Garam Masala Box (200g)",
-        "category": "Spices",
-        "selling_price": 155.0,
-        "cost_price": 105.0,
-        "stock_quantity": 50,
-        "margin_pct": 32.3,
+        "product_id": "PROD_BISCUIT_01",
+        "name": "Britannia Good Day Butter Cookies (Pack of 6)",
+        "category": "Bakery & Snacks",
+        "selling_price": 160.0,
+        "cost_price": 110.0,
+        "stock_quantity": 195,
+        "margin_pct": 31.2,
         "velocity_status": "SLOW_MOVING",
-        "surge_lift_pct": 75.0
+        "surge_lift_pct": 60.0
+      },
+      {
+        "product_id": "PROD_GHEE_01",
+        "name": "Amul Pure Cow Ghee Tin (1 Litre)",
+        "category": "Dairy & Oils",
+        "selling_price": 640.0,
+        "cost_price": 530.0,
+        "stock_quantity": 85,
+        "margin_pct": 17.2,
+        "velocity_status": "FAST_MOVING",
+        "surge_lift_pct": 60.0
       }
     ],
-    "suggested_combo_title": "Karthik Glow: Lamps & Festive Flavors",
+    "suggested_combo_title": "New Year Celebration Pack: Tea, Snacks & Cooking Staples",
     "country": "India",
-    "city": "Bengaluru",
+    "city": "Mumbai",
     "generation_source": "LIVE_VERTEX_SA_API (gemini-2.5-flash-lite)",
-    "synced_at": "2026-10-16T05:54:37.934587+00:00"
+    "synced_at": "2026-10-16T06:54:04.290467+00:00"
   }
 ]
