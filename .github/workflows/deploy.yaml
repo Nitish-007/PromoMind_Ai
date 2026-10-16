@@ -63,14 +63,14 @@ jobs:
           IMAGE="${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPOSITORY}/${SERVICE}:${GITHUB_SHA}"
 
           gcloud run deploy ${SERVICE} \
-          --image ${IMAGE} \
-          --region ${REGION} \
-          --platform managed \
-          --allow-unauthenticated \
-          --port 8080 \
-          --memory 1Gi \
-          --cpu 1 \
-          --update-env-vars="^#^PROJECT_ID=${{ vars.GCP_PROJECT_ID }}#GCP_PROJECT_ID=${{ vars.GCP_PROJECT_ID }}#GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}#FIRESTORE_PROJECT_ID=${{ vars.GCP_PROJECT_ID }}#VERTEX_AI_MODEL_NAME=${{ vars.VERTEX_AI_MODEL_NAME }}#FIRESTORE_SA_JSON=${{ secrets.FIRESTORE_SA_JSON }}#REGION=${{ vars.REGION }}"
+            --image ${IMAGE} \
+            --region ${REGION} \
+            --platform managed \
+            --allow-unauthenticated \
+            --port 8080 \
+            --memory 1Gi \
+            --cpu 1 \
+            --update-env-vars="PROJECT_ID=${{ vars.GCP_PROJECT_ID }},GCP_PROJECT_ID=${{ vars.GCP_PROJECT_ID }},FIRESTORE_PROJECT_ID=${{ vars.GCP_PROJECT_ID }},GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }},VERTEX_AI_MODEL_NAME=${{ vars.VERTEX_AI_MODEL_NAME }},REGION=${{ vars.REGION }}"
       
       - name: Extract live backend url
         id: get-backend-url
