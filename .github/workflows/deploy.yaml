@@ -4,6 +4,10 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'backend/**'
+      - 'frontend/**'
+      - '.github/workflows/deploy.yaml'
   workflow_dispatch:
 
 # Avoid overlapping deployments from multiple pushes.

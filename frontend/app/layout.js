@@ -2,8 +2,15 @@ import "./globals.css";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
 export const metadata = {
-  title: "PromoMind AI — Intelligent Demand Forecasting & Profit Optimization for Retail & Commerce",
+  title: "PromoMind AI — Retail Intelligence & Demand OS",
   description: "AI-Powered Demand Forecasting, Dynamic Sales Copilot & Capital Profit Optimization for Retail & Commerce",
+  icons: {
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+    ],
+    shortcut: "/icon.svg",
+    apple: "/icon.svg",
+  },
 };
 
 export default function RootLayout({ children }) {
