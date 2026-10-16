@@ -7,6 +7,7 @@ import {
   FileText,
   Presentation,
   LogIn,
+  User,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -14,6 +15,7 @@ import Link from "next/link";
 
 export function Header({
   storeProfile,
+  currentUser,
   theme,
   onToggleTheme,
   onOpenProfile,
@@ -54,7 +56,7 @@ export function Header({
           <button
             onClick={onOpenProfile}
             className="group flex items-center gap-2 rounded-md border border-border bg-transparent px-3 py-1.5 text-left text-sm transition-colors hover:bg-muted"
-            title="Edit Store Profile & Regional Demographics"
+            title="Manage Stores & Profile Settings"
           >
             <Store className="h-4 w-4 text-muted-foreground group-hover:text-foreground" />
             <div className="hidden xs:block sm:block" suppressHydrationWarning>
@@ -67,18 +69,31 @@ export function Header({
             </div>
           </button>
 
-          {/* Switch Store / Login Button (Issue #9) */}
-          {onOpenLoginModal && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={onOpenLoginModal}
-              className="gap-1.5 text-xs h-9 px-3 border-border font-semibold"
-              title="Retailer Login & Switch Store Branch"
+          {/* User Account / Sign In Button */}
+          {currentUser ? (
+            <button
+              onClick={onOpenProfile}
+              className="flex items-center gap-1.5 rounded-md border border-border bg-muted/40 px-3 py-1.5 text-xs font-semibold hover:bg-muted transition-colors text-foreground"
+              title={`Logged in as ${currentUser.email || currentUser.full_name}`}
             >
-              <LogIn className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">Switch Store / Login</span>
-            </Button>
+              <User className="h-3.5 w-3.5 text-muted-foreground" />
+              <span className="max-w-[120px] truncate hidden sm:inline">
+                {currentUser.full_name || currentUser.email?.split("@")[0] || "Account"}
+              </span>
+            </button>
+          ) : (
+            onOpenLoginModal && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={onOpenLoginModal}
+                className="gap-1.5 text-xs h-9 px-3 border-border font-semibold"
+                title="Sign In or Create Account"
+              >
+                <LogIn className="h-3.5 w-3.5" />
+                <span>Sign In / Sign Up</span>
+              </Button>
+            )
           )}
 
           {/* Whitepaper Link */}

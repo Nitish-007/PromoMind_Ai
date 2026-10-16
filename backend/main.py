@@ -1,6 +1,6 @@
 import os
 import sys
-from fastapi import FastAPI, HTTPException, UploadFile, File, Form, Header
+from fastapi import FastAPI, HTTPException, UploadFile, File, Form, Header, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, HTMLResponse
@@ -40,7 +40,9 @@ from models import (
     ConflictCheckRequest, ConflictCheckResponse, StoreProfile,
     InvestmentROISimulation, ROIScenarioRequest, ChatQuery, ChatResponse,
     FestivalDiscoveryRequest, StoreProfileUpdate, StorageStatusResponse,
-    LoginRequest, LoginResponse, ApiKeyConfigRequest, OfferStatusUpdate
+    LoginRequest, LoginResponse, ApiKeyConfigRequest, OfferStatusUpdate,
+    UserSignupRequest, UserSigninRequest, UserProfile, UserAuthResponse,
+    SwitchStoreRequest
 )
 from mock_data import DEMAND_FORECASTS
 from agents import PromoMindEngine, RetailCopilotAgent, DynamicFestivalEngine, GeminiLiveClient
@@ -112,13 +114,159 @@ def get_cloud_storage_status():
 
 
 # ==============================================================================
-# One-Time Login, Store Setup & Auto Regional Festival Persistence
+# User Authentication & Store Management Under User Account
 # ==============================================================================
+
+@app.post("/api/auth/signup", response_model=UserAuthResponse)
+def user_signup(payload: UserSignupRequest):
+    """
+    User Sign Up:
+    Registers a new retailer user account (Full Name, Email, Password).
+    Automatically establishes an initial store under their account.
+    Store profile details (region, capital, format, margins) can be configured
+    or changed anytime under Profile Creation / Settings.
+    """
+    user_data, err = StoreDataManager.signup_user(
+        email=payload.email,
+        password=payload.password,
+        full_name=payload.full_name,
+        phone=payload.phone
+    )
+    if err:
+        raise HTTPException(status_code=400, detail=err)
+
+    active_store_id = user_data.get("active_store_id") or "sharma_supermarket_01"
+    prof_dict = StoreDataManager.get_store_profile()
+    profile_model = StoreProfile(**prof_dict)
+    status = StoreDataManager.get_storage_status()
+
+    # Pre-cache regional festivals for the initial store
+    DynamicFestivalEngine.discover_festivals(
+        region=profile_model.region,
+        country=profile_model.country or "India",
+        city=profile_model.city,
+        force_refresh=False
+    )
+
+    clean_user = {k: v for k, v in user_data.items() if k not in ("password_hash", "salt")}
+    return UserAuthResponse(
+        status="SUCCESS",
+        authenticated=True,
+        message="Account created successfully",
+        user=UserProfile(**clean_user),
+        active_store_id=active_store_id,
+        profile=profile_model,
+        available_stores=StoreDataManager.list_stores(),
+        token=f"tok_{user_data['user_id']}",
+        gemini_configured=GeminiLiveClient.is_configured(),
+        storage_mode=status["mode"]
+    )
+
+
+@app.post("/api/auth/signin", response_model=UserAuthResponse)
+def user_signin(payload: UserSigninRequest):
+    """
+    User Sign In:
+    Authenticates existing user with Email & Password.
+    Switches session to user's active store.
+    """
+    user_data, err = StoreDataManager.authenticate_user(
+        email=payload.email,
+        password=payload.password
+    )
+    if err:
+        raise HTTPException(status_code=401, detail=err)
+
+    active_store_id = user_data.get("active_store_id") or "sharma_supermarket_01"
+    prof_dict = StoreDataManager.get_store_profile()
+    profile_model = StoreProfile(**prof_dict)
+    status = StoreDataManager.get_storage_status()
+
+    clean_user = {k: v for k, v in user_data.items() if k not in ("password_hash", "salt")}
+    return UserAuthResponse(
+        status="SUCCESS",
+        authenticated=True,
+        message="Authenticated successfully",
+        user=UserProfile(**clean_user),
+        active_store_id=active_store_id,
+        profile=profile_model,
+        available_stores=StoreDataManager.list_stores(),
+        token=f"tok_{user_data['user_id']}",
+        gemini_configured=GeminiLiveClient.is_configured(),
+        storage_mode=status["mode"]
+    )
+
+
+@app.get("/api/auth/me")
+def get_current_user_account(user_id: Optional[str] = Query(None), email: Optional[str] = Query(None)):
+    """
+    Get current logged-in user profile, their associated stores, and active store.
+    """
+    user = None
+    if user_id:
+        user = StoreDataManager.get_user_by_id(user_id)
+    elif email:
+        user = StoreDataManager.get_user_by_email(email)
+
+    if not user:
+        # Default fallback to demo admin user so UI always loads gracefully
+        user = StoreDataManager.get_user_by_email("admin@promomind.ai")
+
+    if not user:
+        raise HTTPException(status_code=404, detail="User account not found")
+
+    clean_user = {k: v for k, v in user.items() if k not in ("password_hash", "salt")}
+    active_store_id = clean_user.get("active_store_id") or StoreDataManager.get_adapter().store_id
+    prof_dict = StoreDataManager.get_store_profile()
+
+    return {
+        "status": "SUCCESS",
+        "user": clean_user,
+        "active_store_id": active_store_id,
+        "profile": prof_dict,
+        "available_stores": StoreDataManager.list_stores()
+    }
+
+
+@app.post("/api/auth/switch-store", response_model=UserAuthResponse)
+def switch_active_store(payload: SwitchStoreRequest):
+    """
+    Switch the active store branch for a logged-in user.
+    """
+    user_id = payload.user_id or "usr_admin_01"
+    user_data, err = StoreDataManager.switch_user_store(user_id, payload.store_id)
+    if err:
+        prof_dict = StoreDataManager.switch_store(payload.store_id)
+        user_data = StoreDataManager.get_user_by_email("admin@promomind.ai") or {
+            "user_id": user_id,
+            "email": "admin@promomind.ai",
+            "full_name": "Store Manager",
+            "store_ids": [payload.store_id],
+            "active_store_id": payload.store_id
+        }
+    else:
+        prof_dict = StoreDataManager.get_store_profile()
+
+    clean_user = {k: v for k, v in user_data.items() if k not in ("password_hash", "salt")}
+    status = StoreDataManager.get_storage_status()
+
+    return UserAuthResponse(
+        status="SUCCESS",
+        authenticated=True,
+        message=f"Switched store to {payload.store_id}",
+        user=UserProfile(**clean_user),
+        active_store_id=payload.store_id,
+        profile=StoreProfile(**prof_dict),
+        available_stores=StoreDataManager.list_stores(),
+        gemini_configured=GeminiLiveClient.is_configured(),
+        storage_mode=status["mode"]
+    )
+
 
 @app.post("/api/auth/login", response_model=LoginResponse)
 def login_or_switch_store(payload: LoginRequest):
     """
-    One-Time Retailer Login & Store Region Setup:
+    One-Time Retailer Login & Store Region Setup (Legacy & Quick Switch):
     1. Persists store profile & region in Firestore (`stores/{store_id}/store_profile`).
     2. Automatically discovers & persists regional festivals for the store's region in `stores/{store_id}/calendar_events`.
     3. Loads active and scheduled offers from `stores/{store_id}/promotions`.
@@ -178,12 +326,24 @@ def login_or_switch_store(payload: LoginRequest):
     offers_raw = StoreDataManager.get_promotions()
     active_offers = [ScheduledOffer(**o) for o in offers_raw]
 
+    # Find associated user if any
+    matched_user = None
+    if payload.phone_or_email and "@" in payload.phone_or_email:
+        u = StoreDataManager.get_user_by_email(payload.phone_or_email)
+        if u:
+            matched_user = UserProfile(**{k: v for k, v in u.items() if k not in ("password_hash", "salt")})
+    if not matched_user:
+        u = StoreDataManager.get_user_by_email("admin@promomind.ai")
+        if u:
+            matched_user = UserProfile(**{k: v for k, v in u.items() if k not in ("password_hash", "salt")})
+
     status = StoreDataManager.get_storage_status()
     return LoginResponse(
         status="SUCCESS",
         authenticated=True,
         store_id=target_store_id,
         profile=profile_model,
+        user=matched_user,
         available_stores=StoreDataManager.list_stores(),
         regional_festivals=festivals,
         active_offers=active_offers,
@@ -193,16 +353,28 @@ def login_or_switch_store(payload: LoginRequest):
 
 
 @app.get("/api/stores")
-def list_available_stores():
+def list_available_stores(user_id: Optional[str] = Query(None)):
+    stores = StoreDataManager.list_stores()
+    user_stores = []
+    if user_id:
+        user = StoreDataManager.get_user_by_id(user_id)
+        if user and user.get("store_ids"):
+            user_stores = [s for s in stores if s.get("store_id") in user["store_ids"]]
+
     return {
         "status": "SUCCESS",
         "active_store_id": StoreDataManager.get_adapter().store_id,
-        "stores": StoreDataManager.list_stores()
+        "stores": stores,
+        "user_stores": user_stores or stores
     }
 
 
 @app.post("/api/stores")
-def create_or_switch_store(payload: StoreProfileUpdate, x_gemini_api_key: Optional[str] = Header(None)):
+def create_or_switch_store(
+    payload: StoreProfileUpdate,
+    x_gemini_api_key: Optional[str] = Header(None),
+    x_user_id: Optional[str] = Header(None)
+):
     _apply_request_context(x_gemini_api_key=x_gemini_api_key)
     updates = payload.model_dump(exclude_unset=True)
     store_id = updates.get("store_id")
@@ -211,10 +383,13 @@ def create_or_switch_store(payload: StoreProfileUpdate, x_gemini_api_key: Option
     if not store_id:
         store_id = f"store_branch_{len(StoreDataManager.list_stores()) + 1:02d}"
 
-    current = StoreDataManager.switch_store(store_id)
-    current.update(updates)
-    current["store_id"] = store_id
-    saved = StoreDataManager.save_store_profile(current)
+    if x_user_id:
+        user_data, saved = StoreDataManager.create_store_under_user(x_user_id, updates)
+    else:
+        current = StoreDataManager.switch_store(store_id)
+        current.update(updates)
+        current["store_id"] = store_id
+        saved = StoreDataManager.save_store_profile(current)
 
     # Sync regional festivals for the newly created/switched store
     festivals = DynamicFestivalEngine.discover_festivals(

@@ -8,7 +8,7 @@ import { InventoryScreen } from "@/components/inventory/InventoryScreen";
 import { CopilotScreen } from "@/components/copilot/CopilotScreen";
 import { BrandComparisonModal } from "@/components/modals/BrandComparisonModal";
 import { AddProductModal } from "@/components/modals/AddProductModal";
-import { LoginStoreModal } from "@/components/modals/LoginStoreModal";
+import { UserAuthModal } from "@/components/modals/UserAuthModal";
 import {
   fetchInventory,
   fetchFinancialRoi,
@@ -17,6 +17,7 @@ import {
   addProduct,
   fetchStoreProfile,
   fetchStorageStatus,
+  fetchCurrentUser,
 } from "@/lib/api";
 
 import { CalendarScreen } from "@/components/calendar/CalendarScreen";
@@ -28,7 +29,8 @@ export default function Home() {
   const [theme, setTheme] = useState("light");
   const [copilotPrompt, setCopilotPrompt] = useState("");
 
-  // Store Profile & Storage
+  // Authenticated User & Multi-Store Profile
+  const [currentUser, setCurrentUser] = useState(null);
   const [storeProfile, setStoreProfile] = useState({
     store_id: "sharma_supermarket_01",
     store_name: "Sharma Supermarket & Kirana",
@@ -61,10 +63,18 @@ export default function Home() {
       document.documentElement.classList.remove("dark");
     }
 
-    // Check if user has logged in once; if not, open the one-time Login & Region Setup modal
-    const hasLoggedIn = localStorage.getItem("promomind_logged_in");
-    if (!hasLoggedIn) {
-      setIsLoginModalOpen(true);
+    // Check if user has an active session
+    const cachedUser = localStorage.getItem("promomind_user");
+    if (cachedUser) {
+      try {
+        const u = JSON.parse(cachedUser);
+        setCurrentUser(u);
+      } catch (_) {}
+    } else {
+      const hasLoggedIn = localStorage.getItem("promomind_logged_in");
+      if (!hasLoggedIn) {
+        setIsLoginModalOpen(true);
+      }
     }
 
     const cachedStoreName = localStorage.getItem("promomind_store_name");
@@ -189,11 +199,38 @@ export default function Home() {
     loadInitialData();
   };
 
+  const handleUserAuthenticated = (user, profile) => {
+    if (user) {
+      setCurrentUser(user);
+      if (typeof window !== "undefined") {
+        localStorage.setItem("promomind_user", JSON.stringify(user));
+        localStorage.setItem("promomind_logged_in", "true");
+      }
+    }
+    if (profile) {
+      setStoreProfile((prev) => ({
+        ...prev,
+        ...profile,
+      }));
+    }
+    loadInitialData();
+  };
+
+  const handleUserSignOut = () => {
+    setCurrentUser(null);
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("promomind_user");
+      localStorage.removeItem("promomind_logged_in");
+    }
+    setIsLoginModalOpen(true);
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground transition-colors">
       {/* 1. App Top Bar */}
       <Header
         storeProfile={storeProfile}
+        currentUser={currentUser}
         theme={theme}
         onToggleTheme={toggleTheme}
         onOpenProfile={() => setActiveTab("profile")}
@@ -254,8 +291,10 @@ export default function Home() {
         {/* Feature 5: Store Profile & Multi-Store Management */}
         {activeTab === "profile" && (
           <ProfileScreen
+            currentUser={currentUser}
             onProfileUpdated={handleProfileUpdated}
             onOpenLoginModal={() => setIsLoginModalOpen(true)}
+            onUserSignOut={handleUserSignOut}
           />
         )}
       </main>
@@ -276,12 +315,11 @@ export default function Home() {
         onAddProduct={handleAddSku}
       />
 
-      {/* One-Time Retailer Login & Regional Setup Modal */}
-      <LoginStoreModal
+      {/* Dedicated Clean User Sign Up & Sign In Modal */}
+      <UserAuthModal
         isOpen={isLoginModalOpen}
         onClose={() => setIsLoginModalOpen(false)}
-        currentProfile={storeProfile}
-        onStoreAuthenticated={handleProfileUpdated}
+        onUserAuthenticated={handleUserAuthenticated}
       />
     </div>
   );

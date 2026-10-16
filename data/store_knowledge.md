@@ -1,17 +1,17 @@
 # 🏪 PromoMind AI — Retail Store Knowledge & Catalog Base
-> *Store Name*: **Test Bangalore Mart** | *Owner*: **Suresh Kumar**
-> *Cultural Region*: **Karnataka & South India** (Bengaluru, 560038)
-> *Store Format*: **Supermarket** | *WhatsApp Broadcast Reach*: **2500 Families**
-> *Working Capital Invested*: **₹450,517** | *Target Net Margin*: **16.5%**
-> *Storage Mode: **CLOUD** | Synchronized: 2026-10-15 17:08:55 UTC*
+> *Store Name*: **Sharma Supermarket Koramangala** | *Owner*: **Ramesh Sharma**
+> *Cultural Region*: **Karnataka & South India** (Bengaluru, 560048)
+> *Store Format*: **Supermarket** | *WhatsApp Broadcast Reach*: **2502 Families**
+> *Working Capital Invested*: **₹494,860** | *Target Net Margin*: **16.5%**
+> *Storage Mode: **CLOUD** | Synchronized: 2026-10-16 05:54:55 UTC*
 > *Auto-generated from retail inventory data & open-source demand forecasting engine.*
 
 ---
 ## 💰 1. Working Capital Investment & Return on Capital (ROI) Intelligence
 
-- **Total Inventory Capital Invested**: ₹450,517
-- **Projected 30-Day Sales Turnover**: ₹1,102,485
-- **Projected Net Dukan Profit**: ₹271,750 (**60.3% Net Return on Capital**)
+- **Total Inventory Capital Invested**: ₹494,860
+- **Projected 30-Day Sales Turnover**: ₹1,209,860
+- **Projected Net Dukan Profit**: ₹295,372 (**59.7% Net Return on Capital**)
 - **Dead Working Capital Trapped in Slow Movers**: ₹124,170 (7 at-risk SKUs)
 - **Capital Unlocked via Smart Promo Bundles**: **₹80,710** cash freed within 12 days (+₹17,756 net promo profit)
 - **Cash Turnover Velocity**: Every **16 days**
@@ -47,5 +47,7 @@
 | `PROD_TEA_01` | Taj Mahal Premium Gold Tea (500g) | Beverages | 140 | ₹240.0 | ₹310.0 | 22.6% | FAST_MOVING | 18d | 🟢 Strong Buy / Restock Now |
 | `SKU_COORG_FILTER_C_24` | Coorg Filter Coffee Powder (500g) | Beverages | 75 | ₹226.2 | ₹290.0 | 22.0% | MODERATE | 16d | Strong Buy / Restock Now |
 | `SKU_COORG_FILTER_C_26` | Coorg Filter Coffee Test 0a0bea (500g) | Beverages | 120 | ₹230.1 | ₹295.0 | 22.0% | FAST_MOVING | 23d | Strong Buy / Restock Now |
+| `SKU_COORG_FILTER_C_28` | Coorg Filter Coffee Test 7e0d58 (500g) | Beverages | 120 | ₹230.1 | ₹295.0 | 22.0% | FAST_MOVING | 23d | Strong Buy / Restock Now |
 | `SKU_MYSORE_SANDAL__25` | Mysore Sandal Soap Pack (3x150g) | Staples & Oils | 90 | ₹152.1 | ₹195.0 | 22.0% | FAST_MOVING | 15d | Strong Buy / Restock Now |
 | `SKU_MYSORE_SANDAL__27` | Mysore Sandal Soap Test 0a0bea (3x150g) | Staples & Oils | 110 | ₹152.1 | ₹195.0 | 22.0% | FAST_MOVING | 18d | Strong Buy / Restock Now |
+| `SKU_MYSORE_SANDAL__29` | Mysore Sandal Soap Test 7e0d58 (3x150g) | Staples & Oils | 110 | ₹152.1 | ₹195.0 | 22.0% | FAST_MOVING | 18d | Strong Buy / Restock Now |

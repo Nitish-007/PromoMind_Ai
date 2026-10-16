@@ -1,0 +1,58 @@
+{
+  "usr_admin_01": {
+    "user_id": "usr_admin_01",
+    "email": "admin@promomind.ai",
+    "full_name": "Ramesh Sharma",
+    "phone": "+91 98450 12345",
+    "password_hash": "a75d39b6a67c113f5fcb778816655957757265d68c281aff50dba3750f011d68",
+    "salt": "promomind_2026",
+    "store_ids": [
+      "sharma_supermarket_01",
+      "patel_fresh_mart_02",
+      "sen_bazar_03"
+    ],
+    "active_store_id": "sharma_supermarket_01",
+    "created_at": "2026-10-15T10:00:00Z"
+  },
+  "usr_ramesh_02": {
+    "user_id": "usr_ramesh_02",
+    "email": "ramesh@sharmamart.in",
+    "full_name": "Ramesh Sharma",
+    "phone": "+91 98450 12345",
+    "password_hash": "a0dc7cc98e31d3902f84ed6532f5c6330c2fcfd791f6cef66c0507273512defb",
+    "salt": "promomind_2026",
+    "store_ids": [
+      "sharma_supermarket_01"
+    ],
+    "active_store_id": "sharma_supermarket_01",
+    "created_at": "2026-10-15T10:00:00Z"
+  },
+  "usr_retailer1792_1792129908": {
+    "user_id": "usr_retailer1792_1792129908",
+    "email": "retailer_1792129907@storemail.com",
+    "full_name": "Vikram Sethi",
+    "phone": "+91 98765 43210",
+    "password_hash": "0daafd73fc0e63157a46f90d85b2699d245720a7d33e43fd94e25d2a2d125e51",
+    "salt": "promomind_2026",
+    "store_ids": [
+      "store_retailer1792",
+      "sethi_gourmet_mart_indir"
+    ],
+    "active_store_id": "sethi_gourmet_mart_indir",
+    "created_at": "2026-10-16T05:51:53.960145+00:00"
+  },
+  "usr_retailer1792_1792130012": {
+    "user_id": "usr_retailer1792_1792130012",
+    "email": "retailer_1792130007@storemail.com",
+    "full_name": "Vikram Sethi",
+    "phone": "+91 98765 43210",
+    "password_hash": "0daafd73fc0e63157a46f90d85b2699d245720a7d33e43fd94e25d2a2d125e51",
+    "salt": "promomind_2026",
+    "store_ids": [
+      "store_retailer1792",
+      "sethi_gourmet_mart_indir"
+    ],
+    "active_store_id": "store_retailer1792",
+    "created_at": "2026-10-16T05:53:34.993450+00:00"
+  }
+}

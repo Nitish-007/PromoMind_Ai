@@ -7,6 +7,8 @@ import {
   fetchStorageStatus,
   fetchStores,
   loginStore,
+  createOrSwitchStore,
+  switchUserStore,
   configureGeminiApiKey,
 } from "@/lib/api";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
@@ -27,6 +29,11 @@ import {
   RefreshCw,
   KeyRound,
   LogIn,
+  User,
+  Plus,
+  Building2,
+  LogOut,
+  Sparkles,
 } from "lucide-react";
 
 const STORE_FORMAT_OPTIONS = [
@@ -46,7 +53,12 @@ const REGION_OPTIONS = [
   { value: "Kerala & South India", label: "Kerala & South India (Onam, Vishu)" },
 ];
 
-export function ProfileScreen({ onProfileUpdated, onOpenLoginModal }) {
+export function ProfileScreen({
+  currentUser,
+  onProfileUpdated,
+  onOpenLoginModal,
+  onUserSignOut,
+}) {
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
   const [isFallback, setIsFallback] = useState(false);
@@ -58,6 +70,17 @@ export function ProfileScreen({ onProfileUpdated, onOpenLoginModal }) {
   const [activeStoreId, setActiveStoreId] = useState("sharma_supermarket_01");
   const [geminiApiKey, setGeminiApiKey] = useState("");
   const [apiKeySaved, setApiKeySaved] = useState(false);
+
+  // Create New Store under User state
+  const [isCreatingStore, setIsCreatingStore] = useState(false);
+  const [newStoreName, setNewStoreName] = useState("");
+  const [newStoreFormat, setNewStoreFormat] = useState("Supermarket");
+  const [newStoreCity, setNewStoreCity] = useState("Bengaluru");
+  const [newStoreRegion, setNewStoreRegion] = useState("Karnataka & South India");
+  const [newStoreCapital, setNewStoreCapital] = useState(500000);
+  const [newStoreMargin, setNewStoreMargin] = useState(18.0);
+  const [creatingStoreLoading, setCreatingStoreLoading] = useState(false);
+  const [createStoreError, setCreateStoreError] = useState("");
 
   // Form fields
   const [storeName, setStoreName] = useState("");
@@ -130,14 +153,81 @@ export function ProfileScreen({ onProfileUpdated, onOpenLoginModal }) {
       localStorage.setItem("promomind_store_id", targetId);
     }
     try {
-      const res = await loginStore({ store_id: targetId });
+      let res;
+      if (currentUser?.user_id) {
+        res = await switchUserStore(targetId, currentUser.user_id);
+      } else {
+        res = await loginStore({ store_id: targetId });
+      }
       if (res && res.profile) {
         populateFields(res.profile);
         if (onProfileUpdated) onProfileUpdated(res.profile);
         await loadStorageData();
       }
     } catch (e) {
-      console.error("Failed switching store:", e);
+      console.warn("Store switch attempt 1 failed, trying fallback:", e);
+      try {
+        const fallbackRes = await loginStore({ store_id: targetId });
+        if (fallbackRes && fallbackRes.profile) {
+          populateFields(fallbackRes.profile);
+          if (onProfileUpdated) onProfileUpdated(fallbackRes.profile);
+          await loadStorageData();
+        }
+      } catch (err2) {
+        console.error("Store switch fallback failed:", err2);
+      }
+    }
+  }
+
+  async function handleCreateNewStore(e) {
+    if (e) e.preventDefault();
+    if (!newStoreName.trim()) {
+      setCreateStoreError("Please enter a valid store branch name.");
+      return;
+    }
+    setCreatingStoreLoading(true);
+    setCreateStoreError("");
+
+    const payload = {
+      store_name: newStoreName.trim(),
+      store_type: newStoreFormat,
+      city: newStoreCity.trim() || "Bengaluru",
+      region: newStoreRegion,
+      total_working_capital_inr: Number(newStoreCapital) || 500000,
+      default_min_margin_pct: Number(newStoreMargin) || 18.0,
+      owner_name: currentUser?.full_name || ownerName || "Store Owner",
+      phone: currentUser?.phone || phone || "+91 98450 12345",
+    };
+
+    try {
+      const res = await createOrSwitchStore(payload);
+      if (res && res.profile) {
+        populateFields(res.profile);
+        if (res.active_store_id) {
+          setActiveStoreId(res.active_store_id);
+          if (typeof window !== "undefined") {
+            localStorage.setItem("promomind_store_id", res.active_store_id);
+          }
+        }
+        if (res.stores && Array.isArray(res.stores)) {
+          setAvailableStores(res.stores);
+        } else {
+          await loadStoresRegistry();
+        }
+        await loadStorageData();
+        if (onProfileUpdated) {
+          onProfileUpdated(res.profile);
+        }
+        setIsCreatingStore(false);
+        setNewStoreName("");
+        setSaveSuccess(true);
+        setTimeout(() => setSaveSuccess(false), 3500);
+      }
+    } catch (err) {
+      console.error("Failed creating store:", err);
+      setCreateStoreError(err.message || "Failed to create store branch under this user.");
+    } finally {
+      setCreatingStoreLoading(false);
     }
   }
 
@@ -383,39 +473,278 @@ export function ProfileScreen({ onProfileUpdated, onOpenLoginModal }) {
         </div>
       </div>
 
-      {/* Multi-Store Switcher & Live Gemini API Key Bar (Issue #9) */}
-      <Card className="border border-border bg-card shadow-xs">
-        <CardContent className="p-5 grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="space-y-2">
-            <label className="text-xs font-bold uppercase tracking-wider text-foreground">
-              Active Firestore Store Branch ({availableStores.length} Stores):
-            </label>
-            <div className="flex flex-wrap gap-2">
-              {availableStores.map((st) => {
-                const isCurr = st.store_id === activeStoreId;
-                return (
-                  <button
-                    key={st.store_id}
-                    type="button"
-                    onClick={() => handleQuickSwitchStore(st.store_id)}
-                    className={`px-3 py-2 rounded-lg border text-xs font-medium transition-colors text-left ${
-                      isCurr
-                        ? "bg-foreground text-background border-foreground font-semibold"
-                        : "bg-muted/40 text-foreground border-border hover:bg-muted"
-                    }`}
-                  >
-                    <div>{st.store_name}</div>
-                    <div className="text-[10px] opacity-75">{st.city} • {st.owner_name}</div>
-                  </button>
-                );
-              })}
+      {/* 1. User Account Profile Banner */}
+      <Card className="border border-border bg-card shadow-xs overflow-hidden">
+        <div className="p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="flex items-center gap-3.5">
+            <div className="h-12 w-12 rounded-full bg-foreground/10 text-foreground flex items-center justify-center font-bold text-lg border border-border shrink-0">
+              {currentUser?.full_name ? (
+                currentUser.full_name.charAt(0).toUpperCase()
+              ) : (
+                <User className="h-6 w-6" />
+              )}
+            </div>
+            <div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <h3 className="text-base font-bold text-foreground">
+                  {currentUser?.full_name || "Merchant Account"}
+                </h3>
+                <Badge
+                  variant="outline"
+                  className="border-border bg-muted/60 text-[11px] font-semibold text-foreground"
+                >
+                  {currentUser ? "Registered User" : "Demo Session"}
+                </Badge>
+              </div>
+              <div className="text-xs text-muted-foreground flex items-center gap-3 mt-1 flex-wrap">
+                <span>{currentUser?.email || "admin@promomind.ai"}</span>
+                {currentUser?.phone && (
+                  <>
+                    <span>•</span>
+                    <span>{currentUser.phone}</span>
+                  </>
+                )}
+                <span>•</span>
+                <span>
+                  Active Branch: <strong className="text-foreground">{activeStoreId}</strong>
+                </span>
+              </div>
             </div>
           </div>
 
-          <div className="space-y-2">
-            <label className="text-xs font-bold uppercase tracking-wider text-foreground flex items-center gap-1.5">
+          <div className="flex items-center gap-2 shrink-0">
+            {onOpenLoginModal && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={onOpenLoginModal}
+                className="h-9 px-3 text-xs font-semibold border-border gap-1.5"
+              >
+                <LogIn className="h-3.5 w-3.5" />
+                {currentUser ? "Switch Account" : "Sign In / Sign Up"}
+              </Button>
+            )}
+            {currentUser && onUserSignOut && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={onUserSignOut}
+                className="h-9 px-3 text-xs font-semibold border-destructive/40 text-destructive hover:bg-destructive/10 gap-1.5"
+              >
+                <LogOut className="h-3.5 w-3.5" />
+                Sign Out
+              </Button>
+            )}
+          </div>
+        </div>
+      </Card>
+
+      {/* 2. Stores Under Your User Account (Multi-Store Management & Inline Creation) */}
+      <Card className="border border-border bg-card shadow-xs">
+        <CardHeader className="pb-3 border-b border-border">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+            <div>
+              <CardTitle className="text-base font-bold text-foreground flex items-center gap-2">
+                <Building2 className="h-4 w-4 text-foreground" />
+                Stores Under Your User Account
+                <Badge variant="secondary" className="ml-1 text-[11px] font-semibold">
+                  {availableStores.length} {availableStores.length === 1 ? "Store" : "Stores"}
+                </Badge>
+              </CardTitle>
+              <CardDescription className="text-xs text-muted-foreground mt-0.5">
+                Select an active store branch to manage inventory &amp; promotions, or create a new store.
+              </CardDescription>
+            </div>
+            <Button
+              variant={isCreatingStore ? "secondary" : "outline"}
+              size="sm"
+              onClick={() => setIsCreatingStore(!isCreatingStore)}
+              className="h-8 px-3 text-xs font-semibold gap-1.5 self-start sm:self-auto"
+            >
+              <Plus className={`h-3.5 w-3.5 transition-transform ${isCreatingStore ? "rotate-45" : ""}`} />
+              {isCreatingStore ? "Close Form" : "Create New Store"}
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent className="p-5 space-y-5">
+          {/* List of Store Branches */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {availableStores.map((st) => {
+              const isCurr = st.store_id === activeStoreId;
+              return (
+                <div
+                  key={st.store_id}
+                  onClick={() => handleQuickSwitchStore(st.store_id)}
+                  className={`p-3.5 rounded-xl border text-left cursor-pointer transition-all ${
+                    isCurr
+                      ? "border-foreground bg-muted/60 ring-1 ring-foreground"
+                      : "border-border bg-card hover:bg-muted/30"
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-2 mb-1.5">
+                    <span className="font-semibold text-sm text-foreground truncate">
+                      {st.store_name}
+                    </span>
+                    {isCurr ? (
+                      <Badge className="bg-foreground text-background text-[10px] px-1.5 py-0 font-bold shrink-0">
+                        Active
+                      </Badge>
+                    ) : (
+                      <span className="text-[10px] text-muted-foreground border border-border px-1.5 py-0.5 rounded shrink-0">
+                        Switch
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-xs text-muted-foreground flex items-center gap-1.5">
+                    <span>{st.city || "India"}</span>
+                    <span>•</span>
+                    <span>{st.store_type || "Retail"}</span>
+                  </div>
+                  <div className="text-[11px] text-muted-foreground/80 mt-1 font-mono">
+                    ID: {st.store_id}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Inline Create New Store Form */}
+          {isCreatingStore && (
+            <div className="p-4 sm:p-5 rounded-xl border border-border bg-muted/20 space-y-4">
+              <div className="flex items-center justify-between border-b border-border pb-3">
+                <div>
+                  <h4 className="text-sm font-bold text-foreground flex items-center gap-2">
+                    <Store className="h-4 w-4" />
+                    Create New Store Branch
+                  </h4>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    Set up a new physical or cloud store profile under your user account.
+                  </p>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setIsCreatingStore(false)}
+                  className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground"
+                >
+                  ✕
+                </Button>
+              </div>
+
+              {createStoreError && (
+                <div className="p-2.5 rounded-lg border border-destructive/40 bg-destructive/10 text-xs text-destructive flex items-center gap-2">
+                  <AlertCircle className="h-3.5 w-3.5 shrink-0" />
+                  <span>{createStoreError}</span>
+                </div>
+              )}
+
+              <form onSubmit={handleCreateNewStore} className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-foreground">
+                      Store Name <span className="text-destructive">*</span>
+                    </label>
+                    <Input
+                      placeholder="e.g. Sharma Organic Mart"
+                      value={newStoreName}
+                      onChange={(e) => setNewStoreName(e.target.value)}
+                      className="h-9 text-xs bg-background"
+                      required
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-foreground">Store Format</label>
+                    <CustomSelect
+                      value={newStoreFormat}
+                      onChange={setNewStoreFormat}
+                      options={STORE_FORMAT_OPTIONS}
+                      placeholder="Select format..."
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-foreground">City / District</label>
+                    <Input
+                      placeholder="e.g. Bengaluru"
+                      value={newStoreCity}
+                      onChange={(e) => setNewStoreCity(e.target.value)}
+                      className="h-9 text-xs bg-background"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-foreground">Region / Demographics</label>
+                    <CustomSelect
+                      value={newStoreRegion}
+                      onChange={setNewStoreRegion}
+                      options={REGION_OPTIONS}
+                      placeholder="Select region..."
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-foreground">Initial Working Capital (₹)</label>
+                    <Input
+                      type="number"
+                      step="25000"
+                      value={newStoreCapital}
+                      onChange={(e) => setNewStoreCapital(Number(e.target.value))}
+                      className="h-9 text-xs bg-background"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-foreground">Target Margin (%)</label>
+                    <Input
+                      type="number"
+                      step="0.5"
+                      value={newStoreMargin}
+                      onChange={(e) => setNewStoreMargin(Number(e.target.value))}
+                      className="h-9 text-xs bg-background"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex justify-end gap-2 pt-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setIsCreatingStore(false)}
+                    className="h-9 px-4 text-xs"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="submit"
+                    size="sm"
+                    disabled={creatingStoreLoading || !newStoreName.trim()}
+                    className="h-9 px-4 text-xs font-semibold bg-primary text-primary-foreground hover:bg-primary/90 gap-1.5"
+                  >
+                    {creatingStoreLoading ? (
+                      <>
+                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                        Creating Store...
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="h-3.5 w-3.5" />
+                        Create Store &amp; Activate
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </form>
+            </div>
+          )}
+
+          {/* Live Gemini API Key Bar */}
+          <div className="pt-2 border-t border-border">
+            <label className="text-xs font-bold uppercase tracking-wider text-foreground flex items-center gap-1.5 mb-2">
               <KeyRound className="h-3.5 w-3.5" />
-              Live Gemini API Key (Search-Time Generation):
+              Live Gemini API Key (Runtime Override):
             </label>
             <div className="flex gap-2">
               <Input
@@ -434,7 +763,7 @@ export function ProfileScreen({ onProfileUpdated, onOpenLoginModal }) {
                 {apiKeySaved ? "Key Active!" : "Apply Key"}
               </Button>
             </div>
-            <p className="text-[11px] text-muted-foreground">
+            <p className="text-[11px] text-muted-foreground mt-1">
               Supports both Google AI Studio keys (<code className="font-mono">AIza...</code>) and Vertex AI Express keys (<code className="font-mono">AQ....</code>).
             </p>
           </div>

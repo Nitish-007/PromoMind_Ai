@@ -181,6 +181,46 @@ class OfferStatusUpdate(CompatBaseModel):
     discount_pct: Optional[float] = None
 
 
+class UserSignupRequest(CompatBaseModel):
+    email: str
+    password: str
+    full_name: str
+    phone: Optional[str] = None
+
+
+class UserSigninRequest(CompatBaseModel):
+    email: str
+    password: str
+
+
+class UserProfile(CompatBaseModel):
+    user_id: str
+    email: str
+    full_name: str
+    phone: Optional[str] = None
+    created_at: Optional[str] = None
+    store_ids: List[str] = []
+    active_store_id: Optional[str] = None
+
+
+class UserAuthResponse(CompatBaseModel):
+    status: str
+    authenticated: bool
+    message: Optional[str] = None
+    user: UserProfile
+    active_store_id: str
+    profile: StoreProfile
+    available_stores: List[Dict[str, Any]]
+    token: Optional[str] = None
+    gemini_configured: Optional[bool] = True
+    storage_mode: Optional[str] = "CLOUD"
+
+
+class SwitchStoreRequest(CompatBaseModel):
+    store_id: str
+    user_id: Optional[str] = None
+
+
 class LoginRequest(CompatBaseModel):
     store_id: Optional[str] = None
     owner_name: Optional[str] = None
@@ -203,6 +243,7 @@ class LoginResponse(CompatBaseModel):
     store_id: str
     profile: StoreProfile
     available_stores: List[Dict[str, Any]]
+    user: Optional[UserProfile] = None
     regional_festivals: Optional[List[RegionalFestivalEvent]] = None
     active_offers: Optional[List[ScheduledOffer]] = None
     gemini_configured: bool

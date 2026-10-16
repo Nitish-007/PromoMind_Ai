@@ -932,6 +932,43 @@
     ]
   },
   {
+    "id": "SKU_COORG_FILTER_C_28",
+    "name": "Coorg Filter Coffee Test 7e0d58 (500g)",
+    "category": "Beverages",
+    "cost_price": 230.1,
+    "selling_price": 295.0,
+    "stock_quantity": 120,
+    "days_in_stock": 5,
+    "expiry_days": 180,
+    "velocity_status": "FAST_MOVING",
+    "weekly_sales_avg": 36,
+    "image_url": "product_default.png",
+    "past_sales_weeks": [
+      30,
+      32,
+      34,
+      36,
+      37,
+      36
+    ],
+    "forecast_sales_weeks": [
+      44,
+      49,
+      54,
+      59
+    ],
+    "sell_through_verdict": "STRONG_INVEST_BUY",
+    "verdict_badge": "Strong Buy / Restock Now",
+    "days_inventory_remaining": 23,
+    "sell_through_rate_pct": 100.0,
+    "reorder_recommendation": "High surge predicted. Restock aggressively to capitalize on event demand.",
+    "brand_comparison_insight": "Structured & forecasted SKU in Beverages.",
+    "alternative_brands": [
+      "Local Wholesaler Grade-A",
+      "National Market Alternative"
+    ]
+  },
+  {
     "id": "SKU_MYSORE_SANDAL__25",
     "name": "Mysore Sandal Soap Pack (3x150g)",
     "category": "Staples & Oils",
@@ -971,6 +1008,43 @@
   {
     "id": "SKU_MYSORE_SANDAL__27",
     "name": "Mysore Sandal Soap Test 0a0bea (3x150g)",
+    "category": "Staples & Oils",
+    "cost_price": 152.1,
+    "selling_price": 195.0,
+    "stock_quantity": 110,
+    "days_in_stock": 5,
+    "expiry_days": 180,
+    "velocity_status": "FAST_MOVING",
+    "weekly_sales_avg": 42,
+    "image_url": "product_default.png",
+    "past_sales_weeks": [
+      35,
+      37,
+      39,
+      42,
+      44,
+      42
+    ],
+    "forecast_sales_weeks": [
+      51,
+      56,
+      63,
+      69
+    ],
+    "sell_through_verdict": "STRONG_INVEST_BUY",
+    "verdict_badge": "Strong Buy / Restock Now",
+    "days_inventory_remaining": 18,
+    "sell_through_rate_pct": 100.0,
+    "reorder_recommendation": "High surge predicted. Restock aggressively to capitalize on event demand.",
+    "brand_comparison_insight": "Structured & forecasted SKU in Staples & Oils.",
+    "alternative_brands": [
+      "Local Wholesaler Grade-A",
+      "National Market Alternative"
+    ]
+  },
+  {
+    "id": "SKU_MYSORE_SANDAL__29",
+    "name": "Mysore Sandal Soap Test 7e0d58 (3x150g)",
     "category": "Staples & Oils",
     "cost_price": 152.1,
     "selling_price": 195.0,

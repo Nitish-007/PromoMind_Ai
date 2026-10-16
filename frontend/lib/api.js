@@ -10,11 +10,20 @@ function getAuthHeaders(extraHeaders = {}) {
   if (typeof window !== "undefined") {
     const apiKey = localStorage.getItem("promomind_gemini_api_key");
     const storeId = localStorage.getItem("promomind_store_id");
+    const userRaw = localStorage.getItem("promomind_user");
     if (apiKey && apiKey.trim()) {
       headers["X-Gemini-Api-Key"] = apiKey.trim();
     }
     if (storeId && storeId.trim()) {
       headers["X-Store-Id"] = storeId.trim();
+    }
+    if (userRaw) {
+      try {
+        const u = JSON.parse(userRaw);
+        if (u && u.user_id) {
+          headers["X-User-Id"] = u.user_id;
+        }
+      } catch (_) {}
     }
   }
   return headers;
@@ -67,7 +76,39 @@ async function apiRequest(path, options = {}) {
 }
 
 // ============================================================================
-// Authentication, Store Management & API Key Config
+// User Authentication & Multi-Store Management Under User
+// ============================================================================
+
+export async function signUpUser({ email, password, full_name, phone }) {
+  return apiRequest("/api/auth/signup", {
+    method: "POST",
+    body: JSON.stringify({ email, password, full_name, phone }),
+  });
+}
+
+export async function signInUser({ email, password }) {
+  return apiRequest("/api/auth/signin", {
+    method: "POST",
+    body: JSON.stringify({ email, password }),
+  });
+}
+
+export async function fetchCurrentUser(userId = null, email = null) {
+  let query = "";
+  if (userId) query = `?user_id=${encodeURIComponent(userId)}`;
+  else if (email) query = `?email=${encodeURIComponent(email)}`;
+  return apiRequest(`/api/auth/me${query}`);
+}
+
+export async function switchUserStore(storeId, userId = null) {
+  return apiRequest("/api/auth/switch-store", {
+    method: "POST",
+    body: JSON.stringify({ store_id: storeId, user_id: userId }),
+  });
+}
+
+// ============================================================================
+// Store Management & API Key Config
 // ============================================================================
 
 export async function loginStore(payload) {
@@ -77,8 +118,9 @@ export async function loginStore(payload) {
   });
 }
 
-export async function fetchStores() {
-  return apiRequest("/api/stores");
+export async function fetchStores(userId = null) {
+  const query = userId ? `?user_id=${encodeURIComponent(userId)}` : "";
+  return apiRequest(`/api/stores${query}`);
 }
 
 export async function createOrSwitchStore(payload) {

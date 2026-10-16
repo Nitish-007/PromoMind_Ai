@@ -1,17 +1,17 @@
 {
   "country": "India",
   "region": "Karnataka & South India",
-  "gstin": "29AAAAA0000A1Z5",
-  "phone": "+91 99887 76655",
-  "store_name": "Test Bangalore Mart",
-  "audience_size": 1420,
+  "gstin": "29AAAAA9999A1Z9",
+  "phone": "+91 98450 99999",
+  "store_name": "Sharma Supermarket Koramangala",
+  "audience_size": 2502,
   "total_working_capital_inr": 650000.0,
-  "updated_at": "2026-10-15T17:08:52.630723+00:00",
+  "updated_at": "2026-10-16T05:54:40.574758+00:00",
   "default_min_margin_pct": 16.5,
-  "pin_code": "560038",
+  "pin_code": "560048",
   "store_type": "Supermarket",
-  "locality": "Indiranagar",
-  "owner_name": "Suresh Kumar",
+  "locality": "Koramangala 4th Block",
+  "owner_name": "Ramesh Sharma",
   "email": "ramesh@sharmamart.in",
   "store_format": "Supermarket",
   "customer_list": [
@@ -44,9 +44,21 @@
       "phone": "+91 98455 66778",
       "segment": "Dry Fruits & Bulk Staples",
       "preferred_channel": "WhatsApp"
+    },
+    {
+      "name": "Arjun Rao",
+      "phone": "+91 98450 77711",
+      "segment": "Store Broadcast List",
+      "preferred_channel": "WhatsApp"
+    },
+    {
+      "name": "Divya Hegde",
+      "phone": "+91 98450 77722",
+      "segment": "Store Broadcast List",
+      "preferred_channel": "WhatsApp"
     }
   ],
-  "whatsapp_audience_size": 2500,
+  "whatsapp_audience_size": 2502,
   "store_id": "sharma_supermarket_01",
   "city": "Bengaluru"
 }

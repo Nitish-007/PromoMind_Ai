@@ -49,7 +49,13 @@
 - **Offline / Local Fallback Mode**: Automatically falls back to local JSON + Markdown when running without internet or credentials, ensuring 100% zero downtime.
 - **Instant Store Login (<100ms)**: Decoupled login flow serves cached regional events without blocking on synchronous AI generation during sign-in.
 
-### 6. 📊 Interactive Slide Presentation Deck & Collateral Studio
+### 6. 👤 User Authentication & Multi-Store Ownership Under Account
+- **Clean User Onboarding Flow**: Complete separation of **User Authentication** (Sign Up / Sign In) from store setup. Retailers sign up with their Full Name, Email, and Password with zero initial store configuration friction.
+- **Multi-Store Management in Profile**: Under each merchant user account, retailers can link, view, and switch across multiple store branches (e.g., Koramangala Supermarket, Indiranagar Organic Mart).
+- **In-App Store Creation**: Retailers configure specific store parameters (Store Format, City, Cultural Region, Working Capital Budget ₹, Margin Threshold %) directly within their Profile screen, instantly spinning up and activating new store locations without relogging.
+- **Dual-Mode Persistence**: User accounts and credentials are securely salted and hashed (`SHA-256 + salt`), backed by both Google Cloud Firestore (`users/{user_id}`) and local resilient JSON fallback (`data/users_store.json`).
+
+### 7. 📊 Interactive Slide Presentation Deck & Collateral Studio
 - **Pitch Deck**: Accessible in-browser at [`frontend/public/presentation_deck.html`](frontend/public/presentation_deck.html) or at `/presentation_deck.html` on the Next.js frontend.
 - **Pitch Script**: 3-minute hackathon and investor presentation guide in [`DEMO_SCRIPT.md`](DEMO_SCRIPT.md).
 - **Collateral Studio**: In-app creator for WhatsApp copy and print-ready high-contrast shelf posters with barcodes.
@@ -237,6 +243,11 @@ PromoMind AI operates in **Dual-Mode**: It runs out-of-the-box in local offline 
 
 | Method | Endpoint | Description |
 |---|---|---|
+| `POST` | `/api/auth/signup` | **User Sign Up**: Register merchant user with Full Name, Email, Password, & Phone |
+| `POST` | `/api/auth/signin` | **User Sign In**: Authenticate existing merchant and switch session to active store |
+| `GET` | `/api/auth/me` | **Current User Account**: Retrieve authenticated user profile, linked stores & active store |
+| `POST` | `/api/auth/switch-store` | **Switch Active Store**: Switch active branch for logged-in merchant account |
+| `POST` | `/api/stores` | **Create / Switch Store**: Spin up and activate new store branch under merchant user |
 | `POST` | `/api/chat` | **AI Sales Copilot**: Real-time Vertex AI conversational retail reasoning |
 | `POST` | `/api/calendar/discover` | **Live AI Festival Search**: Dynamically discover regional festivals via Vertex AI |
 | `GET` | `/api/calendar/events` | Multi-horizon regional festival events (`?region=...&country=...`) |
@@ -266,9 +277,10 @@ Run the full end-to-end integration test suite:
 python -m unittest discover tests
 
 # Or run individual test modules
-python tests/test_api.py
-python tests/test_storage.py
-python tests/test_phase2_endpoints.py
+python tests/test_user_auth.py        # User signup, signin, and store creation tests
+python tests/test_api.py              # Inventory, forecasting, and promotion tests
+python tests/test_storage.py          # Storage adapter and credential tests
+python tests/test_phase2_endpoints.py # End-to-end cloud and API validation
 ```
 
 ---
