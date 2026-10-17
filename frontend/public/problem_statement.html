@@ -18,7 +18,25 @@
   <!-- KaTeX for crisp mathematical rendering -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="initKatexAutoRender()"></script>
+  <script>
+    function initKatexAutoRender() {
+      if (typeof renderMathInElement === "function") {
+        renderMathInElement(document.body, {
+          delimiters: [
+            { left: "$$", right: "$$", display: true },
+            { left: "\\[", right: "\\]", display: true },
+            { left: "$", right: "$", display: false },
+            { left: "\\(", right: "\\)", display: false }
+          ],
+          ignoredTags: ["script", "noscript", "style", "textarea", "pre", "code"],
+          throwOnError: false
+        });
+      }
+    }
+    document.addEventListener("DOMContentLoaded", initKatexAutoRender);
+    window.addEventListener("load", initKatexAutoRender);
+  </script>
 
   <style>
     :root {
@@ -622,7 +640,7 @@
         <span class="section-num">Section 01 // Overview</span>
         <h2 class="section-title">Executive Summary & System Thesis</h2>
         <p>
-          Independent retail establishments (supermarkets, provision stores, and regional trade hubs) represent over <strong>$600 Billion in annual global commerce</strong>. Yet, more than <strong>28% of their total working capital</strong> remains trapped in slow-moving, dead, or near-expiry SKU inventory.
+          Independent retail establishments (supermarkets, provision stores, and regional trade hubs) represent over <strong>&dollar;600 Billion in annual global commerce</strong>. Yet, more than <strong>28% of their total working capital</strong> remains trapped in slow-moving, dead, or near-expiry SKU inventory.
         </p>
         <p>
           Traditional retail operators lack the statistical tooling to forecast multi-brand demand spikes, quantify the price elasticity of promotional discounts, or anticipate regional festival buying cycles. They are forced into arbitrary markdowns (e.g., flat "20% Off" sales) that destroy store margins below wholesale purchase costs.
@@ -662,12 +680,12 @@
               <tr>
                 <td><strong>Margin Floor Safeguards</strong></td>
                 <td><span class="status-bad">Negative Profit Hallucinations</span>. Suggests promotional discounts based purely on linguistic plausibility (e.g., "Give 35% off to clear stock"), selling products below wholesale cost and creating severe cash losses.</td>
-                <td><span class="status-good">Mathematically Guaranteed Floor</span>. Employs a deterministic constraint satisfaction solver: no bundle can ever be emitted unless Net Margin $M_{	ext{bundle}} \ge M_{\min}$ (e.g. 18.0%).</td>
+                <td><span class="status-good">Mathematically Guaranteed Floor</span>. Employs a deterministic constraint satisfaction solver: no bundle can ever be emitted unless Net Margin $M_{\text{bundle}} \ge M_{\min}$ (e.g. 18.0%).</td>
               </tr>
               <tr>
                 <td><strong>Price Elasticity of Demand (PED)</strong></td>
                 <td><span class="status-bad">Zero Mathematical Modeling</span>. Lacks mathematical awareness of category-specific price sensitivity ($\epsilon$). Guesses volume response randomly.</td>
-                <td><span class="status-good">Deterministic PED Solver</span>. Dynamically solves $\% \Delta Q = -\epsilon \cdot \% \Delta P$ across staples ($\epsilon=0.85$), snacks ($1.70$), and festive gifting ($2.10$).</td>
+                <td><span class="status-good">Deterministic PED Solver</span>. Dynamically solves $\% \Delta Q = -\epsilon \cdot \% \Delta P$ across staples ($\epsilon = 0.85$), snacks ($\epsilon = 1.70$), and festive gifting ($\epsilon = 2.10$).</td>
               </tr>
               <tr>
                 <td><strong>Temporal Festival Awareness</strong></td>
@@ -849,7 +867,7 @@
             <div>
               <h4 style="color:var(--emerald); margin-bottom:0.5rem;">✅ PromoMind AI (Gemini + Holt-Winters)</h4>
               <p style="font-size:0.88rem;">
-                Applies <strong>Holt-Winters Triple Exponential Smoothing</strong> on past 6-week velocity, incorporating cultural surge multipliers. Calculates current runout: $60 / 22 	imes 7 = 19 	ext{ days}$.
+                Applies <strong>Holt-Winters Triple Exponential Smoothing</strong> on past 6-week velocity, incorporating cultural surge multipliers. Calculates current runout: $60 / 22 \times 7 = 19 \text{ days}$.
               </p>
               <p style="font-size:0.85rem; color:var(--emerald);">
                 <strong>Verdict:</strong> <code>CAUTION_CHECK_BRANDS</code>. Recommends ordering only <strong>35 units</strong> to bridge the 14-day festive peak. Benchmarks store-brand alternative with a 4.2% higher gross margin.
@@ -934,8 +952,8 @@
           </p>
           <div class="math-callout">
             <p><strong>Net Incremental Profit Simulation Equation:</strong></p>
-            $$\Delta \Pi = \left( Q_0 \cdot (1 + \Delta Q) \cdot (P_{	ext{promo}} - C) ight) - \left( Q_0 \cdot (P_{	ext{base}} - C) ight)$$
-            $$	ext{Turnover Acceleration (Days)} = rac{	ext{Current Inventory Units}}{Q_0 / 7} - rac{	ext{Current Inventory Units}}{(Q_0 \cdot (1 + \Delta Q)) / 7}$$
+            $$\Delta \Pi = \left[ Q_0 \cdot (1 + \Delta Q) \cdot (P_{\text{promo}} - C) \right] - \left[ Q_0 \cdot (P_{\text{base}} - C) \right]$$
+            $$\text{Turnover Acceleration (Days)} = \frac{\text{Current Inventory Units}}{Q_0 / 7} - \frac{\text{Current Inventory Units}}{(Q_0 \cdot (1 + \Delta Q)) / 7}$$
           </div>
           <p style="font-size:0.9rem; margin-bottom:0;">
             The interactive drawer dynamically recomputes simulated 30-day turnover, net profit boost, cash speedup in days, and displays an unambiguous status verdict: <span style="color:var(--emerald); font-weight:700;">PROFIT POSITIVE (SAFE TO LAUNCH)</span>.
@@ -953,8 +971,8 @@
           The responsiveness of retail customer purchase volume to discount depth is formulated as:
         </p>
         <div class="math-callout">
-          $$\epsilon = - rac{\% \Delta Q}{\% \Delta P} = - rac{(Q_{	ext{promo}} - Q_0) / Q_0}{(P_{	ext{promo}} - P_0) / P_0}$$
-          $$Q_{	ext{promo}} = Q_0 \cdot \left[ 1 - \epsilon \cdot \left( rac{P_{	ext{promo}} - P_0}{P_0} ight) ight]$$
+          $$\epsilon = - \frac{\% \Delta Q}{\% \Delta P} = - \frac{(Q_{\text{promo}} - Q_0) / Q_0}{(P_{\text{promo}} - P_0) / P_0}$$
+          $$Q_{\text{promo}} = Q_0 \cdot \left[ 1 - \epsilon \cdot \left( \frac{P_{\text{promo}} - P_0}{P_0} \right) \right]$$
         </div>
 
         <div class="table-container">
@@ -995,9 +1013,9 @@
           For inventory restock projections, the system utilizes Holt-Winters additive-multiplicative smoothing across 6 past weekly cycles:
         </p>
         <div class="math-callout">
-          $$\ell_t = lpha (Y_t - s_{t-m}) + (1 - lpha)(\ell_{t-1} + b_{t-1})$$
-          $$b_t = eta (\ell_t - \ell_{t-1}) + (1 - eta) b_{t-1}$$
-          $$\hat{Y}_{t+h} = (\ell_t + h b_t + s_{t+h-m}) 	imes \left( 1 + rac{	ext{EventSurgePct}}{100} ight)$$
+          $$\ell_t = \alpha (Y_t - s_{t-m}) + (1 - \alpha)(\ell_{t-1} + b_{t-1})$$
+          $$b_t = \beta (\ell_t - \ell_{t-1}) + (1 - \beta) b_{t-1}$$
+          $$\hat{Y}_{t+h} = (\ell_t + h b_t + s_{t+h-m}) \times \left( 1 + \frac{\text{EventSurgePct}}{100} \right)$$
         </div>
       </section>
 
