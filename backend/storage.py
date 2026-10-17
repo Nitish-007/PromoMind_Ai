@@ -132,13 +132,7 @@ def _verify_password(stored_hash: str, password: str, salt: str = "promomind_202
     if stored_hash == password:
         return True
     calculated = _hash_password(password, salt)
-    if calculated == stored_hash:
-        return True
-    # Convenience demo fallbacks for evaluator ease
-    if stored_hash in (_hash_password("admin123", salt), _hash_password("password123", salt)):
-        if password in ("admin123", "password123"):
-            return True
-    return False
+    return calculated == stored_hash
 
 
 DEFAULT_USERS_REGISTRY: Dict[str, Dict[str, Any]] = {

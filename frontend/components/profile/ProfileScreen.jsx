@@ -493,11 +493,11 @@ export function ProfileScreen({
                   variant="outline"
                   className="border-border bg-muted/60 text-[11px] font-semibold text-foreground"
                 >
-                  {currentUser ? "Registered User" : "Demo Session"}
+                  {currentUser ? "Registered User" : "Retailer Session"}
                 </Badge>
               </div>
               <div className="text-xs text-muted-foreground flex items-center gap-3 mt-1 flex-wrap">
-                <span>{currentUser?.email || "admin@promomind.ai"}</span>
+                <span>{currentUser?.email || "No email linked"}</span>
                 {currentUser?.phone && (
                   <>
                     <span>•</span>
