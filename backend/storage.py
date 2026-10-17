@@ -18,7 +18,12 @@ try:
 except Exception:
     pass
 
-DATA_DIR = os.environ.get("PROMOMIND_DATA_DIR") or os.path.join(PROJECT_ROOT, "data")
+DATA_DIR = (
+    os.environ.get("PROMOMIND_DATA_DIR")
+    or (os.path.join(CURRENT_DIR, "data") if os.path.isdir(os.path.join(CURRENT_DIR, "data")) else None)
+    or (os.path.join(PROJECT_ROOT, "data") if os.path.isdir(os.path.join(PROJECT_ROOT, "data")) else None)
+    or os.path.join(CURRENT_DIR, "data")
+)
 
 if CURRENT_DIR not in sys.path:
     sys.path.insert(0, CURRENT_DIR)

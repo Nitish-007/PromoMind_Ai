@@ -25,8 +25,8 @@ export function Header({
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Brand Logo & Tagline */}
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-foreground text-background font-bold text-lg tracking-tight">
-            PM
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg overflow-hidden border border-border bg-[#14171E] shrink-0 p-1">
+            <img src="/icon.svg" alt="PromoMind AI Logo" className="h-full w-full object-contain" />
           </div>
           <div>
             <div className="flex items-center gap-2">
