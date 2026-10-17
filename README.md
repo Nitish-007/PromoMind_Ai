@@ -29,7 +29,7 @@ PromoMind AI is an autonomous retail demand forecasting and profit optimization 
 
 ---
 
-##  Key Highlights & Core Capabilities
+## Key Highlights & Core Capabilities
 
 ### 1. Dynamic AI Retail Sales Copilot
 - Grounded in real-time store inventory, expiring stock batches, and active sales velocities.
@@ -48,7 +48,7 @@ PromoMind AI is an autonomous retail demand forecasting and profit optimization 
 - Real-time working capital tracking: Computes invested inventory capital, 30-day projected turnover, and dead capital at risk.
 - **Interactive "What-If" Simulator**: Retailers adjust **Discount Depth %** (5%–30%) and **Expected Volume Lift %** (10%–80%) to immediately simulate net profit rupees, turnover velocity, and liquidity impact before publishing promotions.
 
-### 4.  Open-Source Math: Price Elasticity of Demand (PED)
+### 4. Open-Source Math: Price Elasticity of Demand (PED)
 - Deterministic, verifiable economic modeling:
   $$\% \Delta Q = -\epsilon \cdot \% \Delta P$$
 - Category-tuned elasticity coefficients ($\epsilon = 0.85$ for everyday staples, $1.70$ for snacks/beverages, $2.10$ for festival hampers).
@@ -58,10 +58,13 @@ PromoMind AI is an autonomous retail demand forecasting and profit optimization 
   - `FESTIVE_CELEBRATION_HAMPER`: Multi-category celebratory bundles.
   - `VOLUME_TIER_SLAB`: Bulk purchase incentives (Buy 2+, Save More).
 
-### 5. Cloud-Native Dual-Mode Hybrid Storage
+### 5. Cloud-Native Dual-Mode Hybrid Storage & Multi-Tenancy
 - Direct integration with **Google Cloud Firestore** (`stores/{store_id}/*`).
+- **Multi-Tenant Store Isolation**: Each merchant account manages isolated store branches with dedicated inventory and promotion collections. Newly created stores initialize cleanly without demo data contamination, complete with empty-state guidance.
+- **Preset Demo Stores**: Demonstration stores (e.g., `sharma_supermarket_01`) remain pre-seeded with sample inventory, brand curves, and scheduled offers for immediate out-of-the-box evaluation.
+- **POS & Distributor Spreadsheet Intake**: Drag-and-drop intake supporting both CSV and Excel (`.xlsx`, `.xls`) files with automated column mapping (Name, Category, Stock, Cost, MRP, Velocity, WhatsApp) and in-place deduplication.
 - **Zero-Downtime Resilience**: Seamlessly operates in offline mode with local JSON and markdown knowledge persistence when credentials or connectivity are absent.
-- Instant, non-blocking authentication (<100ms) with multi-store management under a single merchant account.
+- **Instant Authentication (<100ms)**: Non-blocking signup and login with background pre-caching of regional festival discovery.
 
 ---
 
@@ -124,7 +127,7 @@ flowchart TD
 | **Serverless Compute** | **Google Cloud Run** | Fully managed container runtime hosting both the FastAPI backend and Next.js frontend with auto-scaling to zero. |
 | **Container Registry** | **Google Artifact Registry** | Secure, automated container image repository for Docker builds. |
 | **Backend Framework** | **FastAPI (Python 3.11)** | High-performance asynchronous REST API backend with Pydantic v2 data validation. |
-| **Quantitative Forecasting**| **Statsmodels / SciPy / NumPy** | Holt-Winters exponential smoothing, demand forecasting, and Price Elasticity of Demand (PED) solvers. |
+| **Quantitative Forecasting**| **Native Statistical Engine** | Double Exponential Smoothing (Holt's Linear Trend), Seasonal Multipliers, and Price Elasticity of Demand (PED) solvers. |
 | **Frontend Framework** | **Next.js 16 (App Router)** | Modern SSR/CSR hybrid React 19 web dashboard built with Tailwind CSS v4 and Lucide Icons. |
 | **CI/CD & DevOps** | **GitHub Actions + Docker** | Automated multi-stage Docker builds and continuous deployment to Cloud Run with path-based trigger filters. |
 
@@ -144,7 +147,7 @@ flowchart TD
 | **Financial & ROI** | `GET` | `/api/store/financial-roi` | Store capital health: turnover velocity, gross profit, dead capital risk |
 | | `POST` | `/api/store/simulate-roi` | Interactive "What-If" simulator (discount depth vs. volume lift) |
 | **Inventory & Offers**| `GET` | `/api/inventory` | Real-time stock levels, MRP, cost, category brand curves, and velocities |
-| | `POST` | `/api/upload-csv` | Ingest POS sales CSV with automatic deduplication & forecasting updates |
+| | `POST` | `/api/upload-csv` | Ingest retail POS CSV or Excel (.xlsx / .xls) spreadsheets with automatic deduplication & forecasting updates |
 | | `POST` | `/api/generate-combo` | Algorithmic bundle creator with margin safeguard & cashier pitches |
 | | `POST` | `/api/offers/check-conflict`| Margin safeguard engine preventing overlapping discount cannibalization |
 | | `GET` | `/api/health` | Health check endpoint returning Cloud vs. Local storage telemetry |
@@ -175,7 +178,7 @@ PromoMind_Ai/
 │   │   ├── inventory/          # Inventory table, brand curves & dead capital alerts
 │   │   ├── modals/             # Authentication & store creation modals
 │   │   ├── profile/            # Store profile, capital budgets & margin floors
-│   │   └── upload/             # POS CSV intake & data preview
+│   │   └── upload/             # POS CSV & Excel (.xlsx) intake & data preview
 │   ├── lib/api.js              # Centralized backend HTTP client
 │   ├── public/                 # Static assets, branding icons & slide deck
 │   ├── Dockerfile              # Multi-stage Next.js production container for Cloud Run
