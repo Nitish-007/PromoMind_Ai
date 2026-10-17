@@ -27,8 +27,8 @@ const nextConfig = {
                 destination: "/problem_statement.html",
             },
             {
-                source: "/deck",
-                destination: "/presentation_deck.html",
+                source: "/whitepaper",
+                destination: "/problem_statement.html",
             },
         ];
     },

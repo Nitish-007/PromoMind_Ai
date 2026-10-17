@@ -5,7 +5,6 @@ import {
   Sun,
   Store,
   FileText,
-  Presentation,
   LogIn,
   User,
 } from "lucide-react";
@@ -96,7 +95,7 @@ export function Header({
             )
           )}
 
-          {/* Whitepaper Link */}
+          {/* Whitepaper & Architecture Link */}
           <Button
             render={
               <Link
@@ -105,29 +104,12 @@ export function Header({
                 rel="noopener noreferrer"
               />
             }
-            variant="ghost"
+            variant="outline"
             size="sm"
-            className="hidden md:inline-flex gap-1.5 text-sm text-muted-foreground hover:text-foreground h-9 px-3"
+            className="hidden md:inline-flex gap-1.5 text-xs font-semibold h-9 px-3 border-border hover:bg-muted text-foreground"
           >
-            <FileText className="h-4 w-4" />
-            <span>Whitepaper</span>
-          </Button>
-
-          {/* Pitch Deck Link */}
-          <Button
-            render={
-              <Link
-                href="/deck"
-                target="_blank"
-                rel="noopener noreferrer"
-              />
-            }
-            variant="ghost"
-            size="sm"
-            className="hidden lg:inline-flex gap-1.5 text-sm text-muted-foreground hover:text-foreground h-9 px-3"
-          >
-            <Presentation className="h-4 w-4" />
-            <span>Pitch Deck</span>
+            <FileText className="h-3.5 w-3.5 text-emerald-500" />
+            <span>Whitepaper &amp; Architecture</span>
           </Button>
 
           {/* Theme Toggle */}

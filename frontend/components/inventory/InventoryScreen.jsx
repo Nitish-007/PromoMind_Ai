@@ -115,8 +115,25 @@ export function InventoryScreen({
         </Badge>
       </div>
 
+      {/* Empty Inventory Onboarding Card */}
+      {products.length === 0 && !isLoading && (
+        <div className="p-6 rounded-xl border-2 border-dashed border-border bg-card/60 text-center space-y-3">
+          <div className="mx-auto h-12 w-12 rounded-full bg-primary/10 text-primary flex items-center justify-center">
+            <Upload className="h-6 w-6" />
+          </div>
+          <h3 className="text-base font-bold text-foreground">No Inventory Data Ingested Yet</h3>
+          <p className="text-xs text-muted-foreground max-w-md mx-auto">
+            Your store is ready! Upload your supermarket or distributor catalog spreadsheet (.csv or .xlsx) to activate Holt-Winters demand forecasting, dead capital liquidators, and live price elasticity solvers.
+          </p>
+          <Button onClick={onOpenImportCsv} className="gap-2 text-xs font-semibold h-10 px-5 cursor-pointer">
+            <Upload className="h-4 w-4" />
+            <span>Upload Retail Spreadsheet (.csv / .xlsx)</span>
+          </Button>
+        </div>
+      )}
+
       {/* Financial ROI Predictor Card with What-If Simulator */}
-      {activePersona !== "procurement" && (
+      {products.length > 0 && activePersona !== "procurement" && (
         <FinancialRoiCard roiData={roiData} onSimulate={onSimulateRoi} />
       )}
 

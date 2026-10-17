@@ -264,7 +264,6 @@ export function UserAuthModal({
                 <label className="text-xs font-medium text-foreground">
                   Password
                 </label>
-                <span className="text-[11px] text-muted-foreground">Demo: admin123</span>
               </div>
               <div className="relative">
                 <Lock className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -293,18 +292,6 @@ export function UserAuthModal({
                 </>
               )}
             </Button>
-
-            {/* Quick Demo Credentials Pill */}
-            <div className="pt-2 border-t border-border/60">
-              <button
-                type="button"
-                onClick={handleQuickDemoLogin}
-                className="w-full flex items-center justify-center gap-1.5 rounded-lg border border-border bg-muted/40 py-2 px-3 text-[11px] text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-              >
-                <Sparkles className="h-3.5 w-3.5 text-amber-500" />
-                <span>Fill Demo: <strong>admin@promomind.ai</strong> (Ramesh Sharma)</span>
-              </button>
-            </div>
           </form>
         )}
 

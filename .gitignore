@@ -54,3 +54,7 @@ scratch/
 # Local data cache
 data/*.json
 data/*.md
+data/*.csv
+data/*.xlsx
+demo_walkthrough/
+*.webm

@@ -30,12 +30,12 @@ export function FinancialRoiCard({ roiData, onSimulate, isSimulating }) {
     }
   };
 
-  const invested = roiData?.capital_invested_inr ?? 245000;
-  const projectedTurnover = roiData?.projected_30d_turnover_inr ?? 318000;
-  const projectedProfit = roiData?.projected_net_profit_inr ?? 58400;
-  const netRoiPct = roiData?.net_return_pct ?? 23.8;
-  const deadCapital = roiData?.dead_capital_at_risk_inr ?? 18500;
-  const unlockedCash = roiData?.unlocked_cash_via_promos_inr ?? 34200;
+  const invested = roiData?.total_inventory_invested_inr ?? roiData?.capital_invested_inr ?? 0;
+  const projectedTurnover = roiData?.projected_sales_revenue_inr ?? roiData?.projected_30d_turnover_inr ?? 0;
+  const projectedProfit = roiData?.projected_gross_profit_inr ?? roiData?.projected_net_profit_inr ?? 0;
+  const netRoiPct = roiData?.overall_roi_pct ?? roiData?.net_return_pct ?? 0;
+  const deadCapital = roiData?.dead_capital_at_risk_inr ?? 0;
+  const unlockedCash = roiData?.unlocked_capital_from_promos_inr ?? roiData?.unlocked_cash_via_promos_inr ?? 0;
 
   return (
     <Card className="border border-border shadow-xs bg-card">

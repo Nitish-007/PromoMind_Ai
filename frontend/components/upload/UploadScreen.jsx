@@ -63,10 +63,11 @@ export function UploadScreen({ storeProfile, onInventoryUpdated }) {
     setDragActive(false);
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       const file = e.dataTransfer.files[0];
-      if (file.name.endsWith(".csv")) {
+      const lower = file.name.toLowerCase();
+      if (lower.endsWith(".csv") || lower.endsWith(".xlsx") || lower.endsWith(".xls")) {
         setSelectedFile(file);
       } else {
-        alert("Please upload a .csv file");
+        alert("Please upload a .csv or .xlsx file");
       }
     }
   }
@@ -129,9 +130,7 @@ export function UploadScreen({ storeProfile, onInventoryUpdated }) {
     URL.revokeObjectURL(url);
   }
 
-  const collectionPath =
-    storageStatus?.collections?.inventory ||
-    `stores/${storeProfile?.store_id || storageStatus?.store_id || "sharma_supermarket_01"}/inventory`;
+  const collectionPath = `stores/${storeProfile?.store_id || "store_default"}/inventory`;
 
   return (
     <div className="space-y-6">
@@ -196,16 +195,16 @@ export function UploadScreen({ storeProfile, onInventoryUpdated }) {
             <input
               type="file"
               ref={fileInputRef}
-              accept=".csv"
+              accept=".csv, .xlsx, .xls"
               className="hidden"
               onChange={handleFileSelect}
             />
             <FolderOpen className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
             <h4 className="text-base font-semibold text-foreground">
-              Drag &amp; Drop any Retail POS or Distributor CSV here
+              Drag &amp; Drop any Retail POS, Distributor CSV or Excel (.xlsx) here
             </h4>
             <p className="text-xs text-muted-foreground mt-1">
-              Re-uploading an updated CSV updates stock &amp; prices in place without creating duplicate items
+              Re-uploading an updated sheet updates stock &amp; prices in place without creating duplicate items
             </p>
             <div className="mt-3 text-[11px] text-muted-foreground font-mono bg-muted/60 border border-border px-2.5 py-1 rounded-md inline-block">
               Auto-maps: Product/Item Name, Category, Stock/Qty, Cost/Buy Rate, MRP/Price, Sales Velocity &amp; Customer WhatsApp
@@ -289,6 +288,16 @@ export function UploadScreen({ storeProfile, onInventoryUpdated }) {
                   </div>
                 </div>
               )}
+              {uploadResult.success && (
+                <div className="pt-2 flex justify-end">
+                  <Button
+                    onClick={() => window.dispatchEvent(new CustomEvent('switch-tab', { detail: 'inventory' }))}
+                    className="font-semibold text-xs h-9 px-4 gap-2 bg-foreground text-background hover:bg-foreground/90 cursor-pointer"
+                  >
+                    <span>View Structured Inventory in Stock &amp; Brands &rarr;</span>
+                  </Button>
+                </div>
+              )}
             </div>
           )}
         </CardContent>
@@ -335,6 +344,20 @@ export function UploadScreen({ storeProfile, onInventoryUpdated }) {
                       <td className="px-4 py-3"><Skeleton className="h-4 w-28" /></td>
                     </tr>
                   ))
+                ) : syncedProducts.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} className="px-4 py-12 text-center text-muted-foreground">
+                      <div className="flex flex-col items-center justify-center space-y-2">
+                        <FolderOpen className="h-8 w-8 text-muted-foreground/60" />
+                        <p className="text-sm font-medium text-foreground">
+                          No SKUs structured in this Firestore collection yet.
+                        </p>
+                        <p className="text-xs text-muted-foreground max-w-md">
+                          Upload your Excel (.xlsx) or CSV spreadsheet above to structure and sync your products directly into <code className="bg-muted px-1.5 py-0.5 rounded text-[11px] font-mono">{collectionPath}</code>.
+                        </p>
+                      </div>
+                    </td>
+                  </tr>
                 ) : (
                   syncedProducts.map((p) => (
                     <tr key={p.id} className="hover:bg-muted/20">

@@ -121,11 +121,12 @@ export function ProfileScreen({
       const isDark = document.documentElement.classList.contains("dark");
       setThemeMode(isDark ? "dark" : "light");
     }
-  }, []);
+  }, [currentUser?.user_id]);
 
   async function loadStoresRegistry() {
     try {
-      const res = await fetchStores();
+      const uid = currentUser?.user_id;
+      const res = await fetchStores(uid);
       if (res && Array.isArray(res.stores)) {
         setAvailableStores(res.stores);
         if (res.active_store_id) setActiveStoreId(res.active_store_id);
@@ -493,11 +494,11 @@ export function ProfileScreen({
                   variant="outline"
                   className="border-border bg-muted/60 text-[11px] font-semibold text-foreground"
                 >
-                  {currentUser ? "Registered User" : "Demo Session"}
+                  {currentUser ? "Registered User" : "Retailer Session"}
                 </Badge>
               </div>
               <div className="text-xs text-muted-foreground flex items-center gap-3 mt-1 flex-wrap">
-                <span>{currentUser?.email || "admin@promomind.ai"}</span>
+                <span>{currentUser?.email || "No email linked"}</span>
                 {currentUser?.phone && (
                   <>
                     <span>•</span>
