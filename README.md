@@ -1,288 +1,245 @@
-# PromoMind AI — Autonomous Retail Demand Forecasting, Dynamic AI Sales Copilot, Worldwide Festival Discovery & Capital Intelligence
-
-> **Autonomous multi-agent demand forecasting, real-time conversational AI Sales Copilot, open-source price elasticity modeling, worldwide cultural festival planning horizons, and Store Capital ROI intelligence for independent retailers & supermarkets.**  
-> *Architected for Google Cloud Platform (Vertex AI, Cloud Firestore, Cloud Run), Next.js 15, FastAPI, and Google Material Design 3.*
+# PromoMind AI
+### Autonomous Retail Demand Forecasting, Dynamic AI Sales Copilot & Capital Intelligence
+> **Built for the Google AI Builder Cup Hackathon**  
+> *Empowering independent supermarkets, kiranas, and neighborhood grocers with enterprise-grade demand forecasting, margin protection, and 24/7 AI-powered sales intelligence.*
 
 ---
 
-## 🌟 Key Innovations & Architecture Highlights
+[![Google Cloud](https://img.shields.io/badge/Google%20Cloud-Vertex%20AI%20%7C%20Cloud%20Run%20%7C%20Firestore-4285F4?logo=google-cloud&logoColor=white)](https://cloud.google.com/)
+[![Gemini 2.5](https://img.shields.io/badge/Google%20Gemini-EA4335?logo=google&logoColor=white)](https://deepmind.google/technologies/gemini/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![Next.js 16](https://img.shields.io/badge/Next.js-black?logo=next.js&logoColor=white)](https://nextjs.org/)
+[![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white)](https://www.docker.com/)
+[![CI/CD](https://img.shields.io/badge/GitHub%20Actions-2088FF?logo=github-actions&logoColor=white)](https://github.com/features/actions)
 
-### 1. 🤖 Dynamic AI Retail Sales Copilot (`/api/chat`)
-- **100% Dynamic Conversational Reasoning**: Powered by Google Cloud Vertex AI (`gemini-2.5-flash-lite`) using Service Account OAuth in `us-central1` with automatic API key fallback.
-- **Real-Time Store Grounding**: Automatically inspects live store inventory velocities, expiring batches, and regional events directly from Firestore before generating advice.
-- **Margin Safeguard Solver**: Mathematically enforces retailer-defined net margin floors (e.g., minimum 22% margin) when formulating clearance bundles.
-- **Omnichannel Output**: Produces 10-second verbal cashier checkout scripts and personalized, multi-tiered customer WhatsApp broadcasts on demand.
+---
 
-### 2. 🪔 Worldwide Live AI Regional Festival Discovery (`/api/calendar/discover`)
-- **Global Event Coverage**: Queries Google Vertex AI in real time for cultural festivals, statutory holidays, and regional shopping peaks across **India** (Karnataka, Maharashtra, Delhi-NCR, West Bengal), **Australia**, **Spain**, **Japan**, **United Kingdom**, **United States**, and worldwide.
-- **Transparent Source Badging**: Festival cards in the UI explicitly indicate their provenance:
-  - `LIVE_VERTEX_SA_API (gemini-2.5-flash-lite)`: Dynamically discovered in real time via live Vertex AI search.
-  - `HYBRID_REGIONAL_SYNTHESIS`: High-confidence offline regional synthesis.
-- **Three-Horizon Planning Deadlines**:
-  - **📦 T-14 Days Advance Procurement**: Restock bulk surge SKUs before wholesale distributor rates spike.
-  - **🚀 T-7 Days Promo Launch**: Early-bird WhatsApp broadcast hampers and advance bookings.
-  - **🧹 T+2 Days Post-Festival Clearance**: Rapid cost-price markdown on leftover seasonal items to prevent 100% inventory loss.
+## What is PromoMind AI?
 
-### 3. 💰 Store Capital Investment & Returns / Profit Predictor
-- **Real-Time Working Capital Health**: Computes total working capital invested in inventory, projected 30-day sales turnover, and net gross profit.
-- **Dead Capital at Risk**: Automatically flags working capital trapped in slow-moving SKUs (>60 days shelf life) before products expire into dead loss.
-- **Cash Unlocked via Smart Promos**: Tracks fresh liquidity freed up within 12 days through algorithmic clearance bundles.
-- **🔮 Interactive "What-If" ROI Simulator**: Retailers adjust **Promotional Discount Depth %** (5% to 30%) and **Expected Volume Lift %** (10% to 80%) to simulate resulting net profit rupees, turnover velocity, and capital turnover acceleration in real time.
+Independent supermarkets, neighborhood grocers, and regional retail marts operate on razor-thin net margins (typically 15%–25%). Unlike retail conglomerates (e.g., Walmart, Target, Reliance Retail) with multi-million-dollar ERPs and dedicated data science departments, local merchants face severe structural challenges:
 
-### 4. 🧠 Open-Source Math: Price Elasticity of Demand (PED) Engine
-- Built on deterministic, open-source mathematical principles without black-box dependency:
+1. **Trapped Working Capital**: Slow-moving inventory (>60 days on shelf) locks up vital cash flow, often leading to expired stock and 100% margin write-offs.
+2. **Missed Cultural Surges**: Hyperlocal cultural festivals and holidays trigger sudden demand spikes that merchants fail to procure in advance, leading to stockouts and lost revenue.
+3. **Discount Cannibalization**: Retailers run overlapping, uncoordinated promotional discounts that cannibalize their best-selling products without clearing dead stock.
+4. **Lack of Operational Bandwidth**: Store owners and floor cashiers lack the time and analytical tools to create persuasive bundle pitches and tailored customer marketing.
+
+**PromoMind AI bridges this enterprise divide.**
+
+PromoMind AI is an autonomous retail demand forecasting and profit optimization platform powered by **Google Cloud Vertex AI (Gemini 2.5)**, **Cloud Run**, and **Cloud Firestore**. It equips independent retailers with an intelligent AI Sales Copilot, dynamic regional festival demand planning, Price Elasticity of Demand (PED) algorithmic bundles, and an interactive Store Capital "What-If" ROI Simulator—all within a fast, intuitive web interface.
+
+---
+
+##  Key Highlights & Core Capabilities
+
+### 1. Dynamic AI Retail Sales Copilot
+- Grounded in real-time store inventory, expiring stock batches, and active sales velocities.
+- Powered by Google Vertex AI (`gemini-2.5-flash-lite`) via secure Service Account authentication with automatic API key fallback.
+- Enforces strict mathematical **margin floors** (e.g., never recommend a promotion below 20% net margin).
+- Generates instant **10-second verbal cashier checkout scripts** and high-converting, personalized **WhatsApp customer broadcast copy**.
+
+### 2. Regional & Worldwide Festival Surge Engine
+- Dynamically discovers upcoming regional cultural festivals, public holidays, and shopping events in real time.
+- Implements **Three-Horizon Planning**:
+  - **T-14 Days Advance Procurement**: Restock high-surge SKUs before wholesale supplier rates spike.
+  - **T-7 Days Promo Launch**: Pre-orders, gift hampers, and early-bird promotional campaigns.
+  - **T+2 Days Post-Festival Clearance**: Rapid cost-price markdown strategies to clear excess perishable inventory with zero dead-stock write-off.
+
+### 3. Store Capital Intelligence & "What-If" ROI Simulator
+- Real-time working capital tracking: Computes invested inventory capital, 30-day projected turnover, and dead capital at risk.
+- **Interactive "What-If" Simulator**: Retailers adjust **Discount Depth %** (5%–30%) and **Expected Volume Lift %** (10%–80%) to immediately simulate net profit rupees, turnover velocity, and liquidity impact before publishing promotions.
+
+### 4.  Open-Source Math: Price Elasticity of Demand (PED)
+- Deterministic, verifiable economic modeling:
   $$\% \Delta Q = -\epsilon \cdot \% \Delta P$$
-- Category-specific elasticity coefficients ($\epsilon = 0.85$ for staples, $1.70$ for packaged snacks, $2.10$ for festive gifting).
-- **4 Open-Source Promotional Strategy Archetypes**:
-  - `ANCHOR_MARGIN_BOOSTER`: High-velocity staple lifts high-margin slow-mover.
-  - `EXPIRY_RESCUE_CLEARANCE`: Progressive markdown before shelf expiry.
-  - `FESTIVE_CELEBRATION_HAMPER`: Multi-category bundles maximizing festive basket size.
-  - `VOLUME_TIER_SLAB`: Bulk multi-unit purchase incentives (Buy 2+, Save More).
+- Category-tuned elasticity coefficients ($\epsilon = 0.85$ for everyday staples, $1.70$ for snacks/beverages, $2.10$ for festival hampers).
+- Employs 4 strategic promotional archetypes:
+  - `ANCHOR_MARGIN_BOOSTER`: Pair high-velocity staples with high-margin slow-movers.
+  - `EXPIRY_RESCUE_CLEARANCE`: Progressive markdown ladders before shelf expiry.
+  - `FESTIVE_CELEBRATION_HAMPER`: Multi-category celebratory bundles.
+  - `VOLUME_TIER_SLAB`: Bulk purchase incentives (Buy 2+, Save More).
 
-### 5. 🔥 Direct Google Cloud Firestore Integration (Dual-Mode Hybrid Storage Adapter)
-- **Cloud Mode**: Directly reads & writes to Firestore collections under `stores/{store_id}/`:
-  - `stores/{store_id}/inventory`: Real-time stock levels, MRP, cost, and velocities.
-  - `stores/{store_id}/promotions`: Active/scheduled campaigns, pricing tiers, and conflict logs.
-  - `stores/{store_id}/calendar_events`: Regional festive event calendar.
-  - `stores/{store_id}/store_profile`: Store metadata, location, and customer list.
-  - `stores/{store_id}/knowledge_catalog`: Compiled Markdown catalog (`store_knowledge.md`).
-- **Offline / Local Fallback Mode**: Automatically falls back to local JSON + Markdown when running without internet or credentials, ensuring 100% zero downtime.
-- **Instant Store Login (<100ms)**: Decoupled login flow serves cached regional events without blocking on synchronous AI generation during sign-in.
-
-### 6. 👤 User Authentication & Multi-Store Ownership Under Account
-- **Clean User Onboarding Flow**: Complete separation of **User Authentication** (Sign Up / Sign In) from store setup. Retailers sign up with their Full Name, Email, and Password with zero initial store configuration friction.
-- **Multi-Store Management in Profile**: Under each merchant user account, retailers can link, view, and switch across multiple store branches (e.g., Koramangala Supermarket, Indiranagar Organic Mart).
-- **In-App Store Creation**: Retailers configure specific store parameters (Store Format, City, Cultural Region, Working Capital Budget ₹, Margin Threshold %) directly within their Profile screen, instantly spinning up and activating new store locations without relogging.
-- **Dual-Mode Persistence**: User accounts and credentials are securely salted and hashed (`SHA-256 + salt`), backed by both Google Cloud Firestore (`users/{user_id}`) and local resilient JSON fallback (`data/users_store.json`).
-
-### 7. 📊 Interactive Slide Presentation Deck & Collateral Studio
-- **Pitch Deck**: Accessible in-browser at [`frontend/public/presentation_deck.html`](frontend/public/presentation_deck.html) or at `/presentation_deck.html` on the Next.js frontend.
-- **Pitch Script**: 3-minute hackathon and investor presentation guide in [`DEMO_SCRIPT.md`](DEMO_SCRIPT.md).
-- **Collateral Studio**: In-app creator for WhatsApp copy and print-ready high-contrast shelf posters with barcodes.
+### 5. Cloud-Native Dual-Mode Hybrid Storage
+- Direct integration with **Google Cloud Firestore** (`stores/{store_id}/*`).
+- **Zero-Downtime Resilience**: Seamlessly operates in offline mode with local JSON and markdown knowledge persistence when credentials or connectivity are absent.
+- Instant, non-blocking authentication (<100ms) with multi-store management under a single merchant account.
 
 ---
 
-## 🏗️ System Architecture
+## System Architecture
 
 ```mermaid
 flowchart TD
-    subgraph Client["Next.js 15 Client Layer (Port 3000)"]
-        UI["Dashboard & Navigation"]
-        COPILOT_UI["AI Sales Copilot Chat"]
+    subgraph Frontend["Frontend Layer (Next.js 16 + Tailwind v4)"]
+        UI["Store Dashboard & Controls"]
+        COPILOT_UI["AI Retail Sales Copilot"]
         CAL_UI["Regional Festival Calendar"]
-        SIM_UI["What-If ROI Simulator"]
-        STUDIO_UI["Collateral Studio"]
+        SIM_UI["What-If Profit & ROI Simulator"]
+        STUDIO_UI["Collateral & Poster Studio"]
     end
 
-    subgraph Backend["FastAPI Orchestration Core (Port 8080)"]
-        API["REST API Router (main.py)"]
-        COPILOT_AGENT["RetailCopilotAgent (agents.py)"]
-        FEST_ENGINE["DynamicFestivalEngine (agents.py)"]
-        PROMO_ENGINE["PromoMindEngine (agents.py)"]
-        FORECAST["Holt-Winters & PED Engine (forecasting.py)"]
-        STORAGE["DualModeStorageAdapter (storage.py)"]
+    subgraph Backend["Backend Layer (FastAPI on Google Cloud Run)"]
+        API["REST API Gateway (main.py)"]
+        COPILOT_AGENT["Retail Copilot Agent (agents.py)"]
+        FEST_ENGINE["Festival Discovery Engine (agents.py)"]
+        PED_ENGINE["PED & Forecasting Engine (forecasting.py)"]
+        STORAGE["Dual-Mode Storage Adapter (storage.py)"]
     end
 
-    subgraph CloudServices["Google Cloud Platform & AI"]
-        VERTEX["Google Cloud Vertex AI (Gemini 2.5 Flash Lite)"]
-        FIRESTORE[("Google Cloud Firestore (stores/{store_id}/...)")]
+    subgraph GCP["Google Cloud Platform Services"]
+        VERTEX["Google Cloud Vertex AI<br/>(Gemini 2.5 Flash Lite)"]
+        FIRESTORE[("Google Cloud Firestore<br/>NoSQL Store DB")]
     end
 
-    subgraph OfflineStore["Offline Resilience Storage"]
-        LOCAL_JSON[("Local JSON Data Store (data/*.json)")]
-        CATALOG_MD["Compiled Knowledge Catalog (data/store_knowledge.md)"]
+    subgraph Offline["Offline Resilience Store"]
+        LOCAL_JSON[("Local JSON Fallback Store")]
+        CATALOG_MD["Markdown Knowledge Catalog"]
     end
 
-    Client -->|Direct REST / HTTP| API
+    UI --> API
+    COPILOT_UI --> API
+    CAL_UI --> API
+    SIM_UI --> API
+    STUDIO_UI --> API
+
     API --> COPILOT_AGENT
     API --> FEST_ENGINE
-    API --> PROMO_ENGINE
-    API --> FORECAST
+    API --> PED_ENGINE
     API --> STORAGE
 
-    COPILOT_AGENT -->|Real-Time Prompts & Math| VERTEX
-    FEST_ENGINE -->|Live Regional Search| VERTEX
-    STORAGE -->|Live Read/Write Sync| FIRESTORE
-    STORAGE -->|Zero-Downtime Fallback| LOCAL_JSON
-    STORAGE -->|Auto-Recompile| CATALOG_MD
+    COPILOT_AGENT --> VERTEX
+    FEST_ENGINE --> VERTEX
+    STORAGE --> FIRESTORE
+    STORAGE --> LOCAL_JSON
+    STORAGE --> CATALOG_MD
 ```
 
 ---
 
-## 📂 Project Structure
+## Tech Stack
+
+| Domain | Tech / Service | Role |
+|---|---|---|
+| **LLM Model** | **Google Cloud Vertex AI** (`gemini-2.5-flash-lite`) | Real-time conversational retail reasoning, dynamic festival discovery, and omnichannel marketing copy synthesis. |
+| **Database** | **Google Cloud Firestore** | Scalable, real-time cloud document store for multi-store inventories, promotions, calendars, and merchant profiles. |
+| **Serverless Compute** | **Google Cloud Run** | Fully managed container runtime hosting both the FastAPI backend and Next.js frontend with auto-scaling to zero. |
+| **Container Registry** | **Google Artifact Registry** | Secure, automated container image repository for Docker builds. |
+| **Backend Framework** | **FastAPI (Python 3.11)** | High-performance asynchronous REST API backend with Pydantic v2 data validation. |
+| **Quantitative Forecasting**| **Statsmodels / SciPy / NumPy** | Holt-Winters exponential smoothing, demand forecasting, and Price Elasticity of Demand (PED) solvers. |
+| **Frontend Framework** | **Next.js 16 (App Router)** | Modern SSR/CSR hybrid React 19 web dashboard built with Tailwind CSS v4 and Lucide Icons. |
+| **CI/CD & DevOps** | **GitHub Actions + Docker** | Automated multi-stage Docker builds and continuous deployment to Cloud Run with path-based trigger filters. |
+
+---
+
+## Core API Endpoints
+
+| Category | Method | Endpoint | Description |
+|---|---|---|---|
+| **Auth & Stores** | `POST` | `/api/auth/signup` | Register new merchant user account (Name, Email, Password, Phone) |
+| | `POST` | `/api/auth/signin` | Authenticate merchant and establish active store session |
+| | `GET` | `/api/auth/me` | Retrieve merchant account profile and all associated store branches |
+| | `POST` | `/api/stores` | Create a new store branch with custom location, margin floor, and capital budget |
+| **AI & Copilot** | `POST` | `/api/chat` | AI Sales Copilot reasoning with live store inventory grounding |
+| | `POST` | `/api/calendar/discover`| Real-time AI festival and holiday discovery via Gemini 2.5 |
+| | `GET` | `/api/calendar/events` | Retrieve scheduled regional events with 3-horizon planning windows |
+| **Financial & ROI** | `GET` | `/api/store/financial-roi` | Store capital health: turnover velocity, gross profit, dead capital risk |
+| | `POST` | `/api/store/simulate-roi` | Interactive "What-If" simulator (discount depth vs. volume lift) |
+| **Inventory & Offers**| `GET` | `/api/inventory` | Real-time stock levels, MRP, cost, category brand curves, and velocities |
+| | `POST` | `/api/upload-csv` | Ingest POS sales CSV with automatic deduplication & forecasting updates |
+| | `POST` | `/api/generate-combo` | Algorithmic bundle creator with margin safeguard & cashier pitches |
+| | `POST` | `/api/offers/check-conflict`| Margin safeguard engine preventing overlapping discount cannibalization |
+| | `GET` | `/api/health` | Health check endpoint returning Cloud vs. Local storage telemetry |
+
+---
+
+## Repository Structure
 
 ```
-promomind_ai/
+PromoMind_Ai/
 ├── backend/
-│   ├── main.py               # FastAPI server (CORS, REST routes, auth & chat endpoints)
-│   ├── agents.py             # Vertex AI Gemini live client, Copilot agent, & Festival engine
-│   ├── forecasting.py        # Holt-Winters smoothing, PED optimization & Investment ROI engine
-│   ├── firestore_service.py  # Google Cloud Firestore service with dual-mode fallback
-│   ├── verify_gcp_creds.py   # Diagnostic verification tool for Google Cloud credentials
-│   ├── storage.py            # Dual-mode store manager, CSV importer & store_knowledge.md builder
-│   ├── models.py             # Pydantic schemas (StoreProfile, InvestmentROI, RegionalEvent, etc.)
-│   └── mock_data.py          # Category brand curves, regional calendars, & active offers
-├── frontend/                 # Modern Next.js 15 App Router Frontend
-│   ├── app/
-│   │   ├── layout.js         # Root layout with fonts and metadata
-│   │   └── page.js           # Multi-tab single-page dashboard controller
+│   ├── main.py                 # FastAPI application & REST endpoint routing
+│   ├── agents.py               # Gemini 2.5 Vertex AI client & Copilot agents
+│   ├── forecasting.py          # Holt-Winters smoothing, PED optimization & ROI simulator
+│   ├── firestore_service.py    # Google Cloud Firestore integration layer
+│   ├── storage.py              # Dual-mode hybrid storage adapter & CSV intake
+│   ├── models.py               # Pydantic data contracts & request schemas
+│   ├── mock_data.py            # Regional calendars, brand curves & seed items
+│   ├── verify_gcp_creds.py     # GCP credentials diagnostic verification utility
+│   ├── Dockerfile              # Production Python 3.11 container for Cloud Run
+│   ├── requirements.txt        # Backend Python dependencies
+│   └── data/                   # Persistent local fallback store & knowledge base
+├── frontend/
+│   ├── app/                    # Next.js 16 App Router pages & root layout
 │   ├── components/
-│   │   ├── calendar/         # Regional festival calendar with AI discovery & source badges
-│   │   ├── copilot/          # Dynamic AI Sales Copilot chat thread & Collateral Studio
-│   │   ├── inventory/        # Stock, brand curves & dead capital monitor
-│   │   ├── layout/           # Header, festive ticker bar, and navigation
-│   │   ├── modals/           # LoginStoreModal with fast cached authentication
-│   │   ├── profile/          # Store identity, working capital & margins
-│   │   └── upload/           # POS CSV smart structuring & deduplication importer
-│   ├── lib/
-│   │   ├── api.js            # Direct backend API client (http://127.0.0.1:8080)
-│   │   └── utils.js          # Tailwind class merging utility
-│   ├── public/
-│   │   └── presentation_deck.html # Interactive 9-slide presentation deck
-│   └── .env.local            # Frontend environment variables (NEXT_PUBLIC_API_URL)
-├── data/
-│   ├── inventory_store.json  # Persistent JSON inventory database
-│   ├── store_profile.json    # Store profile, regional demographic settings & capital budget
-│   ├── promotions_store.json # Scheduled and active promotional bundles
-│   ├── calendar_events.json  # Regional festival calendar database
-│   └── store_knowledge.md    # Auto-compiled AI Knowledge Base catalog
-├── tests/
-│   ├── test_api.py           # Integration tests for FastAPI endpoints & CSV deduplication
-│   ├── test_storage.py       # Dual-mode storage and inline credential parsing tests
-│   └── test_phase2_endpoints.py # Automated end-to-end endpoint verification
-├── DEMO_SCRIPT.md            # 3-Minute Hackathon & Investor Pitch Walkthrough Script
-├── SETUP_AND_CLOUD_GUIDE.md  # Detailed setup, usage, & Google Cloud integration guide
-├── FIRESTORE_DATA_ARCHITECTURE.md # Document schemas and security rules guide
-├── Dockerfile                # Google Cloud Run container configuration
-├── requirements.txt          # Python dependencies
-└── README.md                 # Project documentation
+│   │   ├── copilot/            # AI Copilot chat interface & Collateral Studio
+│   │   ├── calendar/           # Regional festival calendar with AI discovery badges
+│   │   ├── inventory/          # Inventory table, brand curves & dead capital alerts
+│   │   ├── modals/             # Authentication & store creation modals
+│   │   ├── profile/            # Store profile, capital budgets & margin floors
+│   │   └── upload/             # POS CSV intake & data preview
+│   ├── lib/api.js              # Centralized backend HTTP client
+│   ├── public/                 # Static assets, branding icons & slide deck
+│   ├── Dockerfile              # Multi-stage Next.js production container for Cloud Run
+│   └── package.json            # Frontend dependencies & scripts
+├── .github/workflows/
+│   └── deploy.yaml             # GitHub Actions CI/CD to Google Cloud Run
+├── tests/                      # Automated unit and integration test suite
+└── README.md                   # Project documentation
 ```
 
 ---
 
-## 🚀 Quick Start (Local Run)
+## Getting Started (Local Development)
 
-### 1. Prerequisites
-- **Python:** 3.10+ (Python 3.11/3.12 recommended)
-- **Node.js:** 18.17+ (Node 20+ recommended)
+### Prerequisites
+- **Python**: 3.11 or higher
+- **Node.js**: 18.17 or higher (Node 20+ recommended)
 - **Git**
 
-### 2. Backend Setup (FastAPI)
-
+### 1. Backend Setup (FastAPI)
 ```bash
 # 1. Clone repository
 git clone https://github.com/Nitish-007/PromoMind_Ai.git
-cd promomind_ai
+cd PromoMind_Ai
 
-# 2. Create virtual environment
+# 2. Create and activate a virtual environment
 python -m venv venv
-# On Windows PowerShell:
-.\venv\Scripts\Activate.ps1
-# On macOS/Linux:
-source venv/bin/activate
+source venv/bin/activate       # On Windows: .\venv\Scripts\Activate.ps1
 
 # 3. Install Python dependencies
-pip install -r requirements.txt
+pip install -r backend/requirements.txt
 
-# 4. Configure environment (.env)
-# Create a .env file with your Google Cloud Service Account JSON:
+# 4. (Optional) Provide Google Cloud credentials in backend/.env:
 # FIRESTORE_SA_JSON={"type": "service_account", "project_id": "...", ...}
-# GEMINI_API_KEY=AIzaSy... (optional backup)
+# GEMINI_API_KEY=AIzaSy...
 
-# 5. Start the backend server on port 8080
+# 5. Start the FastAPI server
 python backend/main.py
 ```
-Backend will start on: 👉 `http://127.0.0.1:8080`
+Backend runs at: `http://127.0.0.1:8080` (Interactive docs at `/docs`)
 
-### 3. Frontend Setup (Next.js 15)
-
-In a separate terminal:
+### 2. Frontend Setup (Next.js 16)
 ```bash
-# 1. Navigate to frontend directory
+# In a new terminal window:
 cd frontend
 
-# 2. Install dependencies
+# 1. Install Node dependencies
 npm install
 
-# 3. Configure frontend environment (.env.local)
-# Ensure NEXT_PUBLIC_API_URL points to the FastAPI backend:
+# 2. Point frontend to the local backend
 echo "NEXT_PUBLIC_API_URL=http://127.0.0.1:8080" > .env.local
 
-# 4. Start Next.js development server
+# 3. Start Next.js development server
 npm run dev
 ```
-Frontend will start on: 👉 `http://localhost:3000`
+Frontend runs at: `http://localhost:3000`
 
 ---
 
-## ☁️ Google Cloud Vertex AI & Firestore Setup
+## Deployment Architecture (Google Cloud Run & CI/CD)
 
-PromoMind AI operates in **Dual-Mode**: It runs out-of-the-box in local offline mode and automatically enables live Google Cloud Firestore synchronization and Vertex AI reasoning the moment credentials are placed.
+PromoMind AI is architected for seamless cloud deployment via **GitHub Actions** and **Google Cloud Run**:
 
-### Service Account Setup:
-1. Open [Google Cloud Console](https://console.cloud.google.com/).
-2. Select or create your Google Cloud project.
-3. Enable the following APIs:
-   - **Cloud Firestore API**
-   - **Vertex AI API**
-4. Navigate to **IAM & Admin** → **Service Accounts** → Create Service Account:
-   - Assign roles: `Cloud Datastore User` and `Vertex AI User`.
-   - Click **Manage Keys** → **Add Key** → **Create new key (JSON)**.
-5. In your `.env` file, supply the JSON:
-   ```env
-   FIRESTORE_SA_JSON='{"type":"service_account","project_id":"your-project","private_key":"...","client_email":"..."}'
-   ```
-6. Verify credentials:
-   ```bash
-   python backend/verify_gcp_creds.py
-   ```
-
----
-
-## 🔌 API Endpoints Summary
-
-| Method | Endpoint | Description |
-|---|---|---|
-| `POST` | `/api/auth/signup` | **User Sign Up**: Register merchant user with Full Name, Email, Password, & Phone |
-| `POST` | `/api/auth/signin` | **User Sign In**: Authenticate existing merchant and switch session to active store |
-| `GET` | `/api/auth/me` | **Current User Account**: Retrieve authenticated user profile, linked stores & active store |
-| `POST` | `/api/auth/switch-store` | **Switch Active Store**: Switch active branch for logged-in merchant account |
-| `POST` | `/api/stores` | **Create / Switch Store**: Spin up and activate new store branch under merchant user |
-| `POST` | `/api/chat` | **AI Sales Copilot**: Real-time Vertex AI conversational retail reasoning |
-| `POST` | `/api/calendar/discover` | **Live AI Festival Search**: Dynamically discover regional festivals via Vertex AI |
-| `GET` | `/api/calendar/events` | Multi-horizon regional festival events (`?region=...&country=...`) |
-| `POST` | `/api/auth/login` | Instant store authentication with non-blocking festival loading |
-| `GET` | `/api/auth/store-exists` | Checks if a store ID exists in Firestore or local storage |
-| `GET` | `/api/health` | Service health status and storage configuration telemetry |
-| `GET` | `/api/storage/status` | Hybrid storage adapter telemetry (Cloud vs Local, Firestore collections) |
-| `GET` | `/api/store/financial-roi` | Store Capital ROI metrics (turnover, net profit, dead capital risk) |
-| `POST` | `/api/store/simulate-roi` | "What-If" ROI simulation (adjust discount depth & volume lift) |
-| `GET` | `/api/inventory` | Retailer inventory, velocities, cost, MRP, and stock status |
-| `POST` | `/api/products` | Add new SKU, run Holt-Winters forecasts, and sync AI Knowledge Base |
-| `GET` | `/api/inventory/{id}/brand-comparison` | Multi-brand sales curves (e.g., Amul vs Nandini vs Mother Dairy) |
-| `GET` | `/api/offers/active` | Currently scheduled and active in-store promotional offers |
-| `POST` | `/api/offers/check-conflict` | Prevents margin cannibalization and overlapping promotions |
-| `POST` | `/api/generate-combo` | Dynamic promo generation with strategy archetypes & cashier pitch |
-| `POST` | `/api/publish-offer` | Dispatches offer to POS and schedules in store calendar |
-| `POST` | `/api/upload-csv` | Parses retailer CSV, runs Holt's models, and deduplicates SKUs |
-| `GET` | `/api/knowledge-md` | View or download the auto-compiled AI knowledge markdown file |
-
----
-
-## 🧪 Automated Test Suite
-
-Run the full end-to-end integration test suite:
-```bash
-# Run all tests
-python -m unittest discover tests
-
-# Or run individual test modules
-python tests/test_user_auth.py        # User signup, signin, and store creation tests
-python tests/test_api.py              # Inventory, forecasting, and promotion tests
-python tests/test_storage.py          # Storage adapter and credential tests
-python tests/test_phase2_endpoints.py # End-to-end cloud and API validation
-```
-
----
-
-*PromoMind AI — Empowering Neighborhood Retailers with Intelligent Demand Forecasting & Google Cloud AI.*
+1. **Path-Filtered CI/CD**: The workflow in `.github/workflows/deploy.yaml` triggers automatically on pushes to `main` only when changes occur in `backend/**`, `frontend/**`, or the workflow itself—preventing unnecessary deployments.
+2. **Staged Microservice Rollout**:
+   - **Backend Deployment**: Builds the backend container, pushes to Google Artifact Registry, and deploys to Cloud Run with a custom service account deployer account with appropriate permissions for secure access to Firestore and Vertex AI.
+   - **Dynamic Frontend Binding**: Captures the live backend Cloud Run URL and injects it into the Next.js multi-stage build (`NEXT_PUBLIC_BACKEND_URL`), ensuring zero hardcoded endpoints.
