@@ -254,11 +254,14 @@ class DualModeStorageAdapter:
         self.conflict_logs_file = os.path.join(self.data_dir, "conflict_logs.json")
         self.users_json_file = os.path.join(self.data_dir, "users_store.json")
 
-        self._ensure_local_data_dir()
         self._init_connection(force_mode)
+        if self.mode != "CLOUD":
+            self._ensure_local_data_dir()
         self._init_users()
 
     def _ensure_local_data_dir(self):
+        if self.mode == "CLOUD":
+            return
         os.makedirs(self.data_dir, exist_ok=True)
 
     @staticmethod
@@ -300,7 +303,7 @@ class DualModeStorageAdapter:
         return None
 
     def _init_connection(self, force_mode: Optional[str] = None):
-        requested_mode = (force_mode or os.environ.get("STORAGE_MODE", "AUTO")).upper()
+        requested_mode = (force_mode or os.environ.get("STORAGE_MODE", "CLOUD")).upper()
         if requested_mode == "LOCAL":
             self.mode = "LOCAL_FALLBACK"
             self.fallback_reason = "Manually forced to LOCAL_FALLBACK via STORAGE_MODE configuration."
@@ -412,13 +415,15 @@ class DualModeStorageAdapter:
                             data["id"] = doc.id
                         products.append(Product(**data))
                     self._memory_inventory[self.store_id] = products
-                    self._save_local_products_cache(products)
                     return products
                 else:
                     self.save_products(list(INVENTORY_DATA))
                     return list(INVENTORY_DATA)
             except Exception as e:
-                logger.warning(f"Failed to read from Firestore inventory, falling back: {e}")
+                logger.error(f"Failed to read from Firestore inventory in CLOUD mode: {e}")
+                if self.store_id in self._memory_inventory and self._memory_inventory[self.store_id]:
+                    return list(self._memory_inventory[self.store_id])
+                raise
 
         if self.store_id in self._memory_inventory and self._memory_inventory[self.store_id]:
             return list(self._memory_inventory[self.store_id])
@@ -436,7 +441,10 @@ class DualModeStorageAdapter:
                     batch.set(doc_ref, _dump_model(p))
                 batch.commit()
             except Exception as e:
-                logger.warning(f"Error persisting products to Firestore: {e}")
+                logger.error(f"Error persisting products to Firestore: {e}")
+                raise
+            self.rebuild_knowledge_markdown(products)
+            return
 
         self._save_local_products_cache(products)
         self.rebuild_knowledge_markdown(products)
@@ -465,7 +473,10 @@ class DualModeStorageAdapter:
             try:
                 self._inventory_coll().document(product.id).set(_dump_model(product))
             except Exception as e:
-                logger.warning(f"Error writing product {product.id} to Firestore: {e}")
+                logger.error(f"Error writing product {product.id} to Firestore: {e}")
+                raise
+            self.rebuild_knowledge_markdown(products)
+            return products
 
         self._save_local_products_cache(products)
         self.rebuild_knowledge_markdown(products)
@@ -722,14 +733,16 @@ class DualModeStorageAdapter:
                 ]
                 if promos:
                     self._memory_promotions[self.store_id] = promos
-                    self._save_local_promotions_cache(promos)
                     return promos
                 else:
                     for offer in SCHEDULED_OFFERS:
                         self.save_promotion(offer)
                     return list(SCHEDULED_OFFERS)
             except Exception as e:
-                logger.warning(f"Firestore promotions query failed: {e}. Falling back.")
+                logger.error(f"Firestore promotions query failed in CLOUD mode: {e}")
+                if self.store_id in self._memory_promotions and self._memory_promotions[self.store_id]:
+                    return list(self._memory_promotions[self.store_id])
+                raise
 
         if self.store_id in self._memory_promotions and self._memory_promotions[self.store_id]:
             return list(self._memory_promotions[self.store_id])
@@ -754,7 +767,24 @@ class DualModeStorageAdapter:
             try:
                 self._promotions_coll().document(offer_id).set(offer_data)
             except Exception as e:
-                logger.warning(f"Failed to write promotion {offer_id} to Firestore: {e}")
+                logger.error(f"Failed to write promotion {offer_id} to Firestore: {e}")
+                raise
+
+            current = self.get_promotions()
+            existing_idx = next(
+                (
+                    i for i, o in enumerate(current)
+                    if o.get("id") == offer_id or (o.get("title") == offer_data.get("title") and o.get("start_date") == offer_data.get("start_date"))
+                ),
+                None
+            )
+            if existing_idx is not None:
+                offer_data["id"] = current[existing_idx].get("id", offer_id)
+                current[existing_idx] = offer_data
+            else:
+                current.insert(0, offer_data)
+            self._memory_promotions[self.store_id] = current
+            return offer_data
 
         current = self.get_promotions()
         existing_idx = next(
@@ -791,7 +821,11 @@ class DualModeStorageAdapter:
             try:
                 self._promotions_coll().document(offer_id).set(updated)
             except Exception as e:
-                logger.warning(f"Failed to update promotion {offer_id} in Firestore: {e}")
+                logger.error(f"Failed to update promotion {offer_id} in Firestore: {e}")
+                raise
+
+            self._memory_promotions[self.store_id] = current
+            return updated
 
         self._memory_promotions[self.store_id] = current
         self._save_local_promotions_cache(current)
@@ -808,7 +842,11 @@ class DualModeStorageAdapter:
             try:
                 self._promotions_coll().document(offer_id).delete()
             except Exception as e:
-                logger.warning(f"Failed to delete promotion {offer_id} from Firestore: {e}")
+                logger.error(f"Failed to delete promotion {offer_id} from Firestore: {e}")
+                raise
+
+            self._memory_promotions[self.store_id] = new_list
+            return True
 
         self._memory_promotions[self.store_id] = new_list
         self._save_local_promotions_cache(new_list)
@@ -825,7 +863,8 @@ class DualModeStorageAdapter:
             try:
                 self._promotions_coll().document(log_id).set(entry)
             except Exception as e:
-                logger.warning(f"Failed to log conflict to Firestore: {e}")
+                logger.error(f"Failed to log conflict to Firestore: {e}")
+                raise
             return entry
 
         self._ensure_local_data_dir()
@@ -847,8 +886,10 @@ class DualModeStorageAdapter:
                 docs = list(self._promotions_coll().where("type", "==", "conflict_log").stream())
                 if docs:
                     return [d.to_dict() for d in docs]
+                return []
             except Exception as e:
-                logger.warning(f"Error querying conflict logs from Firestore: {e}")
+                logger.error(f"Error querying conflict logs from Firestore: {e}")
+                return []
 
         if os.path.exists(self.conflict_logs_file):
             try:
@@ -892,7 +933,18 @@ class DualModeStorageAdapter:
                         self.save_calendar_event(ev)
                     events = list(REGIONAL_FESTIVAL_CALENDAR)
             except Exception as e:
-                logger.warning(f"Error fetching calendar from Firestore: {e}")
+                logger.error(f"Error fetching calendar from Firestore in CLOUD mode: {e}")
+                if self.store_id in self._memory_calendar:
+                    events = list(self._memory_calendar[self.store_id])
+                else:
+                    raise
+
+            if region:
+                reg_key = region.lower().split("&")[0].split(",")[0].strip()
+                filtered = [e for e in events if reg_key in e.get("region", "").lower()]
+                if filtered:
+                    return filtered
+            return events
 
         if not events and self.store_id in self._memory_calendar:
             events = list(self._memory_calendar[self.store_id])
@@ -927,7 +979,9 @@ class DualModeStorageAdapter:
                     batch.set(coll.document(d["id"]), d)
                 batch.commit()
             except Exception as e:
-                logger.warning(f"Error writing festival batch to Firestore: {e}")
+                logger.error(f"Error writing festival batch to Firestore: {e}")
+                raise
+            return cleaned_list
 
         self._save_local_calendar_cache(cleaned_list)
         return cleaned_list
@@ -948,7 +1002,17 @@ class DualModeStorageAdapter:
             try:
                 self._calendar_coll().document(event_id).set(data)
             except Exception as e:
-                logger.warning(f"Error writing calendar event to Firestore: {e}")
+                logger.error(f"Error writing calendar event to Firestore: {e}")
+                raise
+
+            current = self._memory_calendar.get(self.store_id) or []
+            idx = next((i for i, ev in enumerate(current) if ev.get("id") == event_id), None)
+            if idx is not None:
+                current[idx] = data
+            else:
+                current.append(data)
+            self._memory_calendar[self.store_id] = current
+            return data
 
         current = self._memory_calendar.get(self.store_id) or self._load_local_calendar()
         idx = next((i for i, ev in enumerate(current) if ev.get("id") == event_id), None)
@@ -996,7 +1060,10 @@ class DualModeStorageAdapter:
                     self.save_store_profile(seed)
                     return seed
             except Exception as e:
-                logger.warning(f"Error reading store profile from Firestore: {e}")
+                logger.error(f"Error reading store profile from Firestore in CLOUD mode: {e}")
+                if self.store_id in self._memory_profiles:
+                    return dict(self._memory_profiles[self.store_id])
+                raise
 
         if self.store_id in self._memory_profiles:
             return dict(self._memory_profiles[self.store_id])
@@ -1022,7 +1089,14 @@ class DualModeStorageAdapter:
             try:
                 self._profile_coll().document("profile").set(data)
             except Exception as e:
-                logger.warning(f"Failed to write store profile to Firestore: {e}")
+                logger.error(f"Failed to write store profile to Firestore: {e}")
+                raise
+
+            try:
+                self.rebuild_knowledge_markdown()
+            except Exception as e:
+                logger.warning(f"Failed to recompile knowledge markdown on profile save: {e}")
+            return data
 
         self._save_local_profile_cache(data)
         try:
@@ -1133,6 +1207,7 @@ class DualModeStorageAdapter:
                         return md
             except Exception as e:
                 logger.warning(f"Failed to fetch knowledge catalog from Firestore: {e}")
+            return self.rebuild_knowledge_markdown()
 
         if self.store_id in self._memory_markdown and self._memory_markdown[self.store_id]:
             return self._memory_markdown[self.store_id]
@@ -1231,7 +1306,8 @@ class DualModeStorageAdapter:
                 logger.info(f"Loaded {len(docs)} users directly from Firestore.")
                 return
             except Exception as e:
-                logger.warning(f"Failed querying users collection from Firestore: {e}")
+                logger.error(f"Failed querying users collection from Firestore in CLOUD mode: {e}")
+                return
 
         local_users = self._load_local_users()
         for uid, dat in local_users.items():
@@ -1273,7 +1349,8 @@ class DualModeStorageAdapter:
             try:
                 self.client.collection("users").document(user_id).set(u)
             except Exception as e:
-                logger.warning(f"Failed writing user to Firestore: {e}")
+                logger.error(f"Failed writing user to Firestore: {e}")
+                raise
             return  # Directly stored in Cloud Firestore; no local backup file write
 
         canonical_users = {
@@ -1302,8 +1379,10 @@ class DualModeStorageAdapter:
                     self._memory_users[udata["user_id"]] = udata
                     self._memory_users[email_clean] = udata
                     return dict(udata)
+                return None
             except Exception as e:
-                logger.warning(f"Error querying user by email in Firestore: {e}")
+                logger.error(f"Error querying user by email in Firestore: {e}")
+                return None
 
         local_users = self._load_local_users()
         for u in local_users.values():
@@ -1331,8 +1410,10 @@ class DualModeStorageAdapter:
                     if udata.get("email"):
                         self._memory_users[udata["email"].lower()] = udata
                     return dict(udata)
+                return None
             except Exception as e:
-                logger.warning(f"Error querying user by ID in Firestore: {e}")
+                logger.error(f"Error querying user by ID in Firestore: {e}")
+                return None
 
         local_users = self._load_local_users()
         if clean_id in local_users:
