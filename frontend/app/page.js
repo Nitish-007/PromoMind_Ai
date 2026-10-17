@@ -92,6 +92,12 @@ export default function Home() {
 
     setIsHydrated(true);
     loadInitialData();
+
+    const handleSwitch = (e) => {
+      if (e.detail) setActiveTab(e.detail);
+    };
+    window.addEventListener("switch-tab", handleSwitch);
+    return () => window.removeEventListener("switch-tab", handleSwitch);
   }, []);
 
   const toggleTheme = () => {
@@ -107,6 +113,7 @@ export default function Home() {
 
   const loadInitialData = async () => {
     setIsLoadingInventory(true);
+    let loadedProds = [];
     try {
       try {
         const prof = await fetchStoreProfile();
@@ -117,7 +124,10 @@ export default function Home() {
 
       try {
         const prods = await fetchInventory();
-        if (Array.isArray(prods)) setProducts(prods);
+        if (Array.isArray(prods)) {
+          setProducts(prods);
+          loadedProds = prods;
+        }
       } catch (e) {
         console.warn("Could not load inventory:", e);
       }
@@ -138,6 +148,7 @@ export default function Home() {
     } finally {
       setIsLoadingInventory(false);
     }
+    return loadedProds;
   };
 
   const handleSimulateRoi = async (discountPct, volumeLiftPct) => {
@@ -197,7 +208,7 @@ export default function Home() {
     loadInitialData();
   };
 
-  const handleUserAuthenticated = (user, profile) => {
+  const handleUserAuthenticated = async (user, profile) => {
     if (user) {
       setCurrentUser(user);
       if (typeof window !== "undefined") {
@@ -211,7 +222,10 @@ export default function Home() {
         ...profile,
       }));
     }
-    loadInitialData();
+    const prods = await loadInitialData();
+    if (!prods || prods.length === 0) {
+      setActiveTab("upload");
+    }
   };
 
   const handleUserSignOut = () => {

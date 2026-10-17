@@ -422,15 +422,20 @@ class DualModeStorageAdapter:
                     self._memory_inventory[self.store_id] = products
                     return products
                 else:
-                    self.save_products(list(INVENTORY_DATA))
-                    return list(INVENTORY_DATA)
+                    # ONLY auto-seed for the preset demo stores (sharma_supermarket_01, etc.)
+                    if self.store_id in PRESET_STORES_REGISTRY:
+                        self.save_products(list(INVENTORY_DATA))
+                        return list(INVENTORY_DATA)
+                    else:
+                        self._memory_inventory[self.store_id] = []
+                        return []
             except Exception as e:
                 logger.error(f"Failed to read from Firestore inventory in CLOUD mode: {e}")
-                if self.store_id in self._memory_inventory and self._memory_inventory[self.store_id]:
+                if self.store_id in self._memory_inventory:
                     return list(self._memory_inventory[self.store_id])
                 raise
 
-        if self.store_id in self._memory_inventory and self._memory_inventory[self.store_id]:
+        if self.store_id in self._memory_inventory:
             return list(self._memory_inventory[self.store_id])
 
         return self._load_local_products()
@@ -510,7 +515,7 @@ class DualModeStorageAdapter:
                 "markdown": self.get_knowledge_markdown()
             }
 
-        reader = csv.DictReader(io.StringIO(cleaned_csv))
+        reader = csv.DictReader(cleaned_csv.splitlines())
         raw_headers = reader.fieldnames or []
         products = [] if replace_existing else self.load_products()
 
@@ -702,19 +707,36 @@ class DualModeStorageAdapter:
         return stats["imported_count"], stats["markdown"]
 
     def _load_local_products(self) -> List[Product]:
-        if not os.path.exists(self.store_json_file):
+        if self.store_id in self._memory_inventory:
+            return list(self._memory_inventory[self.store_id])
+
+        store_specific_file = os.path.join(self.data_dir, f"inventory_{self.store_id}.json")
+        if os.path.exists(store_specific_file):
+            try:
+                with open(store_specific_file, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                    prods = [Product(**item) for item in data]
+                    self._memory_inventory[self.store_id] = prods
+                    return prods
+            except Exception as e:
+                logger.warning(f"Could not parse {store_specific_file}: {e}")
+
+        if self.store_id in PRESET_STORES_REGISTRY:
+            if os.path.exists(self.store_json_file):
+                try:
+                    with open(self.store_json_file, "r", encoding="utf-8") as f:
+                        data = json.load(f)
+                        prods = [Product(**item) for item in data]
+                        self._memory_inventory[self.store_id] = prods
+                        return prods
+                except Exception:
+                    pass
             self._save_local_products_cache(INVENTORY_DATA)
             self._memory_inventory[self.store_id] = list(INVENTORY_DATA)
             return list(INVENTORY_DATA)
-        try:
-            with open(self.store_json_file, "r", encoding="utf-8") as f:
-                data = json.load(f)
-                prods = [Product(**item) for item in data]
-                self._memory_inventory[self.store_id] = prods
-                return prods
-        except Exception as e:
-            logger.warning(f"Could not parse local inventory: {e}. Returning INVENTORY_DATA.")
-            return list(INVENTORY_DATA)
+
+        self._memory_inventory[self.store_id] = []
+        return []
 
     def _save_local_products_cache(self, products: List[Product]):
         if self.mode == "CLOUD":
@@ -740,9 +762,12 @@ class DualModeStorageAdapter:
                     self._memory_promotions[self.store_id] = promos
                     return promos
                 else:
-                    for offer in SCHEDULED_OFFERS:
-                        self.save_promotion(offer)
-                    return list(SCHEDULED_OFFERS)
+                    if self.store_id in PRESET_STORES_REGISTRY:
+                        for offer in SCHEDULED_OFFERS:
+                            self.save_promotion(offer)
+                        return list(SCHEDULED_OFFERS)
+                    self._memory_promotions[self.store_id] = []
+                    return []
             except Exception as e:
                 logger.error(f"Firestore promotions query failed in CLOUD mode: {e}")
                 if self.store_id in self._memory_promotions and self._memory_promotions[self.store_id]:
@@ -1447,6 +1472,12 @@ class DualModeStorageAdapter:
 
         existing = self.get_user_by_email(email_clean)
         if existing:
+            salt = existing.get("salt", "promomind_2026")
+            stored_hash = existing.get("password_hash", "")
+            if _verify_password(stored_hash, password, salt):
+                active_store = existing.get("active_store_id") or "sharma_supermarket_01"
+                self.switch_store(active_store)
+                return existing, None
             return None, "An account with this email already exists. Please sign in."
 
         safe_handle = re.sub(r"[^a-z0-9]", "", email_clean.split("@")[0])[:12] or "usr"
@@ -1455,19 +1486,34 @@ class DualModeStorageAdapter:
         pwd_hash = _hash_password(password, salt)
 
         initial_store_id = f"store_{safe_handle}"
-        if initial_store_id not in self._memory_profiles:
-            new_store_data = dict(DEFAULT_STORE_PROFILE)
-            new_store_data.update({
-                "store_id": initial_store_id,
-                "store_name": f"{full_name.strip()}'s Mart",
-                "owner_name": full_name.strip(),
-                "email": email_clean,
-                "phone": phone.strip() if phone else "+91 98450 12345",
-                "city": "Bengaluru",
-                "region": "Karnataka & South India",
-                "updated_at": datetime.now(timezone.utc).isoformat()
-            })
-            self.save_store_profile(new_store_data)
+        self.switch_store(initial_store_id)
+        self._memory_inventory[initial_store_id] = []
+        self._memory_promotions[initial_store_id] = []
+
+        # If in CLOUD Firestore, clean any old leftover documents from testing
+        if self.mode == "CLOUD" and self.client:
+            try:
+                coll = self.client.collection("stores").document(initial_store_id).collection("inventory")
+                for doc in coll.stream():
+                    doc.reference.delete()
+            except Exception as e:
+                logger.warning(f"Could not purge stale inventory for {initial_store_id}: {e}")
+
+        new_store_data = dict(DEFAULT_STORE_PROFILE)
+        new_store_data.update({
+            "store_id": initial_store_id,
+            "store_name": f"{full_name.strip()}'s Mart",
+            "owner_name": full_name.strip(),
+            "email": email_clean,
+            "phone": phone.strip() if phone else "+91 98450 12345",
+            "city": "Bengaluru",
+            "region": "Karnataka & South India",
+            "audience_size": 0,
+            "whatsapp_audience_size": 0,
+            "customer_list": [],
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        })
+        self.save_store_profile(new_store_data)
 
         user_data = {
             "user_id": user_id,

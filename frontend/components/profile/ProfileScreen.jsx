@@ -121,11 +121,12 @@ export function ProfileScreen({
       const isDark = document.documentElement.classList.contains("dark");
       setThemeMode(isDark ? "dark" : "light");
     }
-  }, []);
+  }, [currentUser?.user_id]);
 
   async function loadStoresRegistry() {
     try {
-      const res = await fetchStores();
+      const uid = currentUser?.user_id;
+      const res = await fetchStores(uid);
       if (res && Array.isArray(res.stores)) {
         setAvailableStores(res.stores);
         if (res.active_store_id) setActiveStoreId(res.active_store_id);

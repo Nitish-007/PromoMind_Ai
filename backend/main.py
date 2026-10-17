@@ -97,12 +97,14 @@ def health_check():
 
 
 @app.get("/api/storage/status", response_model=StorageStatusResponse)
-def get_storage_status():
+def get_storage_status(x_store_id: Optional[str] = Header(None)):
+    _apply_request_context(x_store_id=x_store_id)
     return StoreDataManager.get_storage_status()
 
 
 @app.get("/api/system/cloud-status")
-def get_cloud_storage_status():
+def get_cloud_storage_status(x_store_id: Optional[str] = Header(None)):
+    _apply_request_context(x_store_id=x_store_id)
     status = dict(StoreDataManager.get_storage_status())
     status["is_connected"] = status.get("firestore_connected", False)
     status["credentials_found"] = (
@@ -140,15 +142,25 @@ def user_signup(payload: UserSignupRequest):
     profile_model = StoreProfile(**prof_dict)
     status = StoreDataManager.get_storage_status()
 
-    # Pre-cache regional festivals for the initial store
-    DynamicFestivalEngine.discover_festivals(
-        region=profile_model.region,
-        country=profile_model.country or "India",
-        city=profile_model.city,
-        force_refresh=False
-    )
+    # Pre-cache regional festivals for the initial store in background thread
+    import threading
+    def _bg_fest():
+        try:
+            DynamicFestivalEngine.discover_festivals(
+                region=profile_model.region,
+                country=profile_model.country or "India",
+                city=profile_model.city,
+                force_refresh=False
+            )
+        except Exception:
+            pass
+    threading.Thread(target=_bg_fest, daemon=True).start()
 
     clean_user = {k: v for k, v in user_data.items() if k not in ("password_hash", "salt")}
+    user_stores = [
+        s for s in StoreDataManager.list_stores()
+        if s.get("store_id") in (user_data.get("store_ids") or [active_store_id])
+    ]
     return UserAuthResponse(
         status="SUCCESS",
         authenticated=True,
@@ -156,7 +168,7 @@ def user_signup(payload: UserSignupRequest):
         user=UserProfile(**clean_user),
         active_store_id=active_store_id,
         profile=profile_model,
-        available_stores=StoreDataManager.list_stores(),
+        available_stores=user_stores or [StoreDataManager.get_store_profile()],
         token=f"tok_{user_data['user_id']}",
         gemini_configured=GeminiLiveClient.is_configured(),
         storage_mode=status["mode"]
@@ -353,19 +365,41 @@ def login_or_switch_store(payload: LoginRequest):
 
 
 @app.get("/api/stores")
-def list_available_stores(user_id: Optional[str] = Query(None)):
+def list_available_stores(
+    user_id: Optional[str] = Query(None),
+    x_user_id: Optional[str] = Header(None)
+):
+    uid = user_id or x_user_id
     stores = StoreDataManager.list_stores()
-    user_stores = []
-    if user_id:
-        user = StoreDataManager.get_user_by_id(user_id)
+    if uid:
+        user = StoreDataManager.get_user_by_id(uid)
         if user and user.get("store_ids"):
-            user_stores = [s for s in stores if s.get("store_id") in user["store_ids"]]
-
+            allowed_ids = set(user["store_ids"])
+            filtered = [s for s in stores if s.get("store_id") in allowed_ids]
+            if not filtered:
+                for sid in user["store_ids"]:
+                    prof = StoreDataManager.get_adapter()._memory_profiles.get(sid)
+                    if prof:
+                        filtered.append(prof)
+                    else:
+                        filtered.append({
+                            "store_id": sid,
+                            "store_name": f"{user.get('full_name', 'Store')}'s Mart",
+                            "city": "Bengaluru",
+                            "region": "Karnataka & South India",
+                            "store_type": "Supermarket"
+                        })
+            return {
+                "status": "SUCCESS",
+                "active_store_id": user.get("active_store_id") or filtered[0]["store_id"],
+                "stores": filtered,
+                "user_stores": filtered
+            }
     return {
         "status": "SUCCESS",
         "active_store_id": StoreDataManager.get_adapter().store_id,
         "stores": stores,
-        "user_stores": user_stores or stores
+        "user_stores": stores
     }
 
 
@@ -758,11 +792,18 @@ async def upload_csv_data(
     content = ""
     if file:
         content_bytes = await file.read()
-        content = content_bytes.decode("utf-8", errors="ignore")
+        filename = (file.filename or "").lower()
+        if filename.endswith(".xlsx") or filename.endswith(".xls"):
+            import io
+            import pandas as pd
+            df = pd.read_excel(io.BytesIO(content_bytes))
+            content = df.to_csv(index=False, lineterminator="\n")
+        else:
+            content = content_bytes.decode("utf-8", errors="ignore")
     elif raw_csv:
         content = raw_csv
     else:
-        raise HTTPException(status_code=400, detail="No CSV file provided")
+        raise HTTPException(status_code=400, detail="No CSV or Excel file provided")
 
     try:
         stats = StoreDataManager.import_csv_data_with_stats(content, replace_existing=replace_existing)

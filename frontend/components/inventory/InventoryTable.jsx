@@ -130,6 +130,28 @@ export function InventoryTable({
                     </td>
                   </tr>
                 ))
+              ) : products.length === 0 ? (
+                <tr>
+                  <td colSpan={8} className="py-14 text-center text-muted-foreground text-sm">
+                    <div className="flex flex-col items-center justify-center space-y-3">
+                      <div className="p-3 bg-muted rounded-full text-muted-foreground">
+                        <BarChart3 className="h-6 w-6" />
+                      </div>
+                      <div className="text-sm font-semibold text-foreground">
+                        Your Store Inventory is Empty
+                      </div>
+                      <p className="text-xs text-muted-foreground max-w-sm">
+                        No products have been added to your store yet. Upload an Excel/CSV spreadsheet to sync your inventory or add products manually.
+                      </p>
+                      <Button
+                        onClick={() => window.dispatchEvent(new CustomEvent('switch-tab', { detail: 'upload' }))}
+                        className="text-xs h-8 px-3 gap-1.5 bg-foreground text-background hover:bg-foreground/90 font-medium cursor-pointer mt-1"
+                      >
+                        Upload CSV / Excel Spreadsheet &rarr;
+                      </Button>
+                    </div>
+                  </td>
+                </tr>
               ) : filteredProducts.length === 0 ? (
                 <tr>
                   <td colSpan={8} className="py-14 text-center text-muted-foreground text-sm">
