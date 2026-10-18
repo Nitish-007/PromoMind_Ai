@@ -58,3 +58,4 @@ data/*.csv
 data/*.xlsx
 demo_walkthrough/
 *.webm
+temp_perfect_audio/

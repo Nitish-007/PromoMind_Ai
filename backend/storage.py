@@ -1455,6 +1455,34 @@ class DualModeStorageAdapter:
 
         return None
 
+    def get_user_by_name(self, full_name: str) -> Optional[Dict[str, Any]]:
+        name_clean = (full_name or "").strip().lower()
+        if not name_clean:
+            return None
+
+        for u in self._memory_users.values():
+            if isinstance(u, dict) and u.get("full_name", "").strip().lower() == name_clean:
+                return dict(u)
+
+        if self.mode == "CLOUD" and self.client:
+            try:
+                for doc in self.client.collection("users").stream():
+                    udata = doc.to_dict()
+                    if udata.get("full_name", "").strip().lower() == name_clean:
+                        self._memory_users[udata.get("user_id")] = udata
+                        if udata.get("email"):
+                            self._memory_users[udata["email"].lower()] = udata
+                        return dict(udata)
+            except Exception as e:
+                logger.error(f"Error querying user by name in Firestore: {e}")
+
+        local_users = self._load_local_users()
+        for u in local_users.values():
+            if isinstance(u, dict) and u.get("full_name", "").strip().lower() == name_clean:
+                return dict(u)
+
+        return None
+
     def signup_user(
         self,
         email: str,
@@ -1463,29 +1491,31 @@ class DualModeStorageAdapter:
         phone: Optional[str] = None
     ) -> Tuple[Optional[Dict[str, Any]], Optional[str]]:
         email_clean = (email or "").strip().lower()
+        name_clean = (full_name or "").strip()
+
         if not email_clean or "@" not in email_clean:
             return None, "Please provide a valid email address."
         if not password or len(password) < 4:
             return None, "Password must be at least 4 characters long."
-        if not full_name or not full_name.strip():
-            return None, "Please provide your full name."
+        if not name_clean:
+            return None, "Please provide your full name / merchant username."
 
-        existing = self.get_user_by_email(email_clean)
-        if existing:
-            salt = existing.get("salt", "promomind_2026")
-            stored_hash = existing.get("password_hash", "")
-            if _verify_password(stored_hash, password, salt):
-                active_store = existing.get("active_store_id") or "sharma_supermarket_01"
-                self.switch_store(active_store)
-                return existing, None
-            return None, "An account with this email already exists. Please sign in."
+        # STRICT LOCK 1: Disallow duplicate email registration
+        existing_email = self.get_user_by_email(email_clean)
+        if existing_email:
+            return None, f"An account with email '{email_clean}' already exists. Please sign in or use a different email."
+
+        # STRICT LOCK 2: Disallow duplicate merchant name / username registration
+        existing_name = self.get_user_by_name(name_clean)
+        if existing_name:
+            return None, f"An account with merchant name '{name_clean}' already exists. Please choose a unique name or sign in."
 
         safe_handle = re.sub(r"[^a-z0-9]", "", email_clean.split("@")[0])[:12] or "usr"
         user_id = f"usr_{safe_handle}_{int(time.time())}"
         salt = "promomind_2026"
         pwd_hash = _hash_password(password, salt)
 
-        initial_store_id = f"store_{safe_handle}"
+        initial_store_id = f"store_{safe_handle}_{int(time.time())}"
         self.switch_store(initial_store_id)
         self._memory_inventory[initial_store_id] = []
         self._memory_promotions[initial_store_id] = []
@@ -1502,8 +1532,8 @@ class DualModeStorageAdapter:
         new_store_data = dict(DEFAULT_STORE_PROFILE)
         new_store_data.update({
             "store_id": initial_store_id,
-            "store_name": f"{full_name.strip()}'s Mart",
-            "owner_name": full_name.strip(),
+            "store_name": f"{name_clean}'s Mart",
+            "owner_name": name_clean,
             "email": email_clean,
             "phone": phone.strip() if phone else "+91 98450 12345",
             "city": "Bengaluru",
@@ -1518,7 +1548,7 @@ class DualModeStorageAdapter:
         user_data = {
             "user_id": user_id,
             "email": email_clean,
-            "full_name": full_name.strip(),
+            "full_name": name_clean,
             "phone": phone.strip() if phone else "",
             "password_hash": pwd_hash,
             "salt": salt,
@@ -1642,6 +1672,10 @@ class StoreDataManager:
     @classmethod
     def get_user_by_email(cls, email: str) -> Optional[Dict[str, Any]]:
         return _DEFAULT_ADAPTER.get_user_by_email(email)
+
+    @classmethod
+    def get_user_by_name(cls, full_name: str) -> Optional[Dict[str, Any]]:
+        return _DEFAULT_ADAPTER.get_user_by_name(full_name)
 
     @classmethod
     def switch_user_store(cls, user_id: str, store_id: str) -> Tuple[Optional[Dict[str, Any]], Optional[str]]:

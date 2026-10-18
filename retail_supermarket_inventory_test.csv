@@ -1,0 +1,51 @@
+product_id,name,category,brand,stock_quantity,cost_price,selling_price,weekly_sales_avg,expiry_days,customer_name,customer_phone,customer_segment
+SKU_STP_01,Fortune Sunlite Refined Sunflower Oil (1L),Staples & Oils,Fortune,180,128.0,155.0,42,270,Deepak Nair,+91 98459 11223,Weekly Pantry Staples
+SKU_STP_02,Aashirvaad Superior MP Sharbati Atta (5kg),Staples & Oils,Aashirvaad,120,220.0,275.0,38,180,Kavitha Shetty,+91 98459 44556,Weekly Pantry Staples
+SKU_STP_03,India Gate Classic Aged Basmati Rice (5kg),Staples & Oils,India Gate,65,540.0,675.0,19,365,Ananya Rao,+91 98459 66778,High Basket AOV VIP
+SKU_STP_04,Tata Salt Vacuum Evaporated Iodized Salt (1kg),Staples & Oils,Tata,250,21.0,28.0,65,730,Rajesh Varma,+91 98459 55667,Weekly Pantry Staples
+SKU_STP_05,24 Mantra Organic Unpolished Toor Dal (1kg),Staples & Oils,24 Mantra,90,142.0,185.0,24,210,Vikram Patel,+91 98459 77889,Organic & Health Conscious
+SKU_STP_06,Saffola Gold Pro Healthy Lifestyle Oil (5L Jar),Staples & Oils,Saffola,40,810.0,995.0,12,240,Suresh Babu,+91 98459 33445,High Basket AOV VIP
+SKU_STP_07,Everest Pure Turmeric Powder / Haldi (500g),Staples & Oils,Everest,110,95.0,130.0,31,360,Meera Iyer,+91 98459 88990,Traditional Kitchen Staples
+SKU_STP_08,Madhur Pure & Hygienic Refined Sugar (5kg),Staples & Oils,Madhur,140,210.0,260.0,35,365,Deepak Nair,+91 98459 11223,Weekly Pantry Staples
+SKU_DRY_01,Nandini Pure Cow Ghee (1L Pouch),Dairy,Nandini,85,510.0,630.0,34,180,Meera Iyer,+91 98459 88990,Traditional Sweets & Ghee
+SKU_DRY_02,Amul Fresh Malai Paneer (200g Block),Dairy,Amul,55,72.0,92.0,48,18,Priya Menon,+91 98459 22334,Fresh Chilled Daily
+SKU_DRY_03,Mother Dairy Pasteurised Table Butter (500g),Dairy,Mother Dairy,70,215.0,275.0,29,60,Vikram Patel,+91 98459 77889,Bakers & Dairy Enthusiasts
+SKU_DRY_04,Milky Mist Natural Greek Yogurt (400g Tub),Dairy,Milky Mist,42,85.0,120.0,16,21,Kavitha Shetty,+91 98459 44556,Organic & Health Conscious
+SKU_DRY_05,"Britannia Processed Cheese Slices (10 Slices, 200g)",Dairy,Britannia,60,125.0,165.0,22,120,Rajesh Varma,+91 98459 55667,Breakfast Essentials
+SKU_NUT_01,Nutraj California Premium Whole Almonds (500g),Dry Fruits,Nutraj,60,340.0,490.0,22,270,Ananya Rao,+91 98459 66778,Festive Gifting & Dry Fruits
+SKU_NUT_02,Royal Harvest Jumbo Roasted & Salted Pistachios (250g),Dry Fruits,Royal Harvest,45,230.0,340.0,15,240,Priya Menon,+91 98459 22334,Festive Gifting & Dry Fruits
+SKU_NUT_03,Tata Sampann 100% Pure Whole Cashews W320 (500g),Dry Fruits,Tata Sampann,50,410.0,575.0,18,300,Meera Iyer,+91 98459 88990,Traditional Sweets & Ghee
+SKU_NUT_04,Tulsi Afghani Dried Golden Anjeer / Figs (250g),Dry Fruits,Tulsi,38,240.0,360.0,11,210,Kavitha Shetty,+91 98459 44556,Organic & Health Conscious
+SKU_NUT_05,Rostaa Gourmet Super 7 Healthy Roasted Seed Mix (200g),Dry Fruits,Rostaa,35,145.0,225.0,14,180,Vikram Patel,+91 98459 77889,Organic & Health Conscious
+SKU_SNK_01,Bikaji Royal Bikaneri Bhujia Sev (400g),Snacks,Bikaji,110,85.0,130.0,40,180,Rajesh Varma,+91 98459 55667,Impulse Snacking & Beverages
+SKU_SNK_02,Haldiram's Nagpur All-In-One Mixture (350g),Snacks,Haldiram's,95,78.0,115.0,36,180,Deepak Nair,+91 98459 11223,Weekly Pantry Staples
+SKU_SNK_03,Britannia Good Day Butter Rich Cookies (600g Mega Saver),Snacks,Britannia,130,98.0,145.0,46,210,Suresh Babu,+91 98459 33445,Tea-Time Family Snacks
+SKU_SNK_04,Mr. Makhana Roasted Pudina & Lime Foxnuts (100g),Snacks,Mr. Makhana,55,80.0,135.0,20,270,Kavitha Shetty,+91 98459 44556,Organic & Health Conscious
+SKU_SNK_05,Lay's India's Magic Masala Potato Chips (115g Mega),Snacks,Lay's,140,32.0,50.0,58,150,Rajesh Varma,+91 98459 55667,Impulse Snacking & Beverages
+SKU_BEV_01,Tata Tea Gold Assam CTC & Long Leaf Blend (500g),Beverages,Tata Tea,105,195.0,265.0,39,365,Suresh Babu,+91 98459 33445,Tea-Time Family Snacks
+SKU_BEV_02,Bru Instant Coffee Chicory Blend Glass Jar (200g),Beverages,Bru,75,265.0,360.0,27,540,Vikram Patel,+91 98459 77889,Coffee Connoisseurs
+SKU_BEV_03,Twinings Pure Green Tea Bags with Lemon & Honey (25pk),Beverages,Twinings,50,180.0,270.0,17,540,Kavitha Shetty,+91 98459 44556,Organic & Health Conscious
+SKU_BEV_04,Real Fruit Power 100% Alphonso Mango Nectar (1L Tetra),Beverages,Real,88,92.0,130.0,33,180,Rajesh Varma,+91 98459 55667,Impulse Snacking & Beverages
+SKU_SWT_01,Ferrero Rocher Fine Hazelnut Chocolates Box (16 Pieces),Sweets & Confectionery,Ferrero,50,380.0,549.0,16,270,Ananya Rao,+91 98459 66778,High Basket AOV VIP
+SKU_SWT_02,Cadbury Celebrations Rich Premium Dry Fruit Box (177g),Sweets & Confectionery,Cadbury,65,280.0,400.0,24,240,Priya Menon,+91 98459 22334,Festive Gifting & Dry Fruits
+SKU_SWT_03,Haldiram's Prabhuji Pure Desi Ghee Gulab Jamun Tin (1kg),Sweets & Confectionery,Haldiram's,72,185.0,260.0,25,180,Meera Iyer,+91 98459 88990,Traditional Sweets & Ghee
+SKU_SWT_04,Bikaji Soan Papdi Pure Desi Ghee Flaky Sweet (500g),Sweets & Confectionery,Bikaji,80,140.0,210.0,28,180,Deepak Nair,+91 98459 11223,Weekly Pantry Staples
+SKU_PUJ_01,Mitti Art Handcrafted Terracotta Oil Deepas (Box of 12),Puja & Festive,Mitti Art,150,45.0,95.0,42,730,Suresh Babu,+91 98459 33445,Puja & Home Essentials
+SKU_PUJ_02,Cycle Pure 3-in-1 Fragrance Agarbatti Pooja Pack (250g),Puja & Festive,Cycle Pure,115,60.0,95.0,35,730,Meera Iyer,+91 98459 88990,Puja & Home Essentials
+SKU_PUJ_03,Mangaldeep Pure Temple Sambrani Dhoop Cups (Pack of 12),Puja & Festive,Mangaldeep,90,75.0,120.0,26,730,Deepak Nair,+91 98459 11223,Puja & Home Essentials
+SKU_HGC_01,Surf Excel Matic Top Load Liquid Detergent Pouch (2L),Personal Care,Surf Excel,70,310.0,420.0,26,730,Vikram Patel,+91 98459 77889,Weekly Pantry Staples
+SKU_HGC_02,Dettol Original Germ Protection Liquid Handwash (1500ml Refill),Personal Care,Dettol,85,155.0,225.0,32,730,Kavitha Shetty,+91 98459 44556,Home Hygiene & Essentials
+SKU_HGC_03,Vim Dishwash Gel with Real Lemon Power (750ml Bottle),Personal Care,Vim,110,115.0,160.0,44,730,Rajesh Varma,+91 98459 55667,Home Hygiene & Essentials
+SKU_HGC_04,Dabur Red Ayurvedic Toothpaste Mega Saver Pack (300g x 2),Personal Care,Dabur,75,145.0,210.0,28,540,Suresh Babu,+91 98459 33445,Home Hygiene & Essentials
+SKU_FOD_01,"Maggi 2-Minute Masala Instant Noodles (12 Pack Saver, 840g)",Snacks,Maggi,140,142.0,180.0,62,240,Rajesh Varma,+91 98459 55667,Impulse Snacking & Instant Meals
+SKU_FOD_02,Kellogg's Real Almond & Honey Crunchy Corn Flakes (1kg Mega),Staples & Oils,Kellogg's,55,360.0,490.0,22,270,Ananya Rao,+91 98459 66778,Healthy Breakfast Family
+SKU_FOD_03,Quaker Rolled Oats 100% Wholegrain Health Pack (1kg),Staples & Oils,Quaker,65,155.0,215.0,28,365,Kavitha Shetty,+91 98459 44556,Organic & Health Conscious
+SKU_SPC_01,Catch Pure Red Chilli Powder / Teekha Lal Mirch (500g),Staples & Oils,Catch,95,125.0,175.0,30,360,Deepak Nair,+91 98459 11223,Weekly Pantry Staples
+SKU_SPC_02,MDH Famous Deggi Mirch Natural Red Colour Blend (100g),Staples & Oils,MDH,110,62.0,85.0,36,365,Meera Iyer,+91 98459 88990,Traditional Kitchen Staples
+SKU_DRY_06,Amul Taaza Homogenised Toned Milk (1L Tetra Pack),Dairy,Amul,90,58.0,74.0,68,120,Vikram Patel,+91 98459 77889,Daily Chilled Essentials
+SKU_SNK_06,Kissan 100% Real Fresh Tomato Ketchup (1.2kg Squeezy),Snacks,Kissan,70,110.0,155.0,26,180,Suresh Babu,+91 98459 33445,Tea-Time Family Snacks
+SKU_SWT_05,Cadbury Dairy Milk Silk Roasted Almond Chocolate (143g),Sweets & Confectionery,Cadbury,60,140.0,195.0,32,270,Ananya Rao,+91 98459 66778,High Basket AOV VIP
+SKU_SWT_06,Haldiram's Pure Desi Ghee Kaju Katli Silver Foil Box (500g),Sweets & Confectionery,Haldiram's,40,390.0,550.0,18,45,Priya Menon,+91 98459 22334,Festive Gifting & Dry Fruits
+SKU_BEV_05,Nescafe Classic 100% Pure Instant Coffee Glass Jar (100g),Beverages,Nescafe,80,235.0,325.0,28,540,Vikram Patel,+91 98459 77889,Coffee Connoisseurs
+SKU_HGC_05,Lizol Disinfectant Surface & Floor Cleaner Citrus (2L),Personal Care,Lizol,60,310.0,415.0,24,730,Kavitha Shetty,+91 98459 44556,Home Hygiene & Essentials
+SKU_HGC_06,Harpic Power Plus Original Disinfectant Toilet Cleaner (1L x 2),Personal Care,Harpic,75,280.0,380.0,27,730,Deepak Nair,+91 98459 11223,Home Hygiene & Essentials

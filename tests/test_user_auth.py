@@ -24,7 +24,7 @@ class TestUserAuthAndStoreCreation(unittest.TestCase):
         """Test default admin demo account sign in"""
         res = self.client.post("/api/auth/signin", json={
             "email": "admin@promomind.ai",
-            "password": "password123"
+            "password": "admin123"
         })
         self.assertEqual(res.status_code, 200)
         data = res.json()
@@ -37,10 +37,11 @@ class TestUserAuthAndStoreCreation(unittest.TestCase):
     def test_02_signup_new_user(self):
         """Test brand new user signup with zero store clutter"""
         test_email = f"retailer_{self.unique_suffix}@storemail.com"
+        test_name = f"Vikram Sethi {self.unique_suffix}"
         res = self.client.post("/api/auth/signup", json={
             "email": test_email,
             "password": "SecurePassword123",
-            "full_name": "Vikram Sethi",
+            "full_name": test_name,
             "phone": "+91 98765 43210"
         })
         self.assertEqual(res.status_code, 200)
@@ -48,7 +49,7 @@ class TestUserAuthAndStoreCreation(unittest.TestCase):
         self.assertEqual(data["status"], "SUCCESS")
         self.assertTrue(data["authenticated"])
         self.assertEqual(data["user"]["email"], test_email)
-        self.assertEqual(data["user"]["full_name"], "Vikram Sethi")
+        self.assertEqual(data["user"]["full_name"], test_name)
         self.assertTrue(len(data["user"]["store_ids"]) >= 1)
         active_store = data["active_store_id"]
         self.assertIsNotNone(active_store)
@@ -118,6 +119,32 @@ class TestUserAuthAndStoreCreation(unittest.TestCase):
             self.assertEqual(switch_res.status_code, 200)
             data = switch_res.json()
             self.assertEqual(data["active_store_id"], target_store)
+
+    def test_06_reject_duplicate_email_signup(self):
+        """Test that signing up with an already registered email is strictly locked and rejected"""
+        test_email = f"retailer_{self.unique_suffix}@storemail.com"
+        res = self.client.post("/api/auth/signup", json={
+            "email": test_email,
+            "password": "AnotherPassword456",
+            "full_name": "Different Name",
+            "phone": "+91 99999 88888"
+        })
+        self.assertEqual(res.status_code, 400)
+        detail = res.json()["detail"]
+        self.assertIn("already exists", detail.lower())
+
+    def test_07_reject_duplicate_merchant_name_signup(self):
+        """Test that signing up with an already registered merchant full name is strictly locked and rejected"""
+        test_name = f"Vikram Sethi {self.unique_suffix}"
+        res = self.client.post("/api/auth/signup", json={
+            "email": f"completely_new_{self.unique_suffix}@storemail.com",
+            "password": "AnotherPassword456",
+            "full_name": test_name,
+            "phone": "+91 99999 88888"
+        })
+        self.assertEqual(res.status_code, 400)
+        detail = res.json()["detail"]
+        self.assertIn("already exists", detail.lower())
 
 if __name__ == "__main__":
     unittest.main()
