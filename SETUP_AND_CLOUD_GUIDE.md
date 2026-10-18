@@ -99,7 +99,7 @@ python backend/main.py
 
 The FastAPI backend will start on: 👉 **`http://127.0.0.1:8080`**
 
-### 3. Frontend Setup (Next.js 15)
+### 3. Frontend Setup (Next.js 16 & Tailwind CSS v4)
 
 In a separate terminal:
 

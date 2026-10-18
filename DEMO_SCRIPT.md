@@ -75,7 +75,7 @@
 - **Visual**: Switch to **"🏪 Profile"** or show terminal logs showing **🟢 Google Cloud Firestore Live** & **Vertex AI**.
 - **Spoken**:
   > *"Under the hood, PromoMind AI is built for enterprise resilience with a **Dual-Mode Google Cloud Firestore** adapter and **Vertex AI OAuth authentication** in us-central1. It runs offline with local JSON if the shop's internet drops, and auto-syncs to Google Cloud Firestore the moment connectivity returns.*
-  > *The decoupled Next.js 15 frontend logs in within 100 milliseconds, and the entire test suite passes with 100% accuracy.*
+  > *The decoupled Next.js 16 frontend logs in within 100 milliseconds with pure client hydration.*
   > *PromoMind AI turns neighborhood retailers into high-margin, predictive retail powerhouses. Thank you, and we welcome your questions!"*
 
 ---
