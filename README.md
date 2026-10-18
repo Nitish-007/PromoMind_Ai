@@ -11,14 +11,13 @@
 [![Next.js 16](https://img.shields.io/badge/Next.js-black?logo=next.js&logoColor=white)](https://nextjs.org/)
 [![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white)](https://www.docker.com/)
 [![CI/CD](https://img.shields.io/badge/GitHub%20Actions-2088FF?logo=github-actions&logoColor=white)](https://github.com/features/actions)
-[![Demo Video](https://img.shields.io/badge/Demo%20Video-Google%20Drive-34A853?logo=googledrive&logoColor=white)](PASTE_YOUR_DRIVE_LINK_HERE)
 
 ---
 
 ## Video Demo & Walkthrough
 
 **Watch the full end-to-end product demo & walkthrough:**  
-**Google Drive Link**: [Watch PromoMind AI Demo Video](https://drive.google.com/file/d/1k9QPU--VemPFdAjvk4XIM09x5vGEN3ed/view?usp=sharing)
+**Google Drive Link**: [Watch PromoMind AI Demo Video](https://drive.google.com/drive/folders/1gpFn4bSAADl9yBEWeZ-l0ZWATykmxmtU?usp=sharing)
 
 ---
 
