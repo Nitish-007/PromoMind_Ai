@@ -617,6 +617,250 @@
         padding: 1.5rem 1rem;
       }
     }
+
+    /* =========================================================================
+       DARK THEME OVERRIDES (Synchronized with PromoMind AI App globals.css)
+       ========================================================================= */
+    html.dark {
+      --bg: #000000;
+      --bg-subtle: #09090b;
+      --bg-surface: #09090b;
+      --bg-surface-elevated: #18181b;
+      --border: #27272a;
+      --border-bright: #3f3f46;
+      --text: #f4f4f5;
+      --text-muted: #a1a1aa;
+      --text-dim: #71717a;
+      
+      --emerald: #10b981;
+      --emerald-light: rgba(16, 185, 129, 0.12);
+      --emerald-border: rgba(16, 185, 129, 0.35);
+      
+      --indigo: #6366f1;
+      --indigo-light: rgba(99, 102, 241, 0.12);
+      --indigo-border: rgba(99, 102, 241, 0.35);
+      
+      --violet: #8b5cf6;
+      --violet-light: rgba(139, 92, 246, 0.12);
+      --violet-border: rgba(139, 92, 246, 0.35);
+      
+      --amber: #f59e0b;
+      --amber-light: rgba(245, 158, 11, 0.12);
+      --amber-border: rgba(245, 158, 11, 0.35);
+      
+      --cyan: #06b6d4;
+      --cyan-light: rgba(6, 182, 212, 0.12);
+      --cyan-border: rgba(6, 182, 212, 0.35);
+      
+      --rose: #f43f5e;
+      --rose-light: rgba(244, 63, 94, 0.12);
+      --rose-border: rgba(244, 63, 94, 0.35);
+    }
+
+    html.dark body {
+      background-color: #000000;
+      color: #f4f4f5;
+      background-image: 
+        radial-gradient(circle at 10% 10%, rgba(99, 102, 241, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 90% 20%, rgba(16, 185, 129, 0.06) 0%, transparent 40%),
+        radial-gradient(circle at 50% 90%, rgba(6, 182, 212, 0.05) 0%, transparent 50%);
+    }
+
+    html.dark .topbar {
+      background: rgba(9, 9, 11, 0.88);
+      border-bottom: 1px solid var(--border);
+    }
+
+    html.dark .brand-title {
+      color: #ffffff;
+    }
+
+    html.dark .brand-title span {
+      color: #a1a1aa;
+    }
+
+    html.dark .version-tag {
+      background: #18181b;
+      color: #a1a1aa;
+      border-color: #27272a;
+    }
+
+    html.dark h1.doc-hero-title,
+    html.dark h2.section-title,
+    html.dark h3.subsection-title,
+    html.dark strong {
+      color: #f4f4f5;
+    }
+
+    html.dark .btn-outline {
+      background: #09090b;
+      color: #f4f4f5;
+      border-color: var(--border);
+    }
+
+    html.dark .btn-outline:hover {
+      background: #18181b;
+      color: #ffffff;
+      border-color: var(--border-bright);
+    }
+
+    html.dark .btn-primary {
+      background: #f4f4f5;
+      color: #09090b;
+      border-color: #f4f4f5;
+    }
+
+    html.dark .btn-primary:hover {
+      background: #ffffff;
+      color: #000000;
+    }
+
+    html.dark .glass-card {
+      background: #09090b;
+      border-color: var(--border);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+    }
+
+    html.dark .glass-card.highlight {
+      background: linear-gradient(180deg, rgba(30, 27, 75, 0.25) 0%, #09090b 100%);
+      border-color: rgba(99, 102, 241, 0.35);
+    }
+
+    html.dark .glass-card.emerald-highlight {
+      background: linear-gradient(180deg, rgba(6, 78, 59, 0.25) 0%, #09090b 100%);
+      border-color: rgba(16, 185, 129, 0.35);
+    }
+
+    html.dark .table-container {
+      background: #09090b;
+      border-color: var(--border);
+    }
+
+    html.dark table.spec-table th {
+      background: #18181b;
+      color: #f4f4f5;
+      border-bottom: 1px solid var(--border);
+    }
+
+    html.dark table.spec-table td {
+      background: #09090b;
+      color: #a1a1aa;
+      border-bottom: 1px solid var(--border);
+    }
+
+    html.dark table.spec-table tr:hover td {
+      background: #18181b;
+    }
+
+    html.dark .math-callout {
+      background: #0d1117;
+      border-color: var(--border);
+      border-left-color: #10b981;
+      color: #f4f4f5;
+    }
+
+    html.dark .math-callout p,
+    html.dark .math-callout .katex-display {
+      color: #f4f4f5;
+    }
+
+    html.dark .collateral-card {
+      background: #09090b;
+      border-color: var(--border);
+    }
+
+    html.dark .horizon-card {
+      background: #09090b;
+      border-color: var(--border);
+    }
+
+    html.dark .horizon-card h4 {
+      color: #f4f4f5 !important;
+    }
+
+    html.dark .horizon-card p {
+      color: #a1a1aa !important;
+    }
+
+    html.dark .sidebar-meta-box {
+      background: #09090b;
+      border-color: var(--border);
+    }
+
+    html.dark .sidebar-meta-box strong {
+      color: #f4f4f5;
+    }
+
+    html.dark .sidebar-meta-box p {
+      color: #a1a1aa;
+    }
+
+    html.dark .toc-item a {
+      color: #a1a1aa;
+    }
+
+    html.dark .toc-item a:hover {
+      color: #ffffff;
+      background: #18181b;
+    }
+
+    html.dark .badge {
+      background: #18181b;
+      color: #a1a1aa;
+      border-color: var(--border);
+    }
+
+    html.dark .arch-diagram-wrap {
+      background: #09090b;
+      border-color: var(--border);
+    }
+
+    /* Architecture SVG Dark Mode Styling */
+    html.dark .svg-canvas { fill: #090d16 !important; stroke: #1e293b !important; }
+    html.dark .svg-core-card { fill: #141c2e !important; stroke: #6366f1 !important; }
+    html.dark .svg-core-header { fill: #1e293b !important; }
+    html.dark .svg-core-title { fill: #ffffff !important; }
+    html.dark .svg-core-sub { fill: #94a3b8 !important; }
+    html.dark .svg-divider { stroke: #1e293b !important; }
+    html.dark .svg-core-metric1 { fill: #10b981 !important; }
+    html.dark .svg-core-metric2 { fill: #38bdf8 !important; }
+    
+    html.dark .svg-node-card { fill: #0f172a !important; }
+    html.dark .svg-node-sub { fill: #cbd5e1 !important; }
+    html.dark .svg-node-detail { fill: #64748b !important; }
+
+    html.dark .svg-lobe1-header { fill: #2e1065 !important; }
+    html.dark .svg-lobe1-title { fill: #c084fc !important; }
+    html.dark .svg-lobe2-header { fill: #083344 !important; }
+    html.dark .svg-lobe2-title { fill: #22d3ee !important; }
+    html.dark .svg-lobe3-header { fill: #022c22 !important; }
+    html.dark .svg-lobe3-title { fill: #34d399 !important; }
+    html.dark .svg-lobe4-header { fill: #451a03 !important; }
+    html.dark .svg-lobe4-title { fill: #fbbf24 !important; }
+
+    html.dark .svg-db-card { fill: #1e1b4b !important; stroke: #818cf8 !important; }
+    html.dark .svg-db-header { fill: #2e1065 !important; }
+    html.dark .svg-db-title { fill: #c7d2fe !important; }
+    html.dark .svg-db-sub { fill: #818cf8 !important; }
+
+    html.dark .mockup-whatsapp {
+      background: #0b141a !important;
+      border-color: #202c33 !important;
+      color: #e9edef !important;
+    }
+
+    html.dark .mockup-poster {
+      background: #1c1917 !important;
+      border-color: #44403c !important;
+      color: #fde047 !important;
+    }
+
+    html.dark .mockup-cashier {
+      background: #18181b !important;
+      border-color: #27272a !important;
+      color: #f4f4f5 !important;
+    }
+
   </style>
 </head>
 <body>
@@ -634,6 +878,10 @@
     </a>
 
     <div class="top-actions">
+      <!-- Theme Toggle Button -->
+      <button id="themeToggleBtn" onclick="toggleTheme()" class="btn btn-outline" title="Toggle Light / Dark Theme" style="padding: 0.5rem 0.65rem;">
+        <span id="themeIcon">🌙</span>
+      </button>
       <a href="/" class="btn btn-emerald">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         Launch Dashboard
@@ -774,7 +1022,7 @@
         <div class="arch-diagram-wrap">
           <svg viewBox="0 0 920 480" fill="none" xmlns="http://www.w3.org/2000/svg">
             <!-- Background Grids & Connectors Canvas -->
-            <rect width="920" height="480" rx="12" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"/>
+            <rect class="svg-canvas" width="920" height="480" rx="12" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"/>
             
             <!-- Connector Lines (Subtle Gray/Indigo Flow) -->
             <path d="M270 95 L330 185" stroke="#7c3aed" stroke-width="1.5" stroke-dasharray="4 4"/>
@@ -784,53 +1032,53 @@
             <line x1="460" y1="310" x2="460" y2="390" stroke="#4f46e5" stroke-width="2"/>
 
             <!-- Central Neural Hub Node -->
-            <rect x="330" y="160" width="260" height="150" rx="16" fill="#ffffff" stroke="#4f46e5" stroke-width="2"/>
-            <rect x="330" y="160" width="260" height="38" rx="16" fill="#eef2ff"/>
-            <rect x="330" y="186" width="260" height="12" fill="#eef2ff"/>
-            <text x="460" y="185" fill="#1e1b4b" font-size="15" font-weight="700" text-anchor="middle" font-family="Inter, sans-serif">PromoMind Neural Core</text>
-            <text x="460" y="218" fill="#52525b" font-size="11" font-weight="500" text-anchor="middle" font-family="Inter, sans-serif">FastAPI Asynchronous Orchestrator</text>
-            <line x1="360" y1="232" x2="560" y2="232" stroke="#e4e4e7" stroke-width="1"/>
-            <text x="460" y="255" fill="#047857" font-size="11" font-weight="600" text-anchor="middle" font-family="Inter, sans-serif">Constraint Solver: Margin Floor ≥ 18%</text>
-            <text x="460" y="278" fill="#0284c7" font-size="11" font-weight="600" text-anchor="middle" font-family="Inter, sans-serif">Holt-Winters + Deterministic PED</text>
+            <rect class="svg-core-card" x="330" y="160" width="260" height="150" rx="16" fill="#ffffff" stroke="#4f46e5" stroke-width="2"/>
+            <rect class="svg-core-header" x="330" y="160" width="260" height="38" rx="16" fill="#eef2ff"/>
+            <rect class="svg-core-header" x="330" y="186" width="260" height="12" fill="#eef2ff"/>
+            <text class="svg-core-title" x="460" y="185" fill="#1e1b4b" font-size="15" font-weight="700" text-anchor="middle" font-family="Inter, sans-serif">PromoMind Neural Core</text>
+            <text class="svg-core-sub" x="460" y="218" fill="#52525b" font-size="11" font-weight="500" text-anchor="middle" font-family="Inter, sans-serif">FastAPI Asynchronous Orchestrator</text>
+            <line class="svg-divider" x1="360" y1="232" x2="560" y2="232" stroke="#e4e4e7" stroke-width="1"/>
+            <text class="svg-core-metric1" x="460" y="255" fill="#047857" font-size="11" font-weight="600" text-anchor="middle" font-family="Inter, sans-serif">Constraint Solver: Margin Floor ≥ 18%</text>
+            <text class="svg-core-metric2" x="460" y="278" fill="#0284c7" font-size="11" font-weight="600" text-anchor="middle" font-family="Inter, sans-serif">Holt-Winters + Deterministic PED</text>
 
             <!-- Lobe 1: Cognitive Vertex AI Gemini (Top Left) -->
-            <rect x="40" y="40" width="230" height="90" rx="10" fill="#ffffff" stroke="#7c3aed" stroke-width="1.5"/>
-            <rect x="40" y="40" width="230" height="28" rx="10" fill="#f5f3ff"/>
-            <rect x="40" y="58" width="230" height="10" fill="#f5f3ff"/>
-            <text x="155" y="60" fill="#6d28d9" font-size="12" font-weight="700" text-anchor="middle" font-family="Inter, sans-serif">🧠 Vertex AI Gemini Models</text>
-            <text x="155" y="90" fill="#3f3f46" font-size="10.5" font-weight="500" text-anchor="middle" font-family="Inter, sans-serif">Dynamic Multi-Step Reasoning</text>
-            <text x="155" y="108" fill="#71717a" font-size="10" text-anchor="middle" font-family="Inter, sans-serif">Grounding & State Inspection</text>
+            <rect class="svg-node-card" x="40" y="40" width="230" height="90" rx="10" fill="#ffffff" stroke="#7c3aed" stroke-width="1.5"/>
+            <rect class="svg-lobe1-header" x="40" y="40" width="230" height="28" rx="10" fill="#f5f3ff"/>
+            <rect class="svg-lobe1-header" x="40" y="58" width="230" height="10" fill="#f5f3ff"/>
+            <text class="svg-lobe1-title" x="155" y="60" fill="#6d28d9" font-size="12" font-weight="700" text-anchor="middle" font-family="Inter, sans-serif">🧠 Vertex AI Gemini Models</text>
+            <text class="svg-node-sub" x="155" y="90" fill="#3f3f46" font-size="10.5" font-weight="500" text-anchor="middle" font-family="Inter, sans-serif">Dynamic Multi-Step Reasoning</text>
+            <text class="svg-node-detail" x="155" y="108" fill="#71717a" font-size="10" text-anchor="middle" font-family="Inter, sans-serif">Grounding & State Inspection</text>
 
             <!-- Lobe 2: Worldwide Festival Engine (Bottom Left) -->
-            <rect x="40" y="320" width="230" height="90" rx="10" fill="#ffffff" stroke="#0284c7" stroke-width="1.5"/>
-            <rect x="40" y="320" width="230" height="28" rx="10" fill="#ecfeff"/>
-            <rect x="40" y="338" width="230" height="10" fill="#ecfeff"/>
-            <text x="155" y="340" fill="#0369a1" font-size="12" font-weight="700" text-anchor="middle" font-family="Inter, sans-serif">🪔 3-Horizon Festival Engine</text>
-            <text x="155" y="370" fill="#3f3f46" font-size="10.5" font-weight="500" text-anchor="middle" font-family="Inter, sans-serif">Live Regional Discovery (7+ Regions)</text>
-            <text x="155" y="388" fill="#71717a" font-size="10" text-anchor="middle" font-family="Inter, sans-serif">T-14d, T-7d, T+2d Deadlines</text>
+            <rect class="svg-node-card" x="40" y="320" width="230" height="90" rx="10" fill="#ffffff" stroke="#0284c7" stroke-width="1.5"/>
+            <rect class="svg-lobe2-header" x="40" y="320" width="230" height="28" rx="10" fill="#ecfeff"/>
+            <rect class="svg-lobe2-header" x="40" y="338" width="230" height="10" fill="#ecfeff"/>
+            <text class="svg-lobe2-title" x="155" y="340" fill="#0369a1" font-size="12" font-weight="700" text-anchor="middle" font-family="Inter, sans-serif">🪔 3-Horizon Festival Engine</text>
+            <text class="svg-node-sub" x="155" y="370" fill="#3f3f46" font-size="10.5" font-weight="500" text-anchor="middle" font-family="Inter, sans-serif">Live Regional Discovery (7+ Regions)</text>
+            <text class="svg-node-detail" x="155" y="388" fill="#71717a" font-size="10" text-anchor="middle" font-family="Inter, sans-serif">T-14d, T-7d, T+2d Deadlines</text>
 
             <!-- Right Lobe 3: Deterministic Price Elasticity & Holt-Winters (Top Right) -->
-            <rect x="650" y="40" width="230" height="90" rx="10" fill="#ffffff" stroke="#059669" stroke-width="1.5"/>
-            <rect x="650" y="40" width="230" height="28" rx="10" fill="#ecfdf5"/>
-            <rect x="650" y="58" width="230" height="10" fill="#ecfdf5"/>
-            <text x="765" y="60" fill="#047857" font-size="12" font-weight="700" text-anchor="middle" font-family="Inter, sans-serif">📐 Deterministic Math Engine</text>
-            <text x="765" y="90" fill="#3f3f46" font-size="10.5" font-weight="500" text-anchor="middle" font-family="Inter, sans-serif">PED Formula Solver (%ΔQ = -ε %ΔP)</text>
-            <text x="765" y="108" fill="#71717a" font-size="10" text-anchor="middle" font-family="Inter, sans-serif">Holt-Winters Smoothing Projections</text>
+            <rect class="svg-node-card" x="650" y="40" width="230" height="90" rx="10" fill="#ffffff" stroke="#059669" stroke-width="1.5"/>
+            <rect class="svg-lobe3-header" x="650" y="40" width="230" height="28" rx="10" fill="#ecfdf5"/>
+            <rect class="svg-lobe3-header" x="650" y="58" width="230" height="10" fill="#ecfdf5"/>
+            <text class="svg-lobe3-title" x="765" y="60" fill="#047857" font-size="12" font-weight="700" text-anchor="middle" font-family="Inter, sans-serif">📐 Deterministic Math Engine</text>
+            <text class="svg-node-sub" x="765" y="90" fill="#3f3f46" font-size="10.5" font-weight="500" text-anchor="middle" font-family="Inter, sans-serif">PED Formula Solver (%ΔQ = -ε %ΔP)</text>
+            <text class="svg-node-detail" x="765" y="108" fill="#71717a" font-size="10" text-anchor="middle" font-family="Inter, sans-serif">Holt-Winters Smoothing Projections</text>
 
             <!-- Right Lobe 4: Collateral Studio Action Cortex (Bottom Right) -->
-            <rect x="650" y="320" width="230" height="90" rx="10" fill="#ffffff" stroke="#d97706" stroke-width="1.5"/>
-            <rect x="650" y="320" width="230" height="28" rx="10" fill="#fffbeb"/>
-            <rect x="650" y="338" width="230" height="10" fill="#fffbeb"/>
-            <text x="765" y="340" fill="#b45309" font-size="12" font-weight="700" text-anchor="middle" font-family="Inter, sans-serif">📣 Omnichannel Action Cortex</text>
-            <text x="765" y="370" fill="#3f3f46" font-size="10.5" font-weight="500" text-anchor="middle" font-family="Inter, sans-serif">Customer WhatsApp Broadcast</text>
-            <text x="765" y="388" fill="#71717a" font-size="10" text-anchor="middle" font-family="Inter, sans-serif">Printable Shelf Poster & Barcodes</text>
+            <rect class="svg-node-card" x="650" y="320" width="230" height="90" rx="10" fill="#ffffff" stroke="#d97706" stroke-width="1.5"/>
+            <rect class="svg-lobe4-header" x="650" y="320" width="230" height="28" rx="10" fill="#fffbeb"/>
+            <rect class="svg-lobe4-header" x="650" y="338" width="230" height="10" fill="#fffbeb"/>
+            <text class="svg-lobe4-title" x="765" y="340" fill="#b45309" font-size="12" font-weight="700" text-anchor="middle" font-family="Inter, sans-serif">📣 Omnichannel Action Cortex</text>
+            <text class="svg-node-sub" x="765" y="370" fill="#3f3f46" font-size="10.5" font-weight="500" text-anchor="middle" font-family="Inter, sans-serif">Customer WhatsApp Broadcast</text>
+            <text class="svg-node-detail" x="765" y="388" fill="#71717a" font-size="10" text-anchor="middle" font-family="Inter, sans-serif">Printable Shelf Poster & Barcodes</text>
 
             <!-- Cloud Database Spine (Bottom Center) -->
-            <rect x="350" y="390" width="220" height="60" rx="8" fill="#ffffff" stroke="#4338ca" stroke-width="1.5"/>
-            <rect x="350" y="390" width="220" height="24" rx="8" fill="#eef2ff"/>
-            <rect x="350" y="406" width="220" height="8" fill="#eef2ff"/>
-            <text x="460" y="408" fill="#3730a3" font-size="11.5" font-weight="700" text-anchor="middle" font-family="Inter, sans-serif">🔥 Google Cloud Firestore</text>
-            <text x="460" y="432" fill="#4f46e5" font-size="10" font-weight="600" text-anchor="middle" font-family="Inter, sans-serif">Pure CLOUD Mode (Zero-Local Fallback)</text>
+            <rect class="svg-db-card" x="350" y="390" width="220" height="60" rx="8" fill="#ffffff" stroke="#4338ca" stroke-width="1.5"/>
+            <rect class="svg-db-header" x="350" y="390" width="220" height="24" rx="8" fill="#eef2ff"/>
+            <rect class="svg-db-header" x="350" y="406" width="220" height="8" fill="#eef2ff"/>
+            <text class="svg-db-title" x="460" y="408" fill="#3730a3" font-size="11.5" font-weight="700" text-anchor="middle" font-family="Inter, sans-serif">🔥 Google Cloud Firestore</text>
+            <text class="svg-db-sub" x="460" y="432" fill="#4f46e5" font-size="10" font-weight="600" text-anchor="middle" font-family="Inter, sans-serif">Pure CLOUD Mode (Zero-Local Fallback)</text>
           </svg>
         </div>
       </section>
@@ -1098,7 +1346,7 @@
               <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
               WhatsApp Customer Broadcast
             </div>
-            <div class="mockup-text" style="background:#f0fdf4; border-color:#bbf7d0; color:#14532d;">
+            <div class="mockup-text mockup-whatsapp" style="background:#f0fdf4; border-color:#bbf7d0; color:#14532d;">
 ✨ *Sharma Supermarket Festive Special!* ✨
 Save flat ₹71 on our Festive Chai &amp; Dry Fruits Hamper!
 
@@ -1118,7 +1366,7 @@ Save flat ₹71 on our Festive Chai &amp; Dry Fruits Hamper!
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
               Printable Shelf Poster &amp; Barcode
             </div>
-            <div class="mockup-text" style="text-align:center; background:#fffbeb; border-color:#fde68a; color:#78350f; font-family:var(--font-mono);">
+            <div class="mockup-text mockup-poster" style="text-align:center; background:#fffbeb; border-color:#fde68a; color:#78350f; font-family:var(--font-mono);">
 *FESTIVE MEGA SAVER COMBO*
 ⭐ SAVE FLAT ₹71 ⭐
 MRP: ~~₹840~~ | **OFFER: ₹769**
@@ -1217,5 +1465,31 @@ stores/{store_id}/
     </main>
   </div>
 
+
+  <!-- Theme Synchronization Script with PromoMind AI App -->
+  <script>
+    function applySavedTheme() {
+      var savedTheme = localStorage.getItem("promomind_theme") || "light";
+      var icon = document.getElementById("themeIcon");
+      if (savedTheme === "dark") {
+        document.documentElement.classList.add("dark");
+        if (icon) icon.textContent = "☀️";
+      } else {
+        document.documentElement.classList.remove("dark");
+        if (icon) icon.textContent = "🌙";
+      }
+    }
+
+    function toggleTheme() {
+      var isDark = document.documentElement.classList.contains("dark");
+      var newTheme = isDark ? "light" : "dark";
+      localStorage.setItem("promomind_theme", newTheme);
+      applySavedTheme();
+    }
+
+    // Run theme application immediately on DOM ready
+    applySavedTheme();
+    document.addEventListener("DOMContentLoaded", applySavedTheme);
+  </script>
 </body>
 </html>
